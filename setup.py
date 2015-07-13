@@ -1,5 +1,5 @@
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -40,7 +40,7 @@ setup(
     ],
 
     keywords='database versioning backup dynamodb bigtable mongodb',
-    packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
+    packages=['gludb'],
 
     # TODO: Requirements
     install_requires=[],

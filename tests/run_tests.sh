@@ -36,9 +36,10 @@ else
     virtualenv -p $VE_VER "$VE_DIR"
     source "$VE_DIR/bin/activate"
     pip install --upgrade -r ../dev-requirements.txt
+    pip install -e ..
 fi
 
 echo "Using nose version:"
 nosetests --version
 
-nosetests
+nosetests -w "$SCRIPT_DIR"

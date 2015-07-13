@@ -1,8 +1,9 @@
-from functools import wraps
+def DBObject(table_name, versioning):
+    """Classes annotated with DBObject gain persistence methods
 
-# TODO: this is just a single object for package testing
-#       it will change when we actually decide on a namespace
-def DataObject(f):
-    # TODO: actual work
-    return f
-    
+    TODO: documentation
+    """
+    def wrapped(cls):
+        # TODO: actually add methods
+        return cls
+    return wrapped
