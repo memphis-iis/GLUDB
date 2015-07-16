@@ -30,11 +30,32 @@ class Storable(_with_metaclass(ABCMeta)):
     all annotated classes as 'virtual base classes' of Storage so that you
     can test them with isinstance(obj, Storable)
     """
+
+    @abstractmethod
+    def get_id(self):
+        """The instance should return the current key/ID for the instance. If
+        a 'falsey' value is return, on save one will be created and set via a
+        call to self.set_id
+        """
+        pass
+
+    @abstractmethod
+    def set_id(self, new_id):
+        """The instance should accept a new key/ID. See also get_id
+        """
+        pass
+
     @abstractmethod
     def to_data(self):
+        """The instance should return JSON representation of it's internal
+        state. See also from_data
+        """
         pass
 
     @classmethod
     @abstractmethod
     def from_data(self):
+        """This classmethod returns a new instance of the subclass populated
+        from the JSON representation
+        """
         pass

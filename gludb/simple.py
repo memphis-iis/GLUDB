@@ -49,6 +49,14 @@ def _auto_init(self, *args, **kwrds):
         self.setup(*args, **kwrds)
 
 
+def _get_id(self):
+    return self.id
+
+
+def _set_id(self, new_id):
+    self.id = new_id
+
+
 def _to_data(self):
     data = dict([
         (fld.name, getattr(self, fld.name, fld.default))
@@ -66,6 +74,7 @@ def DBObject(table_name, versioning):
     """Classes annotated with DBObject gain persistence methods.
     """
     def wrapped(cls):
+        field_names = set()
         all_fields = []
 
         for name in dir(cls):
@@ -73,6 +82,10 @@ def DBObject(table_name, versioning):
             if fld and isinstance(fld, Field):
                 fld.name = name
                 all_fields.append(fld)
+                field_names.add(name)
+
+        if 'id' not in field_names:
+            all_fields.insert(0, Field('id', default=None))
 
         # Things we count on as part of our processing
         cls.__table_name__ = table_name
@@ -83,6 +96,8 @@ def DBObject(table_name, versioning):
         cls.__init__ = _auto_init
 
         # Duck-type the class for our data methods
+        cls.get_id = _get_id
+        cls.set_id = _set_id
         cls.to_data = _to_data
         cls.from_data = classmethod(_from_data)
 
