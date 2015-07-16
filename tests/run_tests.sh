@@ -1,17 +1,19 @@
 #!/bin/bash
 
-set -e
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
-if [ "x$2" != "x" ];
-then
-    echo "Only one run mode at a time!"
-    exit 1
-fi
+# Get $1 for the python number and then shift 0 and 1
+# out so that we can pass parm along with $*
+py_ver="$1"
+shift
 
-case "$1" in
+# Stop on any failures - note that we do this AFTER our
+# shift calls above
+set -e
+
+# Figure out to do about our python version
+case "$py_ver" in
     2)
         VE_VER=python2
         VE_DIR="$SCRIPT_DIR/env2"
@@ -23,10 +25,11 @@ case "$1" in
         ;;
 
     *)
-        echo "Run with 2 or 3 for Python2 or Python3 testing"
+        echo "Run with 2 or 3 for Python2 or Python3 testing, all other parms passed to nose"
         exit 2
 esac
 
+# Use our virtualenv (and create if necessary)
 if [ -d "$VE_DIR" ];
 then
     echo "$VE_DIR already exists"
@@ -39,7 +42,10 @@ else
     pip install -e ..
 fi
 
-echo "Using nose version:"
-nosetests --version
+# Tell what we're doing and then do it
+# Note that python 2 send --version to stderr, but 3 sends to stdout
+echo "Using Python version: $(python --version 2>&1)"
+echo "Using nose version: $(nosetests --version)"
+echo nosetests -w "$SCRIPT_DIR" $*
 
-nosetests -w "$SCRIPT_DIR"
+nosetests -w "$SCRIPT_DIR" $*
