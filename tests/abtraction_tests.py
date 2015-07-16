@@ -58,5 +58,12 @@ class BasicAbstractionTesting(unittest.TestCase):
         self.assertEquals('abc', s2.descrip)
         self.assertEquals(101, s2.age)
 
-# TODO: prop sets
-# TODO: setup() call test (no params, args, and keywords)
+    def test_prop_sets(self):
+        s = SimpleData(name='Bob', descrip='abc', age=101)
+        s.name = 'Alice'
+        s.descrip = 'xyz'
+        s.age = -42
+        s2 = SimpleData.from_data(s.to_data())
+        self.assertEquals('Alice', s2.name)
+        self.assertEquals('xyz', s2.descrip)
+        self.assertEquals(-42, s2.age)
