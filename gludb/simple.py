@@ -85,7 +85,9 @@ def DBObject(table_name, versioning):
                 field_names.add(name)
 
         if 'id' not in field_names:
-            all_fields.insert(0, Field('id', default=''))
+            fld = Field(default='')
+            fld.name = 'id'
+            all_fields.insert(0, fld)
 
         # Things we count on as part of our processing
         cls.__table_name__ = table_name
