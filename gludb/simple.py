@@ -21,7 +21,6 @@ See gludb.data if you need custom or more advanced functionality.
         print obj.to_data()
 """
 
-# TODO: key support
 # TODO: Indexing support
 # TODO: nested objects, lists, lists of nested objects
 
