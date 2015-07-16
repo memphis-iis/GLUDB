@@ -1,3 +1,7 @@
+# Project specific
+tests/env2/
+tests/env3/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
