@@ -43,8 +43,7 @@ def _auto_init(self, *args, **kwrds):
     """
     for fld in getattr(self, '__fields__', []):
         val = kwrds.get(fld.name, fld.default)
-        if not (val is None):
-            setattr(self, fld.name, val)
+        setattr(self, fld.name, val)
 
     if callable(getattr(self, 'setup', None)):
         self.setup(*args, **kwrds)
@@ -86,7 +85,7 @@ def DBObject(table_name, versioning):
                 field_names.add(name)
 
         if 'id' not in field_names:
-            all_fields.insert(0, Field('id', default=None))
+            all_fields.insert(0, Field('id', default=''))
 
         # Things we count on as part of our processing
         cls.__table_name__ = table_name
