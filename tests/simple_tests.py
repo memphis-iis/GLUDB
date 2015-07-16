@@ -33,17 +33,20 @@ class BasicAbstractionTesting(unittest.TestCase):
 
     def test_setup_called(self):
         s = SetupData('passthru', name='R')
-        self.assertTrue('passthru', s.found_arg)
-        self.assertTrue('R', s.found_name)
-        self.assertTrue("Hellow World R", s.extra_data)
+        self.assertEquals('', s.id)
+        self.assertEquals('passthru', s.found_arg)
+        self.assertEquals('R', s.found_name)
+        self.assertEquals("Hello World R", s.extra_data)
 
     def test_fields(self):
         s = SimpleData()
+        self.assertEquals('', s.id)
         self.assertEquals('default name', s.name)
         self.assertEquals('', s.descrip)
         self.assertEquals(42, s.age)
 
         s = SimpleData(name='Bob', descrip='abc', age=101)
+        self.assertEquals('', s.id)
         self.assertEquals('Bob', s.name)
         self.assertEquals('abc', s.descrip)
         self.assertEquals(101, s.age)
@@ -54,6 +57,7 @@ class BasicAbstractionTesting(unittest.TestCase):
         s2 = SimpleData.from_data(data)
         self.assertEquals(data, s2.to_data())
 
+        self.assertEquals('', s2.id)
         self.assertEquals('Bob', s2.name)
         self.assertEquals('abc', s2.descrip)
         self.assertEquals(101, s2.age)
@@ -64,6 +68,39 @@ class BasicAbstractionTesting(unittest.TestCase):
         s.descrip = 'xyz'
         s.age = -42
         s2 = SimpleData.from_data(s.to_data())
+        self.assertEquals('', s2.id)
         self.assertEquals('Alice', s2.name)
         self.assertEquals('xyz', s2.descrip)
         self.assertEquals(-42, s2.age)
+
+    def test_id(self):
+        s = SimpleData(id='key', name='Bob', descrip='abc', age=101)
+        self.assertEquals('key', s.id)
+        self.assertEquals('key', s.get_id())
+        self.assertEquals('Bob', s.name)
+        self.assertEquals('abc', s.descrip)
+        self.assertEquals(101, s.age)
+
+        # Direct setting
+        s.id = 'key2'
+        self.assertEquals('key2', s.id)
+        self.assertEquals('key2', s.get_id())
+
+        s2 = SimpleData.from_data(s.to_data())
+        self.assertEquals('key2', s2.id)
+        self.assertEquals('key2', s2.get_id())
+        self.assertEquals('Bob', s2.name)
+        self.assertEquals('abc', s2.descrip)
+        self.assertEquals(101, s2.age)
+
+        # Use the set_id method required by Storable
+        s.set_id('key3')
+        self.assertEquals('key3', s.id)
+        self.assertEquals('key3', s.get_id())
+
+        s2 = SimpleData.from_data(s.to_data())
+        self.assertEquals('key3', s2.id)
+        self.assertEquals('key3', s2.get_id())
+        self.assertEquals('Bob', s2.name)
+        self.assertEquals('abc', s2.descrip)
+        self.assertEquals(101, s2.age)
