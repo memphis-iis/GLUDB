@@ -42,7 +42,6 @@ setup(
     keywords='database versioning backup dynamodb bigtable mongodb',
     packages=['gludb'],
 
-    # TODO: Requirements
     install_requires=[],
 
     # List additional groups of dependencies here (e.g. development
