@@ -1,6 +1,8 @@
 GLUDB
 =============
 
+![Travis CI Build State](https://travis-ci.org/memphis-iis/GLUDB.svg?branch=master)
+
 Generalized Learning Utilities Database Library
 
 For more GLU, see also
