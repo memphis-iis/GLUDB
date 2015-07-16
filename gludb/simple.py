@@ -43,7 +43,8 @@ def _auto_init(self, *args, **kwrds):
     """
     for fld in getattr(self, '__fields__', []):
         val = kwrds.get(fld.name, fld.default)
-        setattr(self, fld.name, val)
+        if not (val is None):
+            setattr(self, fld.name, val)
 
     if callable(getattr(self, 'setup', None)):
         self.setup(*args, **kwrds)
