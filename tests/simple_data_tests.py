@@ -51,7 +51,7 @@ class DefaultStorageTesting(unittest.TestCase):
 
         all_recs = SimpleStorage.find_all()
         self.assertEqual(1, len(all_recs))
-        self.assertEquals(s2.to_data(), all_recs[0])
+        self.assertEquals(s2.to_data(), all_recs[0].to_data())
 
 
 # Same tests as DefaultStorageTesting but with differnt setUp/tearDown

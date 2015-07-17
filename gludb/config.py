@@ -16,16 +16,16 @@ class Database(object):
         self.backend = Backend(**kwrds)
 
     def ensure_table(self, cls):
-        self.backend.ensure_table(cls)
+        return self.backend.ensure_table(cls)
 
     def find_one(self, cls, id):
-        self.backend.find_one(cls, id)
+        return self.backend.find_one(cls, id)
 
     def find_all(self, cls):
-        self.backend.find_all(cls)
+        return self.backend.find_all(cls)
 
     def save(self, obj):
-        self.backend.save(obj)
+        return self.backend.save(obj)
 
 
 class _DatabaseMapping(object):
