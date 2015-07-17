@@ -1,3 +1,7 @@
+"""Testing all the functionality in gludb.simple *except* for actual
+data storage (that's in simple_data_tests.py)
+"""
+
 import unittest
 
 from gludb.simple import DBObject, Field
