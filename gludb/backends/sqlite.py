@@ -10,26 +10,24 @@ class Backend(object):
         if not self.filename:
             raise ValueError('sqlite backend requires a filename parameter')
 
+        self.conn = sqlite3.connect(self.filename)
+
     def ensure_table(self, cls):
-        conn = sqlite3.connect(self.filename)
-        cur = conn.cursor()
+        cur = self.conn.cursor()
 
         cur.execute(
             'create table if not exists ' + cls.get_table_name() +
             ' (id text primary key, value text)'
         )
-        conn.commit()
-
+        self.conn.commit()
         cur.close()
-        conn.close()
 
     def find_one(self, cls, id):
-        conn = sqlite3.connect(self.filename)
-        cur = conn.cursor()
+        cur = self.conn.cursor()
 
         cur.execute(
             'select id,value from ' + cls.get_table_name() + ' where id = ?',
-            id
+            (id,)
         )
 
         rec = cur.fetchone()
@@ -38,16 +36,13 @@ class Backend(object):
         assert id == obj.id
 
         cur.close()
-        conn.close()
 
         return obj
 
     def find_all(self, cls):
+        cur = self.conn.cursor()
+
         found = []
-
-        conn = sqlite3.connect(self.filename)
-        cur = conn.cursor()
-
         for row in cur.execute('select id,value from ' + cls.get_table_name()):
             id, data = row[0], row[1]
             obj = cls.from_data(data)
@@ -55,13 +50,11 @@ class Backend(object):
             found.append(obj)
 
         cur.close()
-        conn.close()
 
         return found
 
     def save(self, obj):
-        conn = sqlite3.connect(self.filename)
-        cur = conn.cursor()
+        cur = self.conn.cursor()
 
         tabname = obj.__class__.get_table_name()
 
@@ -73,7 +66,6 @@ class Backend(object):
             'insert or replace into ' + tabname + '(id,value) values (?, ?)',
             (obj.id, obj.to_data())
         )
-        conn.commit()
+        self.conn.commit()
 
         cur.close()
-        conn.close()
