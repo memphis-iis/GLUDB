@@ -31,6 +31,11 @@ class BasicAbstractionTesting(unittest.TestCase):
             self.assertTrue(issubclass(cls, Storable))
             self.assertTrue(isinstance(cls(), Storable))
 
+    def test_storage_metadata(self):
+        s = SimpleData()
+        self.assertEquals('SimpleTest', s.get_table_name())
+        self.assertEquals(gludb.versioning.NONE, s.get_versioning())
+
     def test_setup_called(self):
         s = SetupData('passthru', name='R')
         self.assertEquals('', s.id)

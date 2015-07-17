@@ -32,7 +32,7 @@ from .data import Storable
 class Field(object):
     """Support for class-level field declaration.
     """
-    def __init__(self, default=''):
+    def __init__(self, default='', indexed=False):
         self.name = None
         self.default = default
 
@@ -46,6 +46,14 @@ def _auto_init(self, *args, **kwrds):
 
     if callable(getattr(self, 'setup', None)):
         self.setup(*args, **kwrds)
+
+
+def _get_table_name(self):
+    return self.__table_name__
+
+
+def _get_versioning(self):
+    return self.__versioning__
 
 
 def _get_id(self):
@@ -97,6 +105,8 @@ def DBObject(table_name, versioning):
         cls.__init__ = _auto_init
 
         # Duck-type the class for our data methods
+        cls.get_table_name = _get_table_name
+        cls.get_versioning = _get_versioning
         cls.get_id = _get_id
         cls.set_id = _set_id
         cls.to_data = _to_data
