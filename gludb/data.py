@@ -32,12 +32,14 @@ class Storable(_with_metaclass(ABCMeta)):
     all annotated classes as 'virtual base classes' of Storage so that you
     can test them with isinstance(obj, Storable)"""
 
+    @classmethod
     @abstractmethod
     def get_table_name(self):
         """Return the name of the table/collection/etc where objects should
         be saved/loaded"""
         pass
 
+    @classmethod
     @abstractmethod
     def get_versioning(self):
         """Return the type of versioning to be used - should be one of the
@@ -71,15 +73,15 @@ class Storable(_with_metaclass(ABCMeta)):
 
 
 def _ensure_table(cls):
-    get_mapping(cls).ensure_table()
+    get_mapping(cls).ensure_table(cls)
 
 
 def _find_one(cls, id):
-    return get_mapping(cls).find_one(id)
+    return get_mapping(cls).find_one(cls, id)
 
 
 def _find_all(cls):
-    return get_mapping(cls).find_all()
+    return get_mapping(cls).find_all(cls)
 
 
 def _save(self):

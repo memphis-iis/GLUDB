@@ -12,21 +12,20 @@ classes not specifically mapped to a database
 
 class Database(object):
     def __init__(self, db_driver, **kwrds):
-        # TODO: need to get a driver (and pass along the kwrds) - then
-        #       we can rewrite our methods with types.MethodType
-        pass
+        from .backends.sqlite import Backend  # TODO: dyn import backend
+        self.backend = Backend(**kwrds)
 
-    def ensure_table(self):
-        print("Table Ensured")  # TODO: Remove and replace with error thrown
+    def ensure_table(self, cls):
+        self.backend.ensure_table(cls)
 
-    def find_one(self, id):
-        return None  # TODO: Remove and replace with error thrown
+    def find_one(self, cls, id):
+        self.backend.find_one(cls, id)
 
-    def find_all(self):
-        return []  # TODO: Remove and replace with error thrown
+    def find_all(self, cls):
+        self.backend.find_all(cls)
 
     def save(self, obj):
-        pass  # TODO: Remove and replace with error thrown
+        self.backend.save(obj)
 
 
 class _DatabaseMapping(object):

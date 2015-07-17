@@ -48,12 +48,12 @@ def _auto_init(self, *args, **kwrds):
         self.setup(*args, **kwrds)
 
 
-def _get_table_name(self):
-    return self.__table_name__
+def _get_table_name(cls):
+    return cls.__table_name__
 
 
-def _get_versioning(self):
-    return self.__versioning__
+def _get_versioning(cls):
+    return cls.__versioning__
 
 
 def _get_id(self):
@@ -105,8 +105,8 @@ def DBObject(table_name, versioning):
         cls.__init__ = _auto_init
 
         # Duck-type the class for our data methods
-        cls.get_table_name = _get_table_name
-        cls.get_versioning = _get_versioning
+        cls.get_table_name = classmethod(_get_table_name)
+        cls.get_versioning = classmethod(_get_versioning)
         cls.get_id = _get_id
         cls.set_id = _set_id
         cls.to_data = _to_data
