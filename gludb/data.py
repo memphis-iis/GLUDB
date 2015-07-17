@@ -7,6 +7,8 @@ customization
 
 from abc import ABCMeta, abstractmethod
 
+from .config import get_mapping
+
 
 # A little magic for using metaclasses with both Python 2 and 3
 def _with_metaclass(meta, *bases):
@@ -66,3 +68,35 @@ class Storable(_with_metaclass(ABCMeta)):
         """This classmethod returns a new instance of the subclass populated
         from the JSON representation"""
         pass
+
+
+def _ensure_table(cls):
+    get_mapping(cls).ensure_table()
+
+
+def _find_one(cls, id):
+    return get_mapping(cls).find_one(id)
+
+
+def _find_all(cls):
+    return get_mapping(cls).find_all()
+
+
+def _save(self):
+    return get_mapping(self.__class__).save(self)
+
+
+def DatabaseEnabled(cls):
+    """Classes annotated with DatabaseEnabled gain persistence methods.
+    """
+    if not issubclass(cls, Storable):
+        raise ValueError(
+            "%s is not a subclass of gludb.datab.Storage" % repr(cls)
+        )
+
+    cls.ensure_table = classmethod(_ensure_table)
+    cls.find_one = classmethod(_find_one)
+    cls.find_all = classmethod(_find_all)
+    cls.save = _save
+
+    return cls

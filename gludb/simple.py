@@ -24,9 +24,9 @@ See gludb.data if you need custom or more advanced functionality.
 # TODO: Indexing support
 # TODO: nested objects, lists, lists of nested objects
 
-import json  # TODO: look for other json impls first
+import json
 
-from .data import Storable
+from .data import Storable, DatabaseEnabled
 
 
 class Field(object):
@@ -115,6 +115,10 @@ def DBObject(table_name, versioning):
         # Register with our abc since we actually implement all necessary
         # functionality
         Storable.register(cls)
+
+        # And now that we're registered, we can also get the database
+        # read/write functionality for free
+        cls = DatabaseEnabled(cls)
 
         return cls
 

@@ -45,3 +45,8 @@ def clear_database_config():
     """Reset all mappings to default state. Note that any in-memory databases
     will be lost"""
     _database_mapping.clear_mappings()
+
+
+def get_mapping(cls):
+    """Return a database config object for the given class"""
+    return _database_mapping.get_mapping(cls)
