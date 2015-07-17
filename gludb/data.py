@@ -87,8 +87,9 @@ def _save(self):
 
 
 def DatabaseEnabled(cls):
-    """Classes annotated with DatabaseEnabled gain persistence methods.
-    """
+    """Classes annotated with DatabaseEnabled gain persistence methods. All
+    this really does is add some functions that forward to the mapped database
+    class"""
     if not issubclass(cls, Storable):
         raise ValueError(
             "%s is not a subclass of gludb.datab.Storage" % repr(cls)

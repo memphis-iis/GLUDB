@@ -12,7 +12,21 @@ classes not specifically mapped to a database
 
 class Database(object):
     def __init__(self, db_driver, **kwrds):
-        pass  # TODO: need to get a driver and pass along the kwrds
+        # TODO: need to get a driver (and pass along the kwrds) - then
+        #       we can rewrite our methods with types.MethodType
+        pass
+
+    def ensure_table(self):
+        print("Table Ensured")  # TODO: Remove and replace with error thrown
+
+    def find_one(self, id):
+        return None  # TODO: Remove and replace with error thrown
+
+    def find_all(self):
+        return []  # TODO: Remove and replace with error thrown
+
+    def save(self, obj):
+        pass  # TODO: Remove and replace with error thrown
 
 
 class _DatabaseMapping(object):
@@ -21,6 +35,12 @@ class _DatabaseMapping(object):
 
     def add_mapping(self, cls, db):
         self.mapping[cls] = db
+
+    def get_mapping(self, cls):
+        db = self.mapping.get(cls, self.default_database)
+        if db is None:
+            raise ValueError("There is no database mapping for %s" % repr(cls))
+        return db
 
     def clear_mappings(self):
         self.default_database = None
