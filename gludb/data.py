@@ -5,8 +5,6 @@ gludb.simple. This module is for those needing advanced functionality or
 customization
 """
 
-# TODO: Consider some 'auto' fields: md5 hash of json, create date, update date
-
 from abc import ABCMeta, abstractmethod
 
 from .config import get_mapping
