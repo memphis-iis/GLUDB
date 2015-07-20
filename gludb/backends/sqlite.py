@@ -44,27 +44,22 @@ class Backend(object):
         cur.close()
 
     def find_one(self, cls, id):
-        cur = self.conn.cursor()
-
-        cur.execute(
-            'select id,value from ' + cls.get_table_name() + ' where id = ?',
-            (id,)
-        )
-
-        rec = cur.fetchone()
-        id, data = rec[0], rec[1]
-        obj = cls.from_data(data)
-        assert id == obj.id
-
-        cur.close()
-
-        return obj
+        found = self.find_by_index(cls, 'id', id)
+        return found[0] if found else None
 
     def find_all(self, cls):
+        return self.find_by_index(cls, '1', 1)
+
+    def find_by_index(self, cls, index_name, value):
         cur = self.conn.cursor()
 
+        query = 'select id,value from %s where %s = ?' % (
+            cls.get_table_name(),
+            index_name
+        )
+
         found = []
-        for row in cur.execute('select id,value from ' + cls.get_table_name()):
+        for row in cur.execute(query, (value,)):
             id, data = row[0], row[1]
             obj = cls.from_data(data)
             assert id == obj.id

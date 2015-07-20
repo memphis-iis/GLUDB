@@ -25,6 +25,9 @@ class Database(object):
     def find_all(self, cls):
         return self.backend.find_all(cls)
 
+    def find_by_index(self, cls, index_name, value):
+        return self.backend.find_by_index(cls, index_name, value)
+
     def save(self, obj):
         return self.backend.save(obj)
 

@@ -97,6 +97,10 @@ def _find_all(cls):
     return get_mapping(cls).find_all(cls)
 
 
+def _find_by_index(cls, index_name, value):
+    return get_mapping(cls).find_one(cls, index_name, value)
+
+
 def _save(self):
     return get_mapping(self.__class__).save(self)
 
@@ -113,6 +117,7 @@ def DatabaseEnabled(cls):
     cls.ensure_table = classmethod(_ensure_table)
     cls.find_one = classmethod(_find_one)
     cls.find_all = classmethod(_find_all)
+    cls.find_by_index = classmethod(_find_by_index)
     cls.save = _save
 
     return cls
