@@ -18,6 +18,7 @@ class SimpleStorage(object):
     name = Field('default name')
     descrip = Field()
     age = Field(42)
+    extra_data = Field(dict)
 
 
 class DefaultStorageTesting(unittest.TestCase):
@@ -44,6 +45,12 @@ class DefaultStorageTesting(unittest.TestCase):
         self.assertEquals('Pre', s.name)
         self.assertEquals('Testing', s.descrip)
         self.assertEquals(-1, s.age)
+        self.assertEquals({}, s.extra_data)
+
+        s.extra_data['coolness'] = {'a': 123, 'b': 456}
+        s.extra_data['list-thing'] = [1, 2, 3, 4, 5, 6]
+        s.extra_data['oscar'] = 'grouch'
+        s.extra_data['fp'] = 42.42
 
         s.save()
         self.assertTrue(len(s.id) > 0)

@@ -33,6 +33,7 @@ class SetupData(object):
 @DBObject(table_name='SetupTest')
 class ComplexData(object):
     name = Field('')
+    complex_data = Field(dict)
 
 
 class BasicAbstractionTesting(unittest.TestCase):

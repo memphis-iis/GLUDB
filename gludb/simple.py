@@ -34,6 +34,11 @@ value is needed. For example:
     c = Complicate(name)
     c.complex_data['a'] = 123
     c.complex_data['b'] = 456
+
+IMPORTANT: you should *NOT* just use a default object like this:
+`Field(default={})`. Modifications made to the default object will become the
+NEW default for other classes. See
+[here](http://effbot.org/zone/default-values.htm)
 """
 
 # TODO: Indexing support
@@ -51,6 +56,12 @@ def now_field():
     return 'UTC:' + datetime.datetime.utcnow().isoformat()
 
 
+class _NO_VAL:
+    """Simple helper we use instead of None (in case they want to use a default
+    value of None)."""
+    pass
+
+
 class Field(object):
     """Support for class-level field declaration.
     """
@@ -58,15 +69,21 @@ class Field(object):
         self.name = None
         self.default = default
 
+    def get_default_val(self):
+        """Helper to expand default value (support callables)"""
+        val = self.default
+        while callable(val):
+            val = val()
+        return val
+
 
 def _auto_init(self, *args, **kwrds):
     """Our decorator will add this as __init__ to target classes
     """
     for fld in getattr(self, '__fields__', []):
-        defval = fld.default
-        while callable(defval):
-            defval = defval()
-        val = kwrds.get(fld.name, defval)
+        val = kwrds.get(fld.name, _NO_VAL)
+        if val is _NO_VAL:
+            val = fld.get_default_val()
         setattr(self, fld.name, val)
 
     if callable(getattr(self, 'setup', None)):
@@ -90,13 +107,17 @@ def _set_id(self, new_id):
 
 
 def _to_data(self):
-    data = dict([
-        (fld.name, getattr(self, fld.name, fld.default))  # TODO: default
-        for fld in self.__fields__
-    ])
+    def getval(fld):
+        val = getattr(self, fld.name, _NO_VAL)
+        if val is _NO_VAL:
+            val = fld.get_default_val()
+        return val
+
+    data = dict([(fld.name, getval(fld)) for fld in self.__fields__])
 
     if 'create_date' not in data:
         data['_create_date'] = now_field()
+
     data['_last_update'] = now_field()
 
     h = hashlib.new("md5")
