@@ -41,8 +41,6 @@ NEW default for other classes. See
 [here](http://effbot.org/zone/default-values.htm)
 """
 
-# TODO: Indexing support
-
 import json
 import datetime
 import hashlib
