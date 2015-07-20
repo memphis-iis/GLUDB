@@ -24,7 +24,7 @@ class IndexedData(object):
 
     @Index
     def half_age(self):
-        return self.age/2
+        return int(self.age/2)
 
     def not_indexed(self):
         return 'duh'

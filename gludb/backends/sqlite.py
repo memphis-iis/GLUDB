@@ -74,14 +74,28 @@ class Backend(object):
 
         tabname = obj.__class__.get_table_name()
 
+        index_names = obj.__class__.index_names() or []
+
+        col_names = ['id', 'value'] + index_names
+        value_holders = ','.join(['?' * len(col_names)])
+
         if not obj.id:
             id = uuid()
             obj.id = id
 
-        cur.execute(
-            'insert or replace into ' + tabname + '(id,value) values (?, ?)',
-            (obj.id, obj.to_data())
+        query = 'insert or replace into %s (%s) values (%s)' % (
+            tabname,
+            ','.join(col_names),
+            ','.join(value_holders)
         )
+
+        values = [obj.id, obj.to_data()]
+
+        index_vals = obj.indexes() or {}
+        values += [index_vals.get(name, 'NULL') for name in index_names]
+
+        print("QUERY:", query, "VALUES:", values)
+        cur.execute(query, tuple(values))
         self.conn.commit()
 
         cur.close()

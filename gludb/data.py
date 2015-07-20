@@ -98,7 +98,7 @@ def _find_all(cls):
 
 
 def _find_by_index(cls, index_name, value):
-    return get_mapping(cls).find_one(cls, index_name, value)
+    return get_mapping(cls).find_by_index(cls, index_name, value)
 
 
 def _save(self):
