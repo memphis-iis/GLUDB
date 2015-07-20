@@ -7,12 +7,10 @@ classes not specifically mapped to a database
 
 from importlib import import_module
 
-# TODO: really force config to be process-wide? But we're trying to make things
-#       super simple (no DAO's lying around) and no database-specific coupling
-#       where they defined their classes
-
 
 class Database(object):
+    """Configuration class representing a database instance supported by one
+    of our backends"""
     def __init__(self, db_driver, **kwrds):
         mod = import_module('.backends.'+db_driver, __package__)
         Backend = getattr(mod, "Backend")
@@ -31,6 +29,10 @@ class Database(object):
         return self.backend.save(obj)
 
 
+# Note our use of a class with a singleton instance - so configuration is
+# process-wide. This makes things much simpler for some users (which is one
+# of our main design drivers). One potential enhancement is to allow multiple
+# database mappings - perhaps as a Flask Blueprint plugin/addon
 class _DatabaseMapping(object):
     def __init__(self):
         self.clear_mappings()
