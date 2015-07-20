@@ -45,6 +45,11 @@ class IndexTesting(unittest.TestCase):
         self.assertEquals('abc', s.descrip)
         self.assertEquals(100, s.age)
 
+        self.assertEquals(
+            ['half_age', 'my_name'],
+            sorted(IndexedData.index_names())
+        )
+
         self.assertEquals({'my_name': 'Bob', 'half_age': 50}, s.indexes())
 
         s.name = 'changed'

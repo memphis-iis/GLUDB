@@ -71,6 +71,13 @@ class Storable(_with_metaclass(ABCMeta)):
         from the JSON representation"""
         pass
 
+    @classmethod
+    def index_names(self):
+        """This optional method should return an iterable of index names. These
+        names should correspond to the names used in the dictionary returned by
+        the instance method `indexes` (below)"""
+        return None
+
     def indexes(self):
         """This optional method should return a dictionary of index name values
         that can be used in a query. Note that this is not considered required

@@ -132,21 +132,24 @@ def _from_data(cls, data):
     return cls(**data_dict)
 
 
+def _index_names(cls):
+    def is_index(name):
+        attr = getattr(cls, name, None)
+        return getattr(attr, 'is_index', False)
+
+    return [name for name in dir(cls) if is_index(name)]
+
+
 def _indexes(self):
-    indexes = {}
-
-    for name in dir(self):
+    def get_val(name):
         attr = getattr(self, name, None)
-        if not attr:
-            continue
+        while callable(attr):
+            attr = attr()
+        return attr
 
-        if getattr(attr, 'is_index', False):
-            while callable(attr):
-                attr = attr()
-            # Store even if None so that the indexes are always created
-            indexes[name] = attr
-
-    return indexes
+    return dict([
+        (name, get_val(name)) for name in self.__class__.index_names()
+    ])
 
 
 def DBObject(table_name, versioning=VersioningTypes.NONE):
@@ -182,6 +185,7 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
         cls.set_id = _set_id
         cls.to_data = _to_data
         cls.from_data = classmethod(_from_data)
+        cls.index_names = classmethod(_index_names)
         cls.indexes = _indexes
 
         # Register with our abc since we actually implement all necessary
