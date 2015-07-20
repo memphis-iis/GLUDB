@@ -71,6 +71,12 @@ class Storable(_with_metaclass(ABCMeta)):
         from the JSON representation"""
         pass
 
+    def indexes(self):
+        """This optional method should return a dictionary of index name values
+        that can be used in a query. Note that this is not considered required
+        data, so a backend could ignore indexes if necessary."""
+        return None
+
 
 def _ensure_table(cls):
     get_mapping(cls).ensure_table(cls)

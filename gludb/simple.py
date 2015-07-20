@@ -132,9 +132,25 @@ def _from_data(cls, data):
     return cls(**data_dict)
 
 
+def _indexes(self):
+    indexes = {}
+
+    for name in dir(self):
+        attr = getattr(self, name, None)
+        if not attr:
+            continue
+
+        if getattr(attr, 'is_index', False):
+            while callable(attr):
+                attr = attr()
+            if attr is not None:
+                indexes[name] = attr
+
+    return indexes
+
+
 def DBObject(table_name, versioning=VersioningTypes.NONE):
-    """Classes annotated with DBObject gain persistence methods.
-    """
+    """Classes annotated with DBObject gain persistence methods."""
     def wrapped(cls):
         field_names = set()
         all_fields = []
@@ -166,6 +182,7 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
         cls.set_id = _set_id
         cls.to_data = _to_data
         cls.from_data = classmethod(_from_data)
+        cls.indexes = _indexes
 
         # Register with our abc since we actually implement all necessary
         # functionality
@@ -178,3 +195,14 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
         return cls
 
     return wrapped
+
+
+def Index(func):
+    """Marks instance methods of a DBObject-decorated class as being used for
+    indexing. The function name is used as the index name, and the return
+    value is used as the index value.
+
+    Note that callables are call recursively so in theory you can return
+    a function which will be called to get the index value"""
+    func.is_index = True
+    return func
