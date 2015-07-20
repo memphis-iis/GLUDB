@@ -4,6 +4,8 @@ data storage (that's in simple_data_tests.py)
 
 import unittest
 
+import gludb.config
+
 from gludb.simple import DBObject, Field, Index
 
 from .utils import compare_data_objects
@@ -56,3 +58,41 @@ class IndexTesting(unittest.TestCase):
         s.age = 2
 
         self.assertEquals({'my_name': 'changed', 'half_age': 1}, s.indexes())
+
+
+class IndexReadWriteTesting(unittest.TestCase):
+    def setUp(self):
+        gludb.config.default_database(gludb.config.Database(
+            'sqlite',
+            filename=':memory:'
+        ))
+        IndexedData.ensure_table()
+
+    def tearDown(self):
+        # Undo any database setup
+        gludb.config.clear_database_config()
+
+    def assertObjEq(self, obj1, obj2):
+        self.assertTrue(compare_data_objects(obj1, obj2))
+
+    def assertReadable(self, obj):
+        self.assertObjEq(obj, obj.__class__.find_one(obj.id))
+
+    def test_readwrite(self):
+        s = IndexedData(name='Pre', descrip='Testing', age=10)
+        self.assertEquals('', s.id)
+        self.assertEquals('Pre', s.name)
+        self.assertEquals('Testing', s.descrip)
+        self.assertEquals(10, s.age)
+
+        s.save()
+        self.assertTrue(len(s.id) > 0)
+        self.assertReadable(s)
+
+        s2 = IndexedData(id=s.id, name='Post', descrip='AtItAgain', age=256)
+        s2.save()
+        self.assertReadable(s2)
+
+        all_recs = IndexedData.find_all()
+        self.assertEqual(1, len(all_recs))
+        self.assertObjEq(s2, all_recs[0])
