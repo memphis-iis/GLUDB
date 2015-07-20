@@ -23,10 +23,25 @@ class Backend(object):
     def ensure_table(self, cls):
         cur = self.conn.cursor()
 
-        cur.execute(
-            'create table if not exists ' + cls.get_table_name() +
-            ' (id text primary key, value text)'
-        )
+        table_name = cls.get_table_name()
+        index_names = cls.index_names() or []
+
+        cols = ['id text primary key', 'value text']
+        for name in index_names:
+            cols.append(name + ' text')
+
+        cur.execute('create table if not exists %s (%s)' % (
+            table_name,
+            ','.join(cols)
+        ))
+
+        for name in index_names:
+            cur.execute('create index if not exists %s on %s(%s)' % (
+                table_name + '_' + name + '_idx',
+                table_name,
+                name
+            ))
+
         self.conn.commit()
         cur.close()
 
