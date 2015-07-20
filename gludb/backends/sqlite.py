@@ -3,6 +3,12 @@
 
 import sqlite3
 
+from uuid import uuid4
+
+
+def uuid():
+    return uuid4().hex
+
 
 class Backend(object):
     def __init__(self, **kwrds):
@@ -59,7 +65,7 @@ class Backend(object):
         tabname = obj.__class__.get_table_name()
 
         if not obj.id:
-            id = "TODO: uuid"  # TODO: actual UUID
+            id = uuid()
             obj.id = id
 
         cur.execute(

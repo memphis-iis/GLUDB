@@ -8,12 +8,15 @@ from gludb.simple import DBObject, Field
 from gludb.data import Storable
 import gludb.versioning
 
+from .utils import compare_data_objects
+
 
 @DBObject(table_name='SimpleTest', versioning=gludb.versioning.NONE)
 class SimpleData(object):
     name = Field('default name')
     descrip = Field()
     age = Field(42)
+    setup = "Dummy variable to make sure optional setup calling doesn't choke"
 
 
 @DBObject(table_name='SetupTest', versioning=gludb.versioning.NONE)
@@ -29,6 +32,9 @@ class SetupData(object):
 class BasicAbstractionTesting(unittest.TestCase):
     def setUp(self):
         pass
+
+    def assertObjEq(self, obj1, obj2):
+        self.assertTrue(compare_data_objects(obj1, obj2))
 
     def test_typing(self):
         for cls in [SimpleData, SetupData]:
@@ -64,7 +70,7 @@ class BasicAbstractionTesting(unittest.TestCase):
         s = SimpleData(name='Bob', descrip='abc', age=101)
         data = s.to_data()
         s2 = SimpleData.from_data(data)
-        self.assertEquals(data, s2.to_data())
+        self.assertObjEq(s, s2)
 
         self.assertEquals('', s2.id)
         self.assertEquals('Bob', s2.name)

@@ -25,8 +25,15 @@ See gludb.data if you need custom or more advanced functionality.
 # TODO: nested objects, lists, lists of nested objects
 
 import json
+import datetime
+import hashlib
 
 from .data import Storable, DatabaseEnabled
+
+
+def now_field():
+    """Return a string we use for storing our date time values"""
+    return 'UTC:' + datetime.datetime.utcnow().isoformat()
 
 
 class Field(object):
@@ -69,6 +76,15 @@ def _to_data(self):
         (fld.name, getattr(self, fld.name, fld.default))
         for fld in self.__fields__
     ])
+
+    if 'create_date' not in data:
+        data['_create_date'] = now_field()
+    data['_last_update'] = now_field()
+
+    h = hashlib.new("md5")
+    h.update(json.dumps(data).encode('utf-8'))
+    data['_md5_hash'] = h.hexdigest()
+
     return json.dumps(data)
 
 
