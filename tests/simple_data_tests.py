@@ -5,14 +5,15 @@ data storage (that's in simple_data_tests.py)
 import unittest
 
 import gludb.config
-import gludb.versioning
+
+from gludb.versioning import VersioningTypes
 
 from gludb.simple import DBObject, Field
 
 from .utils import compare_data_objects
 
 
-@DBObject(table_name='SimpleStorageTest', versioning=gludb.versioning.NONE)
+@DBObject(table_name='SimpleStorageTest', versioning=VersioningTypes.NONE)
 class SimpleStorage(object):
     name = Field('default name')
     descrip = Field()

@@ -6,12 +6,13 @@ import unittest
 
 from gludb.simple import DBObject, Field
 from gludb.data import Storable
-import gludb.versioning
+
+from gludb.versioning import VersioningTypes
 
 from .utils import compare_data_objects
 
 
-@DBObject(table_name='SimpleTest', versioning=gludb.versioning.NONE)
+@DBObject(table_name='SimpleTest')
 class SimpleData(object):
     name = Field('default name')
     descrip = Field()
@@ -19,7 +20,7 @@ class SimpleData(object):
     setup = "Dummy variable to make sure optional setup calling doesn't choke"
 
 
-@DBObject(table_name='SetupTest', versioning=gludb.versioning.NONE)
+@DBObject(table_name='SetupTest')
 class SetupData(object):
     name = Field('setup default')
 
@@ -27,6 +28,11 @@ class SetupData(object):
         self.found_arg = args[0] if len(args) == 1 else repr(args)
         self.found_name = kwrds.get('name', '<NAME MISSING!>')
         self.extra_data = "Hello World " + self.name
+
+
+@DBObject(table_name='SetupTest')
+class ComplexData(object):
+    name = Field('')
 
 
 class BasicAbstractionTesting(unittest.TestCase):
@@ -44,7 +50,7 @@ class BasicAbstractionTesting(unittest.TestCase):
     def test_storage_metadata(self):
         s = SimpleData()
         self.assertEquals('SimpleTest', s.get_table_name())
-        self.assertEquals(gludb.versioning.NONE, s.get_versioning())
+        self.assertEquals(VersioningTypes.NONE, s.get_versioning())
 
     def test_setup_called(self):
         s = SetupData('passthru', name='R')

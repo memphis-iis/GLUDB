@@ -2,10 +2,10 @@
 
 Provides the simplest possible interface to our functionality.
 
-We provide a simple annotation to create classes with fields (with
-optional default values), parameterized constructors, persistence,
-and data operations. You are free to derive from any object you wish.
-See gludb.data if you need custom or more advanced functionality.
+We provide a simple annotation to create classes with fields (with optional
+default values), parameterized constructors, persistence, and data operations.
+You are free to derive from any object you wish. See gludb.data if you need
+custom or more advanced functionality.
 
     @DBObject
     class Demo(object):
@@ -19,16 +19,31 @@ See gludb.data if you need custom or more advanced functionality.
     d.save()  # Save to database
     for obj in Demo.find_all():  # Print json rep of all objects in DB
         print obj.to_data()
+
+Also note that currently we aren't supporting nested DBObject objects.
+HOWEVER, we make no restrictions on a field being a JSON-compatible Python
+type. We make it possible to supply a decent default value by allowing a
+function to be specified as a default value - it will be called when a default
+value is needed. For example:
+
+    @DBObject
+    class Complicated(object):
+        name = Field(default='')
+        complex_data = Field(default=dict)
+
+    c = Complicate(name)
+    c.complex_data['a'] = 123
+    c.complex_data['b'] = 456
 """
 
 # TODO: Indexing support
-# TODO: nested objects, lists, lists of nested objects
 
 import json
 import datetime
 import hashlib
 
 from .data import Storable, DatabaseEnabled
+from .versioning import VersioningTypes
 
 
 def now_field():
@@ -48,7 +63,10 @@ def _auto_init(self, *args, **kwrds):
     """Our decorator will add this as __init__ to target classes
     """
     for fld in getattr(self, '__fields__', []):
-        val = kwrds.get(fld.name, fld.default)
+        defval = fld.default
+        while callable(defval):
+            defval = defval()
+        val = kwrds.get(fld.name, defval)
         setattr(self, fld.name, val)
 
     if callable(getattr(self, 'setup', None)):
@@ -73,7 +91,7 @@ def _set_id(self, new_id):
 
 def _to_data(self):
     data = dict([
-        (fld.name, getattr(self, fld.name, fld.default))
+        (fld.name, getattr(self, fld.name, fld.default))  # TODO: default
         for fld in self.__fields__
     ])
 
@@ -93,7 +111,7 @@ def _from_data(cls, data):
     return cls(**data_dict)
 
 
-def DBObject(table_name, versioning):
+def DBObject(table_name, versioning=VersioningTypes.NONE):
     """Classes annotated with DBObject gain persistence methods.
     """
     def wrapped(cls):

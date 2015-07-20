@@ -3,6 +3,9 @@
 GLUDB versioning implementation
 """
 
-NONE = "ver:none"
-LOGGED_ONLY = "ver:logged"
-DELTA_HISTORY = "ver:delta"
+
+# Yes, this could be an enum, but we're supporting Python 2.7
+class VersioningTypes(object):
+    NONE = "ver:none"
+    LOGGED_ONLY = "ver:logged"
+    DELTA_HISTORY = "ver:delta"
