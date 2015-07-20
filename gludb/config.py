@@ -5,6 +5,8 @@ classes to a database configuration. It also includes a default mapping for
 classes not specifically mapped to a database
 """
 
+from importlib import import_module
+
 # TODO: really force config to be process-wide? But we're trying to make things
 #       super simple (no DAO's lying around) and no database-specific coupling
 #       where they defined their classes
@@ -12,7 +14,8 @@ classes not specifically mapped to a database
 
 class Database(object):
     def __init__(self, db_driver, **kwrds):
-        from .backends.sqlite import Backend  # TODO: dyn import backend
+        mod = import_module('.backends.'+db_driver, __package__)
+        Backend = getattr(mod, "Backend")
         self.backend = Backend(**kwrds)
 
     def ensure_table(self, cls):
