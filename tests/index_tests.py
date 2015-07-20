@@ -96,3 +96,14 @@ class IndexReadWriteTesting(unittest.TestCase):
         all_recs = IndexedData.find_all()
         self.assertEqual(1, len(all_recs))
         self.assertObjEq(s2, all_recs[0])
+
+        idx_recs = IndexedData.find_by_index('half_age', 128)
+        self.assertEqual(1, len(idx_recs))
+        self.assertObjEq(s2, idx_recs[0])
+
+        idx_recs = IndexedData.find_by_index('my_name', 'Post')
+        self.assertEqual(1, len(idx_recs))
+        self.assertObjEq(s2, idx_recs[0])
+
+        self.assertEqual(0, len(IndexedData.find_by_index('half_age', 0)))
+        self.assertEqual(0, len(IndexedData.find_by_index('my_name', '')))
