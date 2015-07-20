@@ -143,8 +143,8 @@ def _indexes(self):
         if getattr(attr, 'is_index', False):
             while callable(attr):
                 attr = attr()
-            if attr is not None:
-                indexes[name] = attr
+            # Store even if None so that the indexes are always created
+            indexes[name] = attr
 
     return indexes
 

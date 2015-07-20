@@ -1,6 +1,8 @@
 """gludb.backends.sqlite - backend sqlite database module
 """
 
+# TODO: support indexes
+
 import sqlite3
 
 from uuid import uuid4
