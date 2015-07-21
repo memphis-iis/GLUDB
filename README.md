@@ -34,19 +34,4 @@ going forward.
 Testing
 ----------
 
-Local unit testing can be run via the run_tests.sh script in the tests
-directory. It takes care of ensuring that there is a virtualenv present
-and then using it to run the unit tests via nose. It accepts a single
-required parameter specifying the Python version (2 or 3) and optionally
-parameters to be passed to `nosetests`. For example, to test against Python
-2 "normally" and then against Python 3 with extra verbose output:
-
-    user@GLUDB $ ./tests/run_tests.sh 2
-    user@GLUDB $ ./tests/run_tests.sh 3 -v -v
-
-**Important:** you'll need to have local DynamoDB running. Currently we
-recommend DynamoDB Local from Amazon themselves. Whether you use DynamoDB
-Local or dynalite, you'll need to start them yourself.
-
-This project is also set up to run on Travis CI. Check out .travis.yml for
-details.
+Please see tests/README.md for details.
