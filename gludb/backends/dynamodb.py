@@ -33,8 +33,8 @@ def get_conn():
             is_secure=False
         )
     elif os.environ.get('travis', None):
-        # TODO: we need a mocking library for DynamoDB that we can use
-        #       on Travis CI. (ddbmock is Python 2.7 only)
+        # TODO: we will need some customization for testing on Travis - see
+        #       https://github.com/nabeken/goamz-dynamodb
         conn = None
     else:
         # Regular old production
