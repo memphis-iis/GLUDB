@@ -11,7 +11,7 @@ env:
 sudo: false
 install:
     - pip install -r dev-requirements.txt
-    - ./tests/run_dynalite.sh
+    - ./tests/start_ci_services.sh
 
 # command to run tests
 script: nosetests
