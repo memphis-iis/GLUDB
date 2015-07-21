@@ -23,8 +23,9 @@ def uuid():
 def get_conn():
     """Return a connection to DynamoDB (and handle local/debug possibilities)
     """
-    if os.environ.get('DEBUG', None):
+    if os.environ.get('DEBUG', False) or os.environ.get('travis', False):
         # In DEBUG mode - use the local DynamoDB
+        # This also works for travis since we'll be running dynalite
         conn = DynamoDBConnection(
             host='localhost',
             port=8000,
@@ -32,10 +33,6 @@ def get_conn():
             aws_secret_access_key='TEST',
             is_secure=False
         )
-    elif os.environ.get('travis', None):
-        # TODO: we will need some customization for testing on Travis - see
-        #       https://github.com/nabeken/goamz-dynamodb
-        conn = None
     else:
         # Regular old production
         conn = DynamoDBConnection()
