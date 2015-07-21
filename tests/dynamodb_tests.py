@@ -1,0 +1,25 @@
+"""Testing for dynamodb backend"""
+
+import os
+
+import gludb.config
+
+from .simple_data_tests import SimpleStorage, DefaultStorageTesting
+
+# TODO: put back in when we have a good mocking solution... for now we just
+#       test locally with DynamoDB Local
+if not os.environ.get('travis', False):
+    class SpecificStorageTesting(DefaultStorageTesting):
+        def setUp(self):
+            gludb.config.default_database(None)  # no default database
+            gludb.config.class_database(SimpleStorage, gludb.config.Database(
+                'dynamodb'
+            ))
+            SimpleStorage.ensure_table()
+
+        def tearDown(self):
+            # Undo any database setup
+            gludb.backends.dynamodb.delete_table(
+                SimpleStorage.get_table_name()
+            )
+            gludb.config.clear_database_config()

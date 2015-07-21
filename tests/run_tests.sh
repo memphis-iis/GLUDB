@@ -48,4 +48,10 @@ echo "Using Python version: $(python --version 2>&1)"
 echo "Using nose version: $(nosetests --version)"
 echo nosetests -w "$SCRIPT_DIR" $*
 
+# test config
+export DEBUG=1
+
+# Some notes
+echo "Be sure DynamoDB Local is running for dyanmodb backend tests"
+
 nosetests -w "$SCRIPT_DIR" $*

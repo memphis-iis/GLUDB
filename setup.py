@@ -51,6 +51,7 @@ setup(
     extras_require={
         'dev': [],
         'test': ['coverage', 'nose'],
+        'dynamodb': ['boto']
     },
 
     package_data={},

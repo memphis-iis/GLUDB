@@ -10,4 +10,13 @@ def compare_data_objects(obj1, obj2):
         for k in [k for k, _ in d.items() if k.startswith('_')]:
             del d[k]
         return d
-    return get_dict(obj1) == get_dict(obj2)
+
+    d1, d2 = get_dict(obj1), get_dict(obj2)
+    eq = (d1 == d2)
+
+    if not eq:
+        print('Objects not equal')
+        print(d1)
+        print(d2)
+
+    return eq
