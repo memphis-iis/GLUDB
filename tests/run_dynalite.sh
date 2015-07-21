@@ -5,7 +5,7 @@ cd "$SCRIPT_DIR"
 
 set -e
 
-npm install -g dynalite
+sudo npm install -g dynalite
 
 sudo pip install virtualenv
 
