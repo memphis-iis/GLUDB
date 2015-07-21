@@ -32,4 +32,5 @@ We are currently planning on supporting both Python 2 (2.7+) and Python 3
 going forward.
 
 TODO: We obviously need more documentation. Current plan is to flesh out the
-docs folder and get us on readthedocs.org.
+docs folder and get us on readthedocs.org. Should also include testing on
+local workstation *and* on travis-ci
