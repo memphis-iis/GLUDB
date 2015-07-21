@@ -8,6 +8,7 @@ env:
 
 # we have some dev dependencies to install, and we also need to run dynalite for
 # our testing. See run_dynalite, but we just use supervisord to run dynalite and
+sudo: false
 install:
     - pip install -r dev-requirements.txt
     - ./tests/run_dynalite.sh
