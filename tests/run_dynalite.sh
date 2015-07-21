@@ -9,7 +9,7 @@ npm install -g dynalite
 
 pip install virtualenv
 
-pushd tests
+pushd "$SCRIPT_DIR/tests"
 virtualenv -p python2.7 dynalite_env
 source ./dynalite_env/bin/activate
 pip install --upgrade supervisor wsgiref meld3
