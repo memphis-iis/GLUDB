@@ -6,8 +6,11 @@ env:
     global:
         travis=1  # Yes, docs say that they define this, but it's missing
 
-# command to install dependencies
-install: "pip install -r dev-requirements.txt"
+# we have some dev dependencies to install, and we also need to run dynalite for
+# our testing. See run_dynalite, but we just use supervisord to run dynalite and
+install:
+    - pip install -r dev-requirements.txt
+    - ./tests/run_dynalite.sh
 
 # command to run tests
 script: nosetests
