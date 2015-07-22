@@ -2,11 +2,49 @@
 
 Provide gludb configuration. This consists mainly of a mapping from Storable
 classes to a database configuration. It also includes a default mapping for
-classes not specifically mapped to a database
+classes not specifically mapped to a database.
+
+We check for a mapping for a class in MRO (Method Resolution Order). Suppose
+a class Busy derives from the three classes X, Y, and Z - all of which derive
+from class Base:
+
+    class Base(object):
+        pass
+
+    class X(Base):
+        pass
+    class Y(Base):
+        pass
+    class Z(Base):
+        pass
+
+    class Busy(X, Y, Z):
+        pass
+
+Then a check for mapping would first checking for class Busy, then (in order)
+classes X, Y, Z, Base, and object. If this is the first time you've seen
+multiple inheritance, you'll note that the order of Busy's super classes is
+important. This is how Python resolves method calls (we didn't just make this
+up). In fact, we depend on the results of the standard library call
+`inspect.getmro`.
+
+If none of the classes mentioned have a mapping, then the default mapping will
+be used. If there is no default mapping, then the class can't be mapped to a
+database instance and an error will be thrown.
+
+Astute readers will note that you could map the class `object` to a database
+as a kind of default mapping. We generally don't recommend this, because it
+would work *sort of*. Some notes:
+
+* Recall that we support Python 2 and 3. In Python 3.4, classes declared
+  without a base class get `object` as a base class automatically. In Python
+  2.7 they just don't have a base class. That means that using an `object`
+  DB mapping won't work as a default in every case.
+* We always check for the default database mapping last, so mapping to object
+  would be the last thing checked before the actual default.
 """
 
-# TODO: mro class mapping resolution (with docs)
-
+from inspect import getmro
 from importlib import import_module
 
 
@@ -46,9 +84,19 @@ class _DatabaseMapping(object):
         self.mapping[cls] = db
 
     def get_mapping(self, cls):
-        db = self.mapping.get(cls, self.default_database)
+        db = None
+
+        for candidate_cls in getmro(cls):
+            db = self.mapping.get(candidate_cls, None)
+            if db is not None:
+                break
+
+        if db is None:
+            db = self.default_database
+
         if db is None:
             raise ValueError("There is no database mapping for %s" % repr(cls))
+
         return db
 
     def clear_mappings(self):
