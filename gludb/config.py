@@ -5,6 +5,8 @@ classes to a database configuration. It also includes a default mapping for
 classes not specifically mapped to a database
 """
 
+# TODO: mro class mapping resolution (with docs)
+
 from importlib import import_module
 
 

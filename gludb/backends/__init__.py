@@ -3,5 +3,12 @@
 
 # TODO: MongoDB
 # TODO: BigTable?
-# TODO: Redis
-# TODO: Other Amazon or Google data storage?
+# TODO: Other Amazon or Google data storage? (SimpleDB, Google's doc db store)
+
+# TODO: Other potential backends:
+#       * The most popular NoSQL engines: Riak, Redis, Couch, Cassandra
+#       * Memcache (and thus MemcacheDB)?
+#       * Lucene/Solr
+#       * should NOT recommend them, but what about Maria/MySQL and Postgres?
+#       * File/pickle store?
+#       * Python's dbm
