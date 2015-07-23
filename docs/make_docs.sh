@@ -19,6 +19,7 @@ else
     source "$VE_DIR/bin/activate"
     pip install --upgrade pip setuptools wheel
     pip install --upgrade mkdocs
+    pip install --upgrade -r ../dev-requirements.txt
     pip install -e ..
 fi
 
