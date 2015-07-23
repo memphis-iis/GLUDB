@@ -1,6 +1,8 @@
 # Project specific
 tests/env2/
 tests/env3/
+docs/env
+site/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

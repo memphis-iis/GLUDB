@@ -1,0 +1,18 @@
+site_name: GLUDB Documentation
+repo_url: https://github.com/memphis-iis/GLUDB
+theme: readthedocs
+dev_addr: 127.0.0.1:4000
+
+pages:
+- Home: index.md
+- User Guide:
+    - Overview: overview.md
+    - Using gludb.simple: simple.md
+    - Configuration and Mapping: config.md
+    - Advanced Use: advanced.md
+- Contributing:
+    - Development: development.md
+    - Testing: testing.md
+- About:
+    - License: license.md
+    - Release Notes: relnotes.md

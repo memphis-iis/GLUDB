@@ -1,12 +1,7 @@
 GLUDB Documentation
 ===================
 
-TODO: Actual documentation
-
-TODO: insure API/docstring is included
-
-TODO: Include walkthru of custom classes (i.e. not using anything from
-      gludb.simple)
-
-TODO: Fall doc on MRO and class mapping (see gludb.config docstring for a
-      start)
+This is the main documentation for GLUDB. The current plan is to deploy to
+ReadTheDocs.org. You may also build/serve it locally using mkdocs. You can
+use the script `make_docs.sh` to run mkdocs from an automatically built
+virtualenv in the directory.
