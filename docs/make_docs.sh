@@ -25,5 +25,13 @@ fi
 
 cd ..
 echo "In $(pwd), running:"
-echo "  mkdocs $*"
-mkdocs $*
+
+if [ "$1" == "api" ];
+then
+    shift
+    echo "  python3 docs/make_api_docs.py $* > docs/api.md"
+    python3 docs/make_api_docs.py $* > docs/api.md
+else
+    echo "  mkdocs $*"
+    mkdocs $*
+fi

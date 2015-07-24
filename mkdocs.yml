@@ -10,6 +10,7 @@ pages:
     - Using gludb.simple: simple.md
     - Configuration and Mapping: config.md
     - Advanced Use: advanced.md
+    - API: api.md
 - Contributing:
     - Development: development.md
     - Testing: testing.md
