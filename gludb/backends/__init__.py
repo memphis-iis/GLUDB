@@ -1,9 +1,9 @@
 """glubdb.backends - implementation of actual db backends
 """
 
+# TODO: Google Cloid Datastore
 # TODO: MongoDB
-# TODO: BigTable?
-# TODO: Other Amazon or Google data storage? (SimpleDB, Google's doc db store)
+# TODO: Other Amazon or Google data storage? (SimpleDB, etc)
 
 # TODO: Other potential backends:
 #       * The most popular NoSQL engines: Riak, Redis, Couch, Cassandra

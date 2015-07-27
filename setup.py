@@ -40,7 +40,8 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
 
-    keywords='database versioning backup dynamodb bigtable mongodb',
+    keywords='database versioning backup'
+             'sqlite dynamodb cloud datastore mongodb',
     packages=['gludb'],
 
     install_requires=[

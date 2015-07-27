@@ -4,9 +4,8 @@ For more GLU, see also
 [SuperGLU](https://github.com/GeneralizedLearningUtilities/SuperGLU)
 
 GLUDB is meant to provide a fairly simple way to read/write data to some
-popular datastores (like DynamoDB and BigTable). Depending on the data
-backend, we hope to provide:
-
+popular datastores (like DynamoDB and Google Cloud Datastore). Depending on
+the data backend, we hope to provide:
 
 * A simple abstraction layer for annotating classes that should be stored in
   the database
@@ -18,7 +17,7 @@ backend, we hope to provide:
 To claim version 1.0 status, we will need to implement backend adaptors for:
 * sqlite
 * DynamoDB
-* BigTable
+* Google Cloud Datastore
 * MongoDB
 
 We are currently planning on supporting both Python 2 (2.7+) and Python 3
