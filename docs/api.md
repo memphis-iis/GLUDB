@@ -120,8 +120,8 @@ Mainly for testing
 
 #### function `get_conn`
 
-Return a connection to DynamoDB (and handle local/debug possibilities)
-    
+Return a connection to DynamoDB (and handle local/debug
+possibilities)
 
 
 #### function `gsi_name`
@@ -335,6 +335,20 @@ storable. Note that the DBObject annotation in gludb.simple registers
 all annotated classes as 'virtual base classes' of Storage so that you
 can test them with isinstance(obj, Storable)
 
+####  `ORIG_VER_FIELD_NAME`
+
+str(object='') -> str
+str(bytes_or_buffer[, encoding[, errors]]) -> str
+
+Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.__str__() (if defined)
+or repr(object).
+encoding defaults to sys.getdefaultencoding().
+errors defaults to 'strict'.
+
+
 ####  `__init__`
 
 Initialize self.  See help(type(self)) for accurate signature.
@@ -418,6 +432,22 @@ Usage:
 Return a database config object for the given class
 
 
+### function `orig_version`
+
+Return the original version of an object (defined as what was read from
+the database before any user edits). If there isn't a previous version (for
+instance, newly created objects don't have a previous version), then None
+is returned. Mainly useful for testing
+
+
+### function `record_diff`
+
+Return a JSON-compatible structure capable turn the `new` record back
+into the `old` record. The parameters must be structures compatible with
+json.dumps *or* strings compatible with json.loads. Note that by design,
+`old == record_patch(new, record_diff(old, new))`
+
+
 
 ## module gludb.simple (in pkg gludb)
 
@@ -437,11 +467,11 @@ custom or more advanced functionality.
 
 
     d = Demo(some_field='foo', my_number=3.14)
-    print d.to_data()  # Prints a JSON representation
+    print(d.to_data())  # Prints a JSON representation
     d1 = Demo.from_data(d.to_data())  # Clone using persistence functions
     d.save()  # Save to database
     for obj in Demo.find_all():  # Print json rep of all objects in DB
-        print obj.to_data()
+        print(obj.to_data())
 
 Also note that currently we aren't supporting nested DBObject objects.
 HOWEVER, we make no restrictions on a field being a JSON-compatible Python
@@ -532,20 +562,6 @@ encoding defaults to sys.getdefaultencoding().
 errors defaults to 'strict'.
 
 
-####  `LOGGED_ONLY`
-
-str(object='') -> str
-str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-Create a new string object from the given object. If encoding or
-errors is specified, then the object must expose a data buffer
-that will be decoded using the given encoding and error handler.
-Otherwise, returns the result of object.__str__() (if defined)
-or repr(object).
-encoding defaults to sys.getdefaultencoding().
-errors defaults to 'strict'.
-
-
 ####  `NONE`
 
 str(object='') -> str
@@ -564,6 +580,22 @@ errors defaults to 'strict'.
 
 Initialize self.  See help(type(self)) for accurate signature.
 
+
+
+### function `record_diff`
+
+Return a JSON-compatible structure capable turn the `new` record back
+into the `old` record. The parameters must be structures compatible with
+json.dumps *or* strings compatible with json.loads. Note that by design,
+`old == record_patch(new, record_diff(old, new))`
+
+
+### function `record_patch`
+
+Return the JSON-compatible structure that results from applying the
+changes in `diff` to the record `rec`. The parameters must be structures
+compatible with json.dumps *or* strings compatible with json.loads. Note
+that by design, `old == record_patch(new, record_diff(old, new))`
 
 
 

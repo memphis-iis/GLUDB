@@ -21,8 +21,8 @@ def uuid():
 
 
 def get_conn():
-    """Return a connection to DynamoDB (and handle local/debug possibilities)
-    """
+    """Return a connection to DynamoDB (and handle local/debug
+    possibilities)"""
     if os.environ.get('DEBUG', False) or os.environ.get('travis', False):
         # In DEBUG mode - use the local DynamoDB
         # This also works for travis since we'll be running dynalite
