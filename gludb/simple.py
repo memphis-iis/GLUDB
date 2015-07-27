@@ -14,11 +14,11 @@ custom or more advanced functionality.
 
 
     d = Demo(some_field='foo', my_number=3.14)
-    print d.to_data()  # Prints a JSON representation
+    print(d.to_data())  # Prints a JSON representation
     d1 = Demo.from_data(d.to_data())  # Clone using persistence functions
     d.save()  # Save to database
     for obj in Demo.find_all():  # Print json rep of all objects in DB
-        print obj.to_data()
+        print(obj.to_data())
 
 Also note that currently we aren't supporting nested DBObject objects.
 HOWEVER, we make no restrictions on a field being a JSON-compatible Python

@@ -94,7 +94,6 @@ class Backend(object):
         index_vals = obj.indexes() or {}
         values += [index_vals.get(name, 'NULL') for name in index_names]
 
-        print("QUERY:", query, "VALUES:", values)
         cur.execute(query, tuple(values))
         self.conn.commit()
 
