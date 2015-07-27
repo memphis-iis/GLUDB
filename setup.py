@@ -43,7 +43,9 @@ setup(
     keywords='database versioning backup dynamodb bigtable mongodb',
     packages=['gludb'],
 
-    install_requires=[],
+    install_requires=[
+        "json_delta>=1.1.3",
+    ],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

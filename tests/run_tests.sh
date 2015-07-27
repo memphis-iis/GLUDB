@@ -24,6 +24,14 @@ case "$py_ver" in
         VE_DIR="$SCRIPT_DIR/env3"
         ;;
 
+    reset)
+        echo "Received reset command - deleting env2 and env3"
+        rm "$SCRIPT_DIR/env2" -fr
+        rm "$SCRIPT_DIR/env3" -fr
+        echo "Done - exiting"
+        exit 3
+        ;;
+
     *)
         echo "Run with 2 or 3 for Python2 or Python3 testing, all other parms passed to nose"
         exit 2

@@ -1,4 +1,9 @@
-nose==1.3.7
+# Dependencies that are installed by pip (see install_requires in setup.py)
+json_delta>=1.1.3
 
-# AWS library (for DynamoDB) and a mocking library
+# Dependencies for testing (see extras_require['test'] in setup.py)
+nose==1.3.7
+coverage==3.7.1
+
+# AWS library for DynamoDB (see extras_require['dynamodb'] in setup.py)
 boto==2.38.0
