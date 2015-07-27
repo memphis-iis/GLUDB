@@ -69,7 +69,7 @@ class Database(object):
         return self.backend.find_by_index(cls, index_name, value)
 
     def save(self, obj):
-        return self.backend.save(obj)
+        self.backend.save(obj)
 
 
 # Note our use of a class with a singleton instance - so configuration is

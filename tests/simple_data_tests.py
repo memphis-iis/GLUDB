@@ -7,7 +7,7 @@ import unittest
 import gludb.config
 
 from gludb.versioning import VersioningTypes
-
+from gludb.data import orig_version
 from gludb.simple import DBObject, Field
 
 from .utils import compare_data_objects
@@ -37,7 +37,10 @@ class DefaultStorageTesting(unittest.TestCase):
         self.assertTrue(compare_data_objects(obj1, obj2))
 
     def assertReadable(self, obj):
-        self.assertObjEq(obj, obj.__class__.find_one(obj.id))
+        read_back = obj.__class__.find_one(obj.id)
+        self.assertObjEq(obj, read_back)
+        orig_ver = obj.__class__.from_data(orig_version(read_back))
+        self.assertObjEq(obj, orig_ver)
 
     def test_readwrite(self):
         s = SimpleStorage(name='Pre', descrip='Testing', age=-1)
@@ -52,9 +55,13 @@ class DefaultStorageTesting(unittest.TestCase):
         s.extra_data['oscar'] = 'grouch'
         s.extra_data['fp'] = 42.42
 
+        self.assertTrue(orig_version(s) is None)
+
         s.save()
         self.assertTrue(len(s.id) > 0)
         self.assertReadable(s)
+        # Saved - so should have a prev version that is identical
+        self.assertObjEq(s, SimpleStorage.from_data(orig_version(s)))
 
         s2 = SimpleStorage(id=s.id, name='Post', descrip='AtItAgain', age=256)
         s2.save()
@@ -63,6 +70,20 @@ class DefaultStorageTesting(unittest.TestCase):
         all_recs = SimpleStorage.find_all()
         self.assertEqual(1, len(all_recs))
         self.assertObjEq(s2, all_recs[0])
+
+        # Change the object we read and then insure that the pervious version
+        # saved on load is correct
+        read_obj = all_recs[0]
+        read_obj.name = 'Pre2'
+        read_obj.descrip = 'Testing2'
+        read_obj.age = -2
+
+        s0 = SimpleStorage.from_data(orig_version(read_obj))
+        self.assertEquals(s.id, s0.id)
+        self.assertEquals('Post', s0.name)
+        self.assertEquals('AtItAgain', s0.descrip)
+        self.assertEquals(256, s0.age)
+        self.assertEquals({}, s0.extra_data)
 
 
 # Same tests as DefaultStorageTesting but with differnt setUp/tearDown

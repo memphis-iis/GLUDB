@@ -8,6 +8,7 @@ customization
 from abc import ABCMeta, abstractmethod
 
 from .config import get_mapping
+from .versioning import VersioningTypes, record_diff
 
 
 # A little magic for using metaclasses with both Python 2 and 3
@@ -31,6 +32,10 @@ class Storable(_with_metaclass(ABCMeta)):
     storable. Note that the DBObject annotation in gludb.simple registers
     all annotated classes as 'virtual base classes' of Storage so that you
     can test them with isinstance(obj, Storable)"""
+
+    # This is field we expect to be used for the original version of the
+    # object (saved after retrieval and before any edits occur)
+    ORIG_VER_FIELD_NAME = "_prev_version"
 
     @classmethod
     @abstractmethod
@@ -89,20 +94,49 @@ def _ensure_table(cls):
     get_mapping(cls).ensure_table(cls)
 
 
+def _post_load(obj):
+    # Perform all necessary post load operations we want done when reading
+    # from the database. We return the changed object, but make NO EFFORT
+    # to keep from mutating the original object.
+    setattr(obj, Storable.ORIG_VER_FIELD_NAME, obj.to_data())
+    return obj
+
+
 def _find_one(cls, id):
-    return get_mapping(cls).find_one(cls, id)
+    return _post_load(get_mapping(cls).find_one(cls, id))
 
 
 def _find_all(cls):
-    return get_mapping(cls).find_all(cls)
+    return [
+        _post_load(obj)
+        for obj in get_mapping(cls).find_all(cls)
+    ]
 
 
 def _find_by_index(cls, index_name, value):
-    return get_mapping(cls).find_by_index(cls, index_name, value)
+    return [
+        _post_load(obj)
+        for obj in get_mapping(cls).find_by_index(cls, index_name, value)
+    ]
 
 
 def _save(self):
-    return get_mapping(self.__class__).save(self)
+    # Get the diff's being saved
+    pre_changes = orig_version(self)
+    diff = record_diff(pre_changes, self) if pre_changes else None
+
+    # Actual save
+    get_mapping(self.__class__).save(self)
+
+    # Need to save changes?
+    if diff:
+        # Note that one day we might have other versioning options
+        ver_request = self.__class__.get_versioning()
+        if ver_request == VersioningTypes.DELTA_HISTORY:
+            pass  # TODO: save the diff somewhere
+
+    # Now we have a new original version
+    setattr(self, Storable.ORIG_VER_FIELD_NAME, self.to_data())
 
 
 def DatabaseEnabled(cls):
@@ -121,3 +155,11 @@ def DatabaseEnabled(cls):
     cls.save = _save
 
     return cls
+
+
+def orig_version(obj):
+    """Return the original version of an object (defined as what was read from
+    the database before any user edits). If there isn't a previous version (for
+    instance, newly created objects don't have a previous version), then None
+    is returned. Mainly useful for testing"""
+    return getattr(obj, Storable.ORIG_VER_FIELD_NAME, None)

@@ -6,7 +6,6 @@ import unittest
 
 from gludb.simple import DBObject, Field
 from gludb.data import Storable
-
 from gludb.versioning import VersioningTypes
 
 from .utils import compare_data_objects
@@ -89,6 +88,8 @@ class BasicAbstractionTesting(unittest.TestCase):
         s.name = 'Alice'
         s.descrip = 'xyz'
         s.age = -42
+
+        # Make sure defaults all overridden
         s2 = SimpleData.from_data(s.to_data())
         self.assertEquals('', s2.id)
         self.assertEquals('Alice', s2.name)
