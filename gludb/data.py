@@ -33,8 +33,8 @@ class Storable(_with_metaclass(ABCMeta)):
     all annotated classes as 'virtual base classes' of Storage so that you
     can test them with isinstance(obj, Storable)"""
 
-    # This is field we expect to be used for the original version of the
-    # object (saved after retrieval and before any edits occur)
+    # This is field we use for the original version of the object (saved after
+    # retrieval and before any edits occur)
     ORIG_VER_FIELD_NAME = "_prev_version"
 
     @classmethod
@@ -125,15 +125,15 @@ def _save(self):
     pre_changes = orig_version(self)
     diff = record_diff(pre_changes, self) if pre_changes else None
 
-    # Actual save
-    get_mapping(self.__class__).save(self)
-
     # Need to save changes?
     if diff:
         # Note that one day we might have other versioning options
         ver_request = self.__class__.get_versioning()
         if ver_request == VersioningTypes.DELTA_HISTORY:
             pass  # TODO: save the diff somewhere
+
+    # Actual save
+    get_mapping(self.__class__).save(self)
 
     # Now we have a new original version
     setattr(self, Storable.ORIG_VER_FIELD_NAME, self.to_data())
