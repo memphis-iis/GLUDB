@@ -12,7 +12,6 @@ custom or more advanced functionality.
         some_field = Field()
         my_number = Field(default=42)
 
-
     d = Demo(some_field='foo', my_number=3.14)
     print(d.to_data())  # Prints a JSON representation
     d1 = Demo.from_data(d.to_data())  # Clone using persistence functions
@@ -38,12 +37,13 @@ value is needed. For example:
 IMPORTANT: you should *NOT* just use a default object like this:
 `Field(default={})`. Modifications made to the default object will become the
 NEW default for other classes. See
-[here](http://effbot.org/zone/default-values.htm)
+[here](http://effbot.org/zone/default-values.htm). However, you may supply
+a function that will be called to retreive a default value. In this example
+you should use `Field(default=dict)`.
 """
 
 import json
 import datetime
-import hashlib
 
 from .data import Storable, DatabaseEnabled
 from .versioning import VersioningTypes
@@ -117,10 +117,6 @@ def _to_data(self):
         data['_create_date'] = now_field()
 
     data['_last_update'] = now_field()
-
-    h = hashlib.new("md5")
-    h.update(json.dumps(data).encode('utf-8'))
-    data['_md5_hash'] = h.hexdigest()
 
     return json.dumps(data)
 
