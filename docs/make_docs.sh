@@ -18,7 +18,7 @@ else
     virtualenv -p python3 "$VE_DIR"
     source "$VE_DIR/bin/activate"
     pip install --upgrade pip setuptools wheel
-    pip install --upgrade mkdocs
+    pip install --upgrade git+https://github.com/mkdocs/mkdocs
     pip install --upgrade -r ../dev-requirements.txt
     pip install -e ..
 fi
