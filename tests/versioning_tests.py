@@ -6,6 +6,7 @@ import json
 
 from gludb.versioning import _isstr, record_diff, record_patch
 
+# TODO: test append_diff_hist and parse_diff_hist
 
 class InternalUtilTesting(unittest.TestCase):
     def setUp(self):
@@ -33,11 +34,14 @@ class RawDiffTesting(unittest.TestCase):
         diff = record_diff(old, new)
         recover = record_patch(new, diff)
 
-        old_recover = json.loads(old) if _isstr(old) else old
-        self.assertEquals(old_recover, recover)
+        def cmpfilt(o):
+            return json.loads(o) if _isstr(o) else o
+        self.assertEquals(recover, cmpfilt(recover))
 
-        if not old == new:
-            self.assertNotEquals(new, recover)
+        if old == new:
+            self.assertEquals(cmpfilt(new), cmpfilt(recover))
+        else:
+            self.assertNotEquals(cmpfilt(new), cmpfilt(recover))
 
         print("OLD:%s NEW:%s DIFF:%s RECOVER:%s" % (old, new, diff, recover))
 
