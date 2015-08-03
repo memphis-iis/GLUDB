@@ -1,5 +1,6 @@
 import pkgutil
 from importlib import import_module
+from functools import wraps
 from inspect import (
     getmembers,
     isfunction,
@@ -9,14 +10,24 @@ from inspect import (
     formatargspec
 )
 
+def disp(s):
+    return str(s).replace('_', '\_').replace('*', '\*')
 
 class Outputter(object):
     def __init__(self):
         self.indent_level = 0
+        self.indent_history = []
 
     def indent(self, inc):
         self.indent_level += inc
         self.output("")
+
+    def push_indent(self):
+        self.indent_history.append(self.indent_level)
+        self.indent_level = 0
+
+    def pop_indent(self):
+        self.indent_level = self.indent_history.pop()
 
     def output(self, msg, *args):
         if args:
@@ -36,9 +47,28 @@ dedent = lambda: _outputter.indent(-1)
 header = _outputter.header
 output = _outputter.output
 
+def indented(func):
+    @wraps(func)
+    def wrapped(*args, **kwrds):
+        indent()
+        retval = func(*args, **kwrds)
+        dedent()
+        return retval
+    return wrapped
 
+def independent_indented(func):
+        @wraps(func)
+        def wrapped(*args, **kwrds):
+            _outputter.push_indent()
+            retval = func(*args, **kwrds)
+            _outputter.pop_indent()
+            return retval
+        return wrapped
+
+
+@independent_indented
+@indented
 def doc_package(package):
-    indent()
     header("Package %s", package.__name__)
 
     output(getdoc(package))
@@ -48,13 +78,14 @@ def doc_package(package):
             doc_package(import_module('.' + name, package.__name__))
         else:
             doc_module(package, import_module('.' + name, package.__name__))
-    dedent()
 
 
+@indented
 def doc_module(package, mod):
-    indent()
-    header("module %s (in pkg %s)", mod.__name__, package.__name__)
+    header("module %s", mod.__name__)
 
+    output("(in pkg %s)", package.__name__)
+    output("")
     output(getdoc(mod))
 
     for name, member in getmembers(mod):
@@ -65,35 +96,44 @@ def doc_module(package, mod):
         elif isclass(member):
             doc_class(mod, name, member)
 
-    dedent()
 
-
+@indented
 def doc_function(mod, name, func):
-    indent()
-    header("function `%s`", name)
+    header("function *%s*", name)
     output(getdoc(func))
-    dedent()
 
 
+@indented
 def doc_class(mod, name, cls):
     if cls.__module__ != mod.__name__:
         return
 
-    indent()
     header("class " + name)
+
+    output("Full qualified name: %s.%s", mod.__name__, cls.__qualname__)
+    output("")
     output(getdoc(cls))
+
+    non_methods = []
+
     for memname, member in getmembers(cls):
+        if not memname or not member:
+            continue
         if memname.startswith('_') and memname != '__init__':
+            continue
+
+        if not isfunction(member):
+            non_methods.append((memname, member))
             continue
 
         indent()
 
-        is_func = isfunction(member)
-        header("%s `%s`", 'function ' if is_func else '', memname)
+        header("method *%s*", disp(memname))
 
-        if is_func:
-            args = getfullargspec(member)
-            output(' | ' + formatargspec(*args))
+        args = getfullargspec(member)
+        output('> Argument specification:')
+        output('> ' + disp(formatargspec(*args)))
+        output("")
 
         docstring = ""
         try:
@@ -107,7 +147,11 @@ def doc_class(mod, name, cls):
 
         dedent()
 
-    dedent()
+    if non_methods:
+        output("Class members that aren't methods")
+        output("")
+        for memname, member in non_methods:
+            output(" + %s", disp(memname))
 
 
 def main():

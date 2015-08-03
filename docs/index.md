@@ -15,6 +15,7 @@ the data backend, we hope to provide:
 * Automated, configurable backup scheduling
 
 To claim version 1.0 status, we will need to implement backend adaptors for:
+
 * sqlite
 * DynamoDB
 * Google Cloud Datastore
