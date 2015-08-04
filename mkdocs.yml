@@ -9,6 +9,7 @@ pages:
     - Overview: overview.md
     - Using gludb.simple: simple.md
     - Configuration and Mapping: config.md
+    - Backing Up: backups.md
     - Advanced Use: advanced.md
     - API: api.md
 - Contributing:

@@ -10,8 +10,10 @@ from inspect import (
     formatargspec
 )
 
+
 def disp(s):
     return str(s).replace('_', '\_').replace('*', '\*')
+
 
 class Outputter(object):
     def __init__(self):
@@ -47,14 +49,24 @@ dedent = lambda: _outputter.indent(-1)
 header = _outputter.header
 output = _outputter.output
 
+
+class IndentedBlock():
+    def __enter__(self):
+        indent()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        dedent()
+
+
 def indented(func):
     @wraps(func)
     def wrapped(*args, **kwrds):
-        indent()
-        retval = func(*args, **kwrds)
-        dedent()
+        with IndentedBlock():
+            retval = func(*args, **kwrds)
         return retval
     return wrapped
+
 
 def independent_indented(func):
         @wraps(func)
@@ -114,44 +126,48 @@ def doc_class(mod, name, cls):
     output("")
     output(getdoc(cls))
 
+    def skip(memname, member):
+        return (
+            not memname or
+            not member or
+            (memname.startswith('_') and memname != '__init__')
+        )
+
     non_methods = []
-
     for memname, member in getmembers(cls):
-        if not memname or not member:
-            continue
-        if memname.startswith('_') and memname != '__init__':
-            continue
-
-        if not isfunction(member):
+        if skip(memname, member):
+            pass  # Maybe log this one day?
+        elif not isfunction(member):
             non_methods.append((memname, member))
-            continue
-
-        indent()
-
-        header("method *%s*", disp(memname))
-
-        args = getfullargspec(member)
-        output('> Argument specification:')
-        output('> ' + disp(formatargspec(*args)))
-        output("")
-
-        docstring = ""
-        try:
-            docstring = getdoc(member)
-            docstring = docstring.strip() if docstring else ''
-        except:
-            docstring = ""
-
-        if docstring and docstring != 'None':
-            output(docstring)
-
-        dedent()
+        else:
+            doc_member(mod, cls, memname, member)
 
     if non_methods:
         output("Class members that aren't methods")
         output("")
-        for memname, member in non_methods:
+        for memname, member in sorted(non_methods):
             output(" + %s", disp(memname))
+
+
+@indented
+def doc_member(mod, cls, memname, member):
+    header("method *%s*", disp(memname))
+
+    args = getfullargspec(member)
+    output('> Argument specification:')
+    output('> ' + disp(formatargspec(*args)))
+    output("")
+
+    try:
+        docstring = getdoc(member)
+        docstring = docstring.strip() if docstring else ''
+        if docstring == 'None':
+            docstring = ''
+    except:
+        docstring = ''
+
+    if docstring:
+        output(docstring)
 
 
 def main():
