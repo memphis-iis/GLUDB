@@ -161,6 +161,6 @@ class VersionSavedTesting(unittest.TestCase):
             self.assertTrue(compare_data_objects(exp, actobj))
 
         # a little sanity checking
-        self.assertEquals("last new name", obj_hist[0][0].name)
-        self.assertEquals("first new name", obj_hist[1][0].name)
-        self.assertEquals("default name", obj_hist[2][0].name)
+        self.assertEquals("last new name", obj_hist[0][0]['name'])
+        self.assertEquals("first new name", obj_hist[1][0]['name'])
+        self.assertEquals("default name", obj_hist[2][0]['name'])
