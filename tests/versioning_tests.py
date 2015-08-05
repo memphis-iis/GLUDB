@@ -4,13 +4,30 @@
 import unittest
 import json
 
+import gludb.config
+
+from gludb.simple import DBObject, Field
+
 from gludb.versioning import (
     _isstr,
     record_diff,
     record_patch,
     append_diff_hist,
-    parse_diff_hist
+    parse_diff_hist,
+    VersioningTypes
 )
+
+from .utils import compare_data_objects
+
+
+@DBObject(
+    table_name='VersionedDataTest',
+    versioning=VersioningTypes.DELTA_HISTORY
+)
+class VersionedData(object):
+    name = Field('default name')
+    descrip = Field()
+    age = Field(42)
 
 
 def cmpfilt(o):
@@ -67,10 +84,10 @@ class RawDiffTesting(unittest.TestCase):
 
 class DiffHistoryTesting(unittest.TestCase):
     def setUp(self):
-        self.start = {'a':1, 'b':11, 'c':111}
-        self.mid1 = {'a':2, 'b':22, 'c':222}
-        self.mid2 = {'a':3, 'b':33, 'c':333}
-        self.final = {'a':4, 'b':44, 'c':444}
+        self.start = {'a': 1, 'b': 11, 'c': 111}
+        self.mid1 = {'a': 2, 'b': 22, 'c': 222}
+        self.mid2 = {'a': 3, 'b': 33, 'c': 333}
+        self.final = {'a': 4, 'b': 44, 'c': 444}
         self.series = [self.start, self.mid1, self.mid2, self.final]
 
     def tearDown(self):
@@ -94,5 +111,56 @@ class DiffHistoryTesting(unittest.TestCase):
 
         obj_hist = list(parse_diff_hist(self.final, diff_hist))
         self.assertEquals(4, len(obj_hist))
-        obj_list = list(reversed([ver for ver,verdate in obj_hist]))
+        obj_list = list(reversed([ver for ver, verdate in obj_hist]))
         self.assertEquals(self.series, obj_list)
+
+
+class VersionSavedTesting(unittest.TestCase):
+    def setUp(self):
+        gludb.config.default_database(gludb.config.Database(
+            'sqlite',
+            filename=':memory:'
+        ))
+        VersionedData.ensure_table()
+
+    def tearDown(self):
+        # Undo any database setup
+        gludb.config.clear_database_config()
+
+    def test_versions_saved(self):
+        expected = []
+
+        d = VersionedData()
+
+        def do_save():
+            d.save()
+            expected.append(d.to_data())
+
+        do_save()
+
+        d.name = 'first new name'
+        d.descrip = 'Changed named once'
+        d.age = 1
+        do_save()
+
+        d.name = 'last new name'
+        d.descrip = 'Changed named twice'
+        d.age = 2
+        do_save()
+
+        obj_hist = list(parse_diff_hist(d.to_data(), d._version_hist))
+        self.assertEquals(3, len(obj_hist))
+        self.assertEquals(len(expected), len(obj_hist))
+
+        for exp, act in zip(reversed(expected), obj_hist):
+            exp = VersionedData.from_data(json.dumps(cmpfilt(exp)))
+
+            actobj, actdate = act
+            actobj = VersionedData.from_data(json.dumps(cmpfilt(actobj)))
+
+            self.assertTrue(compare_data_objects(exp, actobj))
+
+        # a little sanity checking
+        self.assertEquals("last new name", obj_hist[0][0].name)
+        self.assertEquals("first new name", obj_hist[1][0].name)
+        self.assertEquals("default name", obj_hist[2][0].name)

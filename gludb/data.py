@@ -8,7 +8,6 @@ customization
 from abc import ABCMeta, abstractmethod
 
 from .config import get_mapping
-from .versioning import VersioningTypes, record_diff
 
 
 # A little magic for using metaclasses with both Python 2 and 3
@@ -121,17 +120,6 @@ def _find_by_index(cls, index_name, value):
 
 
 def _save(self):
-    # Get the diff's being saved
-    pre_changes = orig_version(self)
-    diff = record_diff(pre_changes, self) if pre_changes else None
-
-    # Need to save changes?
-    if diff:
-        # Note that one day we might have other versioning options
-        ver_request = self.__class__.get_versioning()
-        if ver_request == VersioningTypes.DELTA_HISTORY:
-            pass  # TODO: save the diff somewhere
-
     # Actual save
     get_mapping(self.__class__).save(self)
 

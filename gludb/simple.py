@@ -42,11 +42,13 @@ a function that will be called to retreive a default value. In this example
 you should use `Field(default=dict)`.
 """
 
+# TODO: provide a version history method that uses .versioning.parse_diff_hist
+
 import json
 import datetime
 
-from .data import Storable, DatabaseEnabled
-from .versioning import VersioningTypes
+from .data import Storable, DatabaseEnabled, orig_version
+from .versioning import VersioningTypes, record_diff, append_diff_hist
 
 
 def now_field():
@@ -146,6 +148,24 @@ def _indexes(self):
     ])
 
 
+def _delta_save(save_method):
+    def wrapper(self):
+        # Get the diff's being saved
+        pre_changes = orig_version(self)
+        curr_data = self.to_data()
+        diff = record_diff(pre_changes, curr_data) if pre_changes else None
+
+        # Need to save changes?
+        if diff:
+            ver_hist = getattr(self, '_version_hist', list())
+            ver_hist = append_diff_hist(diff, ver_hist)
+            setattr(self, '_version_hist', ver_hist)
+
+        return save_method(self)
+
+    return wrapper
+
+
 def DBObject(table_name, versioning=VersioningTypes.NONE):
     """Classes annotated with DBObject gain persistence methods."""
     def wrapped(cls):
@@ -163,6 +183,12 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
             fld = Field(default='')
             fld.name = 'id'
             all_fields.insert(0, fld)
+
+        # If we have versioning, add a version history field
+        if versioning == VersioningTypes.DELTA_HISTORY:
+            fld = Field(default=list)
+            fld.name = '_version_hist'
+            all_fields.append(fld)
 
         # Things we count on as part of our processing
         cls.__table_name__ = table_name
@@ -189,6 +215,9 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
         # And now that we're registered, we can also get the database
         # read/write functionality for free
         cls = DatabaseEnabled(cls)
+
+        if versioning == VersioningTypes.DELTA_HISTORY:
+            cls.save = _delta_save(cls.save)
 
         return cls
 
