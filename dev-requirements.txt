@@ -8,5 +8,7 @@ coverage==3.7.1
 # AWS library for DynamoDB (see extras_require['dynamodb'] in setup.py)
 boto==2.38.0
 
+# TODO: put in once we have a way to only use for Python 2.7 (no Python3
+#       support) - INCLUDING on travis-ci
 # Google library for Google Cloud Datastore
-googledatastore==v1beta2-rev1-2.1.2
+# googledatastore==v1beta2-rev1-2.1.2
