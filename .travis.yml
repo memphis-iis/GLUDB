@@ -18,3 +18,15 @@ install:
 
 # command to run tests
 script: nosetests
+
+after_failure:
+    - echo "***** supervisord log ****"
+    - cat /tmp/supervisord.log
+    - echo "***** dynalite stdout ****"
+    - cat /tmp/dynalite_stdout.log
+    - echo "***** dynalite stderr ****"
+    - cat /tmp/dynalite_stderr.log
+    - echo "***** gcd stdout ****"
+    - cat /tmp/gcd_stdout.log
+    - echo "***** gcd stderr ****"
+    - cat /tmp/gcd_stderr.log
