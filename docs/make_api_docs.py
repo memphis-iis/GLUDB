@@ -6,10 +6,19 @@ from inspect import (
     isfunction,
     isclass,
     getdoc,
-    getfullargspec,
     formatargspec
 )
 
+# Support for Python 2 and 3 since we hope to eventually run this script
+# with Python 3 when google's libs catch up to the rest of us
+try:
+    from inspect import getfullargspec
+except:
+    def getfullargspec(f):
+        from inspect import getargspec
+        return getargspec(f)
+
+from qualname import qualname
 
 def disp(s):
     return str(s).replace('_', '\_').replace('*', '\*')
@@ -122,7 +131,7 @@ def doc_class(mod, name, cls):
 
     header("class " + name)
 
-    output("Full qualified name: %s.%s", mod.__name__, cls.__qualname__)
+    output("Full qualified name: %s.%s", mod.__name__, qualname(cls))
     output("")
     output(getdoc(cls))
 

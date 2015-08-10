@@ -47,6 +47,10 @@ else
     virtualenv -p $VE_VER "$VE_DIR"
     source "$VE_DIR/bin/activate"
     pip install --upgrade -r ../dev-requirements.txt
+    if [ "$VE_VER" == "python2" ];
+    then
+        pip install --upgrade -r ../dev-requirements-27.txt
+    fi
     pip install -e ..
 fi
 

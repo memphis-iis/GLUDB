@@ -18,66 +18,16 @@ gludb.backends.dynamodb - backend dynamodb database module
 Full qualified name: gludb.backends.dynamodb.Backend
 
 None
+Class members that aren't methods
 
-#### method *\_\_init\_\_*
-
-> Argument specification:
-> (self, \*\*kwrds)
-
-
-
-#### method *ensure\_table*
-
-> Argument specification:
-> (self, cls)
-
-
-
-#### method *find\_all*
-
-> Argument specification:
-> (self, cls)
-
-
-
-#### method *find\_by\_index*
-
-> Argument specification:
-> (self, cls, index\_name, value)
-
-
-
-#### method *find\_one*
-
-> Argument specification:
-> (self, cls, id)
-
-
-
-#### method *get\_class\_table*
-
-> Argument specification:
-> (self, cls)
-
-Return a DynamoDB table object for the given class
-
-
-#### method *save*
-
-> Argument specification:
-> (self, obj)
-
-
-
-#### method *table\_schema\_call*
-
-> Argument specification:
-> (self, target, cls)
-
-Call the callable target with the args and keywords needed for the
-table defined by cls. This is how we centralize the Table.create and
-Table ctor calls
-
+ + \_\_init\_\_
+ + ensure\_table
+ + find\_all
+ + find\_by\_index
+ + find\_one
+ + get\_class\_table
+ + save
+ + table\_schema\_call
 
 
 
@@ -166,48 +116,14 @@ gludb.backends.sqlite - backend sqlite database module
 Full qualified name: gludb.backends.sqlite.Backend
 
 None
+Class members that aren't methods
 
-#### method *\_\_init\_\_*
-
-> Argument specification:
-> (self, \*\*kwrds)
-
-
-
-#### method *ensure\_table*
-
-> Argument specification:
-> (self, cls)
-
-
-
-#### method *find\_all*
-
-> Argument specification:
-> (self, cls)
-
-
-
-#### method *find\_by\_index*
-
-> Argument specification:
-> (self, cls, index\_name, value)
-
-
-
-#### method *find\_one*
-
-> Argument specification:
-> (self, cls, id)
-
-
-
-#### method *save*
-
-> Argument specification:
-> (self, obj)
-
-
+ + \_\_init\_\_
+ + ensure\_table
+ + find\_all
+ + find\_by\_index
+ + find\_one
+ + save
 
 
 ### function *uuid*
@@ -277,48 +193,14 @@ Full qualified name: gludb.config.Database
 
 Configuration class representing a database instance supported by one
 of our backends
+Class members that aren't methods
 
-#### method *\_\_init\_\_*
-
-> Argument specification:
-> (self, db\_driver, \*\*kwrds)
-
-
-
-#### method *ensure\_table*
-
-> Argument specification:
-> (self, cls)
-
-
-
-#### method *find\_all*
-
-> Argument specification:
-> (self, cls)
-
-
-
-#### method *find\_by\_index*
-
-> Argument specification:
-> (self, cls, index\_name, value)
-
-
-
-#### method *find\_one*
-
-> Argument specification:
-> (self, cls, id)
-
-
-
-#### method *save*
-
-> Argument specification:
-> (self, obj)
-
-
+ + \_\_init\_\_
+ + ensure\_table
+ + find\_all
+ + find\_by\_index
+ + find\_one
+ + save
 
 
 ### function *class_database*
@@ -386,53 +268,18 @@ Our abstract base class that marks subclasses as persistable and
 storable. Note that the DBObject annotation in gludb.simple registers
 all annotated classes as 'virtual base classes' of Storage so that you
 can test them with isinstance(obj, Storable)
-
-#### method *get\_id*
-
-> Argument specification:
-> (self)
-
-The instance should return the current key/ID for the instance. If
-a 'falsey' value is return, on save one will be created and set via a
-call to self.set_id
-
-
-#### method *indexes*
-
-> Argument specification:
-> (self)
-
-This optional method should return a dictionary of index name values
-that can be used in a query. Note that this is not considered required
-data, so a backend could ignore indexes if necessary.
-
-
-#### method *set\_id*
-
-> Argument specification:
-> (self, new\_id)
-
-The instance should accept a new key/ID. See also get_id
-
-
-#### method *to\_data*
-
-> Argument specification:
-> (self)
-
-The instance should return JSON representation of it's internal
-state. See also from_data
-
 Class members that aren't methods
 
  + ORIG\_VER\_FIELD\_NAME
  + \_\_init\_\_
  + from\_data
+ + get\_id
  + get\_table\_name
  + get\_versioning
  + index\_names
-
-
+ + indexes
+ + set\_id
+ + to\_data
 
 
 ### function *abstractmethod*
@@ -447,7 +294,8 @@ The abstract methods can be called using any of the normal
 
 Usage:
 
-    class C(metaclass=ABCMeta):
+    class C:
+        __metaclass__ = ABCMeta
         @abstractmethod
         def my_abstract_method(self, ...):
             ...
@@ -464,14 +312,6 @@ Return the original version of an object (defined as what was read from
 the database before any user edits). If there isn't a previous version (for
 instance, newly created objects don't have a previous version), then None
 is returned. Mainly useful for testing
-
-
-### function *record_diff*
-
-Return a JSON-compatible structure capable turn the `new` record back
-into the `old` record. The parameters must be structures compatible with
-json.dumps *or* strings compatible with json.loads. Note that by design,
-`old == record_patch(new, record_diff(old, new))`
 
 
 
@@ -540,21 +380,10 @@ Full qualified name: gludb.simple.Field
 
 Support for class-level field declaration.
     
+Class members that aren't methods
 
-#### method *\_\_init\_\_*
-
-> Argument specification:
-> (self, default='', indexed=False)
-
-
-
-#### method *get\_default\_val*
-
-> Argument specification:
-> (self)
-
-Helper to expand default value (support callables)
-
+ + \_\_init\_\_
+ + get\_default\_val
 
 
 ### function *Index*
@@ -571,9 +400,31 @@ a function which will be called to get the index value
 
 
 
+### function *append_diff_hist*
+
+Given a diff as generated by record_diff, append a diff record to the
+list of diff_hist records.
+
+
 ### function *now_field*
 
 Return a string we use for storing our date time values
+
+
+### function *orig_version*
+
+Return the original version of an object (defined as what was read from
+the database before any user edits). If there isn't a previous version (for
+instance, newly created objects don't have a previous version), then None
+is returned. Mainly useful for testing
+
+
+### function *record_diff*
+
+Return a JSON-compatible structure capable turn the `new` record back
+into the `old` record. The parameters must be structures compatible with
+json.dumps *or* strings compatible with json.loads. Note that by design,
+`old == record_patch(new, record_diff(old, new))`
 
 
 
