@@ -16,6 +16,8 @@ ${SCRIPT_DIR}/${GCD_BASE}/gcd.sh create -d gcd-data ${SCRIPT_DIR}/gcd-data
 echo "#!/bin/bash" > /tmp/gcdrun
 echo "${SCRIPT_DIR}/${GCD_BASE}/gcd.sh start ${SCRIPT_DIR}/gcd-data" >> /tmp/gcdrun
 chmod +x /tmp/gcdrun
+echo "Dumping contents of /tmp/gcdrun"
+cat /tmp/gcdrun
 
 # setup a virtualenv with supervisord to run our services
 pip install virtualenv
