@@ -4,9 +4,7 @@ python:
     - "3.4"
 env:
     global:
-        # Yes, docs say that they define this, but it's missing
         travis=1
-        # config needed for Google Cloud Datastore testing
         DATASTORE_HOST="http://localhost:8080"
         DATASTORE_DATASET="gcd-data"
 
