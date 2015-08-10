@@ -62,6 +62,9 @@ echo nosetests -w "$SCRIPT_DIR" $*
 
 # test config
 export DEBUG=1
+# config needed for Google Cloud Datastore testing
+export DATASTORE_HOST="http://localhost:8080"
+export DATASTORE_DATASET="gcd-data"
 
 # Some notes
 echo "Be sure DynamoDB Local is running for dyanmodb backend tests"

@@ -4,7 +4,11 @@ python:
     - "3.4"
 env:
     global:
-        travis=1  # Yes, docs say that they define this, but it's missing
+        # Yes, docs say that they define this, but it's missing
+        travis=1
+        # config needed for Google Cloud Datastore testing
+        DATASTORE_HOST="http://localhost:8080"
+        DATASTORE_DATASET="gcd-data"
 
 # we have some dev dependencies to install, and we also need to run dynalite for
 # our testing. See run_dynalite, but we just use supervisord to run dynalite and
