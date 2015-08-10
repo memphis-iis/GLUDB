@@ -9,6 +9,9 @@ set -e
 npm install -g dynalite
 
 # gcd install for google cloud datastore testing
+# note: if this file should disappear from Google's download site before they
+# have a better solution, Craig saved a copy of the ZIP file in question. See
+# him to work around Google's buffoonery.
 GCD_BASE=gcd-v1beta2-rev1-2.1.1
 wget http://storage.googleapis.com/gcd/tools/${GCD_BASE}.zip
 unzip ${GCD_BASE}.zip
