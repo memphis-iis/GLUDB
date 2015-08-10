@@ -12,7 +12,7 @@ npm install -g dynalite
 GCD_BASE=gcd-v1beta2-rev1-2.1.1
 wget http://storage.googleapis.com/gcd/tools/${GCD_BASE}.zip
 unzip ${GCD_BASE}.zip
-${SCRIPT_DIR}/${GCD_BASE}/gcd.sh create $SCRIPT_DIR}/gcd-data
+${SCRIPT_DIR}/${GCD_BASE}/gcd.sh create -d gcd-data $SCRIPT_DIR}/gcd-data
 echo "#!/bin/bash" > /tmp/gcdrun
 echo "${SCRIPT_DIR}/${GCD_BASE}/gcd.sh start ${SCRIPT_DIR}/gcd-data" >> /tmp/gcdrun
 chmod +x /tmp/gcdrun
