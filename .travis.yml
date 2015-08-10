@@ -10,7 +10,8 @@ env:
 # our testing. See run_dynalite, but we just use supervisord to run dynalite and
 sudo: false
 install:
-    - pip install -r dev-requirements.txt
+    - pip install --upgrade -r dev-requirements.txt
+    - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --upgrade -r dev-requirements-27.txt; fi
     - ./tests/start_ci_services.sh
 
 # command to run tests
