@@ -105,6 +105,80 @@ Generate a random UUID.
 
 
 
+## module gludb.backends.gcd
+
+(in pkg gludb.backends)
+
+gludb.backends.gcd - backend Google Cloud Datastore module
+
+### class Backend
+
+Full qualified name: gludb.backends.gcd.Backend
+
+None
+Class members that aren't methods
+
+ + \_\_init\_\_
+ + ensure\_table
+ + find\_all
+ + find\_by\_index
+ + find\_one
+ + save
+
+
+### class DatastoreTransaction
+
+Full qualified name: gludb.backends.gcd.DatastoreTransaction
+
+None
+Class members that aren't methods
+
+ + \_\_init\_\_
+ + get\_commit\_req
+ + get\_upsert
+
+
+### function *delete_table*
+
+Mainly for testing
+
+
+### function *extract_entity*
+
+None
+
+
+### function *make_key*
+
+None
+
+
+### function *read_by_indexes*
+
+None
+
+
+### function *read_rec*
+
+None
+
+
+### function *uuid*
+
+None
+
+
+### function *uuid4*
+
+Generate a random UUID.
+
+
+### function *write_rec*
+
+None
+
+
+
 ## module gludb.backends.sqlite
 
 (in pkg gludb.backends)
