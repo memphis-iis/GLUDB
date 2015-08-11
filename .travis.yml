@@ -8,13 +8,18 @@ env:
         DATASTORE_HOST="http://localhost:8080"
         DATASTORE_DATASET="gcd-data"
 
-# we have some dev dependencies to install, and we also need to run dynalite for
-# our testing. See run_dynalite, but we just use supervisord to run dynalite and
+# we have some dev dependencies to install, and we run some services needed for
+# testing. Currently that's dynalite to emulate DynamoDB and gcd to emulate
+# Google Cloud Datastore. We use supervisord to manage these processes, so see
+# ./tests/start_ci_services.sh and ./tests/supervisord.ctl for details. Also
+# note that we use the `sleep 5` hack below to give supervisord time to get
+# the services started
 sudo: false
 install:
     - pip install --upgrade -r dev-requirements.txt
     - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --upgrade -r dev-requirements-27.txt; fi
     - ./tests/start_ci_services.sh
+    - sleep 5
 
 # command to run tests
 script: nosetests
