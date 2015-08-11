@@ -1,7 +1,6 @@
 """glubdb.backends - implementation of actual db backends
 """
 
-# TODO: Google Cloud Datastore
 # TODO: MongoDB
 # TODO: Other Amazon or Google data storage? (SimpleDB, etc)
 
