@@ -22,17 +22,17 @@ if sys.version_info < (3, 0):
             )
             gludb.config.clear_database_config()
 
-    # class GCDIndexReadWriteTesting(IndexReadWriteTesting):
-    #     def setUp(self):
-    #         gludb.config.default_database(gludb.config.Database('gcd'))
-    #         IndexedData.ensure_table()
-    #
-    #     def tearDown(self):
-    #         # Undo any database setup
-    #         gludb.backends.gcd.delete_table(
-    #             IndexedData.get_table_name()
-    #         )
-    #         gludb.config.clear_database_config()
+    class GCDIndexReadWriteTesting(IndexReadWriteTesting):
+        def setUp(self):
+            gludb.config.default_database(gludb.config.Database('gcd'))
+            IndexedData.ensure_table()
+
+        def tearDown(self):
+            # Undo any database setup
+            gludb.backends.gcd.delete_table(
+                IndexedData.get_table_name()
+            )
+            gludb.config.clear_database_config()
 else:
     import unittest
 

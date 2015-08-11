@@ -67,13 +67,7 @@ def write_rec(table_name, objid, data, index_name_values):
         for name, val in index_name_values:
             prop = entity.property.add()
             prop.name = name
-            prop.value.string_value = val
-
-        for p in entity.property:
-            print (" prop %s => %s'" % (p.name, p.value))
-        print("About to write tn:%s, id:%s, data:%s, inv's:%s" % (
-            table_name, objid, data, index_name_values
-        ))
+            prop.value.string_value = str(val)
 
 
 def extract_entity(found):
