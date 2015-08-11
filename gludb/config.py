@@ -1,6 +1,4 @@
-"""gludb.config
-
-Provide gludb configuration. This consists mainly of a mapping from Storable
+"""Provide gludb configuration. This consists mainly of a mapping from Storable
 classes to a database configuration. It also includes a default mapping for
 classes not specifically mapped to a database.
 
@@ -83,7 +81,7 @@ class _DatabaseMapping(object):
     def add_mapping(self, cls, db):
         self.mapping[cls] = db
 
-    def get_mapping(self, cls):
+    def get_mapping(self, cls, no_mapping_ok=False):
         db = None
 
         for candidate_cls in getmro(cls):
@@ -95,6 +93,8 @@ class _DatabaseMapping(object):
             db = self.default_database
 
         if db is None:
+            if no_mapping_ok:
+                return None
             raise ValueError("There is no database mapping for %s" % repr(cls))
 
         return db
@@ -124,6 +124,6 @@ def clear_database_config():
     _database_mapping.clear_mappings()
 
 
-def get_mapping(cls):
+def get_mapping(cls, no_mapping_ok=False):
     """Return a database config object for the given class"""
-    return _database_mapping.get_mapping(cls)
+    return _database_mapping.get_mapping(cls, no_mapping_ok)

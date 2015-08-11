@@ -1,6 +1,5 @@
-"""Testing all the functionality in gludb.simple *except* for actual
-data storage (that's in simple_data_tests.py)
-"""
+"""Testing data storage functionality in gludb.simple (see simple_tests.py for
+testing of the rest of gludb.simple functionality)"""
 
 import unittest
 
@@ -19,6 +18,25 @@ class SimpleStorage(object):
     descrip = Field()
     age = Field(42)
     extra_data = Field(dict)
+
+
+# Same tests as DefaultStorageTesting but with differnt setUp/tearDown
+class MissingMapTesting(unittest.TestCase):
+    def setUp(self):
+        gludb.config.default_database(None)  # no default database
+
+    def tearDown(self):
+        # Undo any database setup
+        gludb.config.clear_database_config()
+
+    def test_failedops(self):
+        def try_op():
+            return gludb.config.get_mapping(SimpleStorage)
+        self.assertRaises(ValueError, try_op)
+
+    def test_justnomap(self):
+        mapped = gludb.config.get_mapping(SimpleStorage, no_mapping_ok=True)
+        self.assertIsNone(mapped)
 
 
 class DefaultStorageTesting(unittest.TestCase):
