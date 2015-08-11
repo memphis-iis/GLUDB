@@ -19,6 +19,8 @@ install:
 # command to run tests
 script: nosetests
 
+# Sometimes the services that we need to run are what fails... if that happens
+# this may actually help us figure out what's going on
 after_failure:
     - echo "***** supervisord log ****"
     - cat /tmp/supervisord.log
