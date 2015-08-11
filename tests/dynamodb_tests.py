@@ -2,8 +2,8 @@
 
 import gludb.config
 
-from .simple_data_tests import SimpleStorage, DefaultStorageTesting
-from .index_tests import IndexReadWriteTesting, IndexedData
+from simple_data_tests import SimpleStorage, DefaultStorageTesting
+from index_tests import IndexReadWriteTesting, IndexedData
 
 
 class SpecificStorageTesting(DefaultStorageTesting):

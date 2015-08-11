@@ -17,7 +17,7 @@ from gludb.versioning import (
     VersioningTypes
 )
 
-from .utils import compare_data_objects
+from utils import compare_data_objects
 
 
 @DBObject(

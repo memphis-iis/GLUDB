@@ -9,7 +9,7 @@ from gludb.versioning import VersioningTypes
 from gludb.data import orig_version
 from gludb.simple import DBObject, Field
 
-from .utils import compare_data_objects
+from utils import compare_data_objects
 
 
 @DBObject(table_name='SimpleStorageTest', versioning=VersioningTypes.NONE)

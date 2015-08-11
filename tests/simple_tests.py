@@ -8,7 +8,7 @@ from gludb.simple import DBObject, Field
 from gludb.data import Storable
 from gludb.versioning import VersioningTypes
 
-from .utils import compare_data_objects
+from utils import compare_data_objects
 
 
 @DBObject(table_name='SimpleTest')

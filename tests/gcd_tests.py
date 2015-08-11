@@ -4,8 +4,8 @@ import sys
 import gludb.config
 
 if sys.version_info < (3, 0):
-    from .simple_data_tests import SimpleStorage, DefaultStorageTesting
-    from .index_tests import IndexReadWriteTesting, IndexedData
+    from simple_data_tests import SimpleStorage, DefaultStorageTesting
+    from index_tests import IndexReadWriteTesting, IndexedData
 
     class SpecificStorageTesting(DefaultStorageTesting):
         def setUp(self):

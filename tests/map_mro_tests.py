@@ -12,7 +12,7 @@ from gludb.simple import DBObject, Field
 from gludb.data import Storable
 from gludb.config import get_mapping
 
-from .utils import compare_data_objects
+from utils import compare_data_objects
 
 
 @DBObject(table_name='BaseClass')

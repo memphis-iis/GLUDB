@@ -8,7 +8,7 @@ import gludb.config
 
 from gludb.simple import DBObject, Field, Index
 
-from .utils import compare_data_objects
+from utils import compare_data_objects
 
 
 @DBObject(table_name='IndexTest')
