@@ -20,6 +20,7 @@ except:
 
 from qualname import qualname
 
+
 def disp(s):
     return str(s).replace('_', '\_').replace('*', '\*')
 
@@ -78,13 +79,13 @@ def indented(func):
 
 
 def independent_indented(func):
-        @wraps(func)
-        def wrapped(*args, **kwrds):
-            _outputter.push_indent()
-            retval = func(*args, **kwrds)
-            _outputter.pop_indent()
-            return retval
-        return wrapped
+    @wraps(func)
+    def wrapped(*args, **kwrds):
+        _outputter.push_indent()
+        retval = func(*args, **kwrds)
+        _outputter.pop_indent()
+        return retval
+    return wrapped
 
 
 @independent_indented

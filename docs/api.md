@@ -212,11 +212,131 @@ Generate a random UUID.
 
 
 
-## module gludb.config
+## module gludb.backup
 
 (in pkg gludb)
 
-gludb.config
+Supply backup functionality for gludb. Note that we mainly provide a way for
+users to create a small script that backs up their data to S3. We are assuming
+that the S3 bucket used will be configured for archival (either deletion or
+archival to Glacier)
+
+### class Backup
+
+Full qualified name: gludb.backup.Backup
+
+None
+Class members that aren't methods
+
+ + \_\_init\_\_
+ + add\_class
+ + add\_package
+ + aws\_access\_key
+ + aws\_secret\_key
+ + backup\_log
+ + bucketname
+ + class\_instance\_stats
+ + ensure\_table
+ + find\_all
+ + find\_by\_index
+ + find\_one
+ + from\_data
+ + get\_id
+ + get\_table\_name
+ + get\_versioning
+ + index\_names
+ + indexes
+ + log
+ + name
+ + run\_backup
+ + save
+ + set\_id
+ + setup
+ + timestamp
+ + to\_data
+
+
+### function *DBObject*
+
+Classes annotated with DBObject gain persistence methods.
+
+
+
+
+
+
+### function *NamedTemporaryFile*
+
+Create and return a temporary file.
+Arguments:
+'prefix', 'suffix', 'dir' -- as for mkstemp.
+'mode' -- the mode argument to os.fdopen (default "w+b").
+'bufsize' -- the buffer size argument to os.fdopen (default -1).
+'delete' -- whether the file is deleted on close (default True).
+The file is created as mkstemp() would do it.
+
+Returns an object with a file-like interface; the name of the file
+is accessible as file.name.  The file will be automatically deleted
+when it is closed unless the 'delete' argument is set to False.
+
+
+
+
+
+
+### function *backup_name*
+
+None
+
+
+### function *get_mapping*
+
+Return a database config object for the given class
+
+
+### function *getmembers*
+
+Return all members of an object as (name, value) pairs sorted by name.
+Optionally, only return members that satisfy a given predicate.
+
+
+### function *getmro*
+
+Return tuple of base classes (including cls) in method resolution order.
+
+
+### function *import_module*
+
+Import a module.
+
+The 'package' argument is required when performing a relative import. It
+specifies the package to use as the anchor point from which to resolve the
+relative import to an absolute import.
+
+
+### function *is_backup_class*
+
+None
+
+
+### function *isclass*
+
+Return true if the object is a class.
+
+Class objects provide these attributes:
+    __doc__         documentation string
+    __module__      name of module in which this class was defined
+
+
+### function *now_field*
+
+Return a string we use for storing our date time values
+
+
+
+## module gludb.config
+
+(in pkg gludb)
 
 Provide gludb configuration. This consists mainly of a mapping from Storable
 classes to a database configuration. It also includes a default mapping for
