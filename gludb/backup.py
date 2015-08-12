@@ -22,6 +22,10 @@ from .config import get_mapping
 from .data import Storable
 from .simple import DBObject, Field
 
+# TODO: need the back to check for previous backups and only run if enough time
+#       has elapsed. Best way is probably: store json for backup after
+#       success. Then we read it back to get date/time of last backup
+
 
 # TODO: we need to refactor this now_field stuff into a single place
 def now_field():
@@ -38,7 +42,7 @@ def is_backup_class(cls):
 
 
 def backup_name(cls):
-    return cls.__name__ + ':' + cls.get_table_name()
+    return cls.__name__ + '--' + cls.get_table_name()
 
 if sys.version_info >= (3, 0):
     def write_line(file_obj, line):
@@ -154,10 +158,16 @@ class Backup(object):
         backup_file.flush()
         backup_size = os.stat(backup_file.name)[6]
 
+        # Figure out key name for archived file
+        key_name = ('Backup_' + now_field() + '.tar.gz').replace(':', '_')
+
         # upload archive to s3
         if os.environ.get('DEBUG', False) or os.environ.get('travis', False):
             # TODO: running locally or Travis - we need to mock/stub/etc
             class TestingKey(object):
+                def __init__(self):
+                    self.key = key_name
+
                 def set_contents_from_filename(subself, fn):
                     if not pth.isfile(fn):
                         raise ValueError(fn + " is not a file")
@@ -168,9 +178,15 @@ class Backup(object):
             conn = S3Connection(self.aws_access_key, self.aws_secret_key)
             bucket = conn.get_bucket(self.bucketname)
             key = Key(bucket)
-            key.key = 'Backup:' + now_field()
+            key.key = key_name
 
-        self.log("Sending %s [size=%d bytes]", backup_file.name, backup_size)
+        self.log(
+            "Sending %s [size=%d bytes] with key name %s",
+            backup_file.name,
+            backup_size,
+            key_name
+        )
+
         key.set_contents_from_filename(backup_file.name)
         self.log("Sent %s", backup_file.name)
 
