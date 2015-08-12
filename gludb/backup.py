@@ -30,11 +30,11 @@ def now_field():
 
 
 def is_backup_class(cls):
-    return (
+    return True if (
         isclass(cls) and
-        issubclass(Storable) and
+        issubclass(cls, Storable) and
         get_mapping(cls, no_mapping_ok=True)
-    )
+    ) else False
 
 
 def backup_name(cls):
@@ -49,10 +49,9 @@ class Backup(object):
     aws_access_key = Field('')
     aws_secret_key = Field('')
     bucketname = Field('')
-    class_instance_stats = Field(dict)
     backup_log = Field(list)
 
-    def setup(self):
+    def setup(self, *args, **kwrds):
         # We don't ever store this name-to-class mapping
         self.classes = dict()
 
@@ -85,7 +84,6 @@ class Backup(object):
             return
 
         cls_name = backup_name(cls)
-        self.class_instance_stats[cls_name] = 0
         self.classes[cls_name] = cls
 
         if include_bases:
@@ -100,7 +98,15 @@ class Backup(object):
         self.backup_log.append(entry)
 
     def run_backup(self):
-        self.log("Starting backup")
+        self.log("Starting backup at %s", now_field())
+        self.log("Backup config object created at %s", self.timestamp)
+
+        # Make sure we're good to go
+        for fld in ['aws_access_key', 'aws_secret_key', 'bucketname']:
+            val = getattr(self, fld, None)
+            if not val:
+                self.log("Backup cannot start: %s is a required field", fld)
+                raise ValueError(self.backup_log[-1])
 
         # Start the compressed tarball our data is stored in
         backup_file = NamedTemporaryFile(suffix=".tar.gz")
@@ -151,5 +157,5 @@ class Backup(object):
         backup_file.close()
         self.log("Backup completed")
 
-# TODO:
+# TODO: return to an annotation when we can use Python3 for our doc generation
 Backup = DBObject(table_name='BackupHistory')(Backup)
