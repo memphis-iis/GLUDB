@@ -4,13 +4,13 @@ that the S3 bucket used will be configured for archival (either deletion or
 archival to Glacier)
 """
 
-# TODO: need unit tests
-
+import sys
 import os
 import os.path as pth
 import datetime
 import pkgutil
 import tarfile
+
 from importlib import import_module
 from inspect import getmembers, isclass, getmro
 from tempfile import NamedTemporaryFile
@@ -40,6 +40,14 @@ def is_backup_class(cls):
 def backup_name(cls):
     return cls.__name__ + ':' + cls.get_table_name()
 
+if sys.version_info >= (3, 0):
+    def write_line(file_obj, line):
+        file_obj.write(bytes(str(line) + '\n', 'UTF-8'))
+else:
+    def write_line(file_obj, line):
+        file_obj.write(str(line))
+        file_obj.write('\n')
+
 
 # Turns out the library qualname doesn't handle annotated classes and we need
 # Python 2 for gcd docs .... so we'll force-annotated Backup below
@@ -63,34 +71,48 @@ class Backup(object):
         if not self.aws_secret_key:
             self.aws_secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
 
-    def add_package(self, pkg_name, recurse=True, include_bases=True):
-        pkg = __import__(pkg_name)
+    def add_package(
+        self,
+        pkg_name,
+        recurse=True,
+        include_bases=True,
+        parent_pkg=None
+    ):
+        if parent_pkg:
+            pkg = import_module('.' + pkg_name, parent_pkg)
+        else:
+            pkg = import_module(pkg_name)
 
         for module_loader, name, ispkg in pkgutil.walk_packages(pkg.__path__):
             if not ispkg:
                 # Module
-                mod = import_module('.' + name, pkg.__name__)
+                mod = import_module('.' + name, pkg_name)
                 for name, member in getmembers(mod):
                     if is_backup_class(member):
                         self.add_class(member, include_bases=include_bases)
             elif recurse:
                 # Package and we're supposed to recurse
-                self.add_package(name, True)
+                self.add_package(pkg_name + '.' + name, True)
 
-    def add_class(self, cls, include_bases=True, fail_on_cls_mismatch=True):
+    def add_class(self, cls, include_bases=True):
         if not is_backup_class(cls):
-            if fail_on_cls_mismatch:
-                raise ValueError(cls.__name__ + " not valid for backup")
-            return
+            return 0
+
+        added = 0
 
         cls_name = backup_name(cls)
-        self.classes[cls_name] = cls
+        if cls_name not in self.classes:
+            self.classes[cls_name] = cls
+            self.log("Added class for backup: %s", cls_name)
+            added = 1
 
         if include_bases:
             for candidate_cls in getmro(cls):
                 if is_backup_class(cls):
                     # Note that we don't keep recursing on base classes
-                    self.add_class(candidate_cls, include_bases=False)
+                    added += self.add_class(candidate_cls, include_bases=False)
+
+        return added
 
     def log(self, entry, *args):
         if args:
@@ -119,8 +141,7 @@ class Backup(object):
 
             with NamedTemporaryFile() as record_file:
                 for rec in cls.find_all():
-                    record_file.write(rec.to_data())
-                    record_file.write('\n')
+                    write_line(record_file, rec.to_data())
                     rec_count += 1
 
                 record_file.flush()

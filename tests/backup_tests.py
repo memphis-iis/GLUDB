@@ -90,6 +90,7 @@ class BackupRunTesting(unittest.TestCase):
 
     def tearDown(self):
         # Undo any database setup
+        print('\n'.join(self.backup.backup_log))
         gludb.config.clear_database_config()
 
     def assertObjEq(self, obj1, obj2):
@@ -100,10 +101,18 @@ class BackupRunTesting(unittest.TestCase):
             SimpleData(name='Name', descrip='Descrip', age=i).save()
             ComplexData(name='Name'+str(i), complex_data={'a': i}).save()
 
-        self.backup.add_class(SimpleData, include_bases=False)
-        self.backup.add_class(ComplexData, include_bases=False)
-        self.backup.run_backup()
-        # TODO: check results
+        self.assertEquals(
+            1,
+            self.backup.add_class(SimpleData, include_bases=False)
+        )
+        self.assertEquals(
+            1,
+            self.backup.add_class(ComplexData, include_bases=False)
+        )
+
+        self.assertEquals(2, len(self.backup.classes))
+
+        self.backup.run_backup()  # TODO: check results
 
     def test_include_bases_backup(self):
         for i in range(7):
@@ -111,6 +120,28 @@ class BackupRunTesting(unittest.TestCase):
             ComplexData(name='Name'+str(i), complex_data={'a': i}).save()
             InheritedData(only_inherited=i).save()
 
-        self.backup.add_class(InheritedData, include_bases=True)
-        self.backup.run_backup()
-        # TODO: check results
+        self.assertEquals(
+            3,
+            self.backup.add_class(InheritedData, include_bases=True)
+        )
+
+        self.assertEquals(3, len(self.backup.classes))
+
+        self.backup.run_backup()  # TODO: check results
+
+    def test_include_package(self):
+        from testpkg.module import TopData
+        from testpkg.subpkg1.module import MidData1
+        from testpkg.subpkg2.module import MidData2
+        from testpkg.subpkg1.subsubpkg.module import BottomData
+
+        for cls in [TopData, MidData1, MidData2, BottomData]:
+            cls.ensure_table()
+            for i in range(7):
+                cls(name='Name'+str(i)).save()
+
+        self.backup.add_package("testpkg")
+
+        self.assertEquals(4, len(self.backup.classes))
+
+        self.backup.run_backup()  # TODO: check results
