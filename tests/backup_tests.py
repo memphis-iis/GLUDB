@@ -81,7 +81,7 @@ class BackupRunTesting(unittest.TestCase):
         ComplexData.ensure_table()
         InheritedData.ensure_table()
 
-        # TODO: all of these values are wrong
+        # TODO: all of these values are wrong - replace when we have a mock S3
         self.backup = Backup(
             aws_access_key='TODO',
             aws_secret_key='TODO',
