@@ -235,7 +235,6 @@ Class members that aren't methods
  + aws\_secret\_key
  + backup\_log
  + bucketname
- + class\_instance\_stats
  + ensure\_table
  + find\_all
  + find\_by\_index
@@ -331,6 +330,11 @@ Class objects provide these attributes:
 ### function *now_field*
 
 Return a string we use for storing our date time values
+
+
+### function *write_line*
+
+None
 
 
 
