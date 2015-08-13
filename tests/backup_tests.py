@@ -7,7 +7,7 @@ import gludb.config
 from gludb.simple import DBObject, Field
 from gludb.backup import Backup, is_backup_class
 
-from utils import compare_data_objects
+from utils import compare_data_objects, BACKUP_BUCKET_NAME
 
 
 @DBObject(table_name='SimpleTest')
@@ -85,7 +85,7 @@ class BackupRunTesting(unittest.TestCase):
         self.backup = Backup(
             aws_access_key='TODO',
             aws_secret_key='TODO',
-            bucketname='BackupTesting'
+            bucketname=BACKUP_BUCKET_NAME
         )
 
     def tearDown(self):

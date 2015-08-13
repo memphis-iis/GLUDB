@@ -24,11 +24,17 @@ cat /tmp/gcdrun
 
 # setup a virtualenv with supervisord to run our services
 pip install virtualenv
+virtualenv -p python2.7 test_services_env
+# Note that s3server.sh depends on the name and location of this virtualenv
+source ./test_services_env/bin/activate
 
-virtualenv -p python2.7 dynalite_env
-source ./dynalite_env/bin/activate
+# Install supervisord and reqs
 pip install --upgrade supervisor wsgiref meld3
+# Install s3server reqs
+pip install --upgrade tornado==4.2.1
 
-touch /tmp/dynamodb_supervisor.sock
-chmod 777 /tmp/dynamodb_supervisor.sock
-./dynalite_env/bin/supervisord -c "$SCRIPT_DIR/supervisord.conf"
+# Actually run supervisord
+touch /tmp/test_services_supervisor.sock
+chmod 777 /tmp/test_services_supervisor.sock
+PATH=$PATH:$SCRIPT_DIR
+./test_services_env/bin/supervisord -c "$SCRIPT_DIR/supervisord.conf"

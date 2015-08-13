@@ -1,1 +1,3 @@
+# Google Cloud Datastore requirements (currently Python 2.7 only)
+# (see extras_require['gcd'] in setup.py)
 googledatastore==v1beta2-rev1-2.1.2

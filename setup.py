@@ -54,8 +54,9 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'dev': [],
-        'test': ['coverage', 'nose'],
-        'dynamodb': ['boto']
+        'test': ['coverage', 'nose', 'tornado'],
+        'dynamodb': ['boto'],
+        'gcd': ['googledatastore']
     },
 
     package_data={},

@@ -3,6 +3,8 @@
 
 import json
 
+BACKUP_BUCKET_NAME = 'backup-testing-bucket'
+
 
 def compare_data_objects(obj1, obj2):
     def get_dict(o):

@@ -37,3 +37,7 @@ after_failure:
     - cat /tmp/gcd_stdout.log
     - echo "***** gcd stderr ****"
     - cat /tmp/gcd_stderr.log
+    - echo "***** s3 stdout ****"
+    - cat /tmp/s3server_stdout.log
+    - echo "***** s3 stderr ****"
+    - cat /tmp/s3server_stderr.log

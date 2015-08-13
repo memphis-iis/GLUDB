@@ -4,13 +4,10 @@ json_delta>=1.1.3
 # Dependencies for testing (see extras_require['test'] in setup.py)
 nose==1.3.7
 coverage==3.7.1
+tornado==4.2.1
 
 # AWS library for DynamoDB (see extras_require['dynamodb'] in setup.py)
 boto==2.38.0
 
-# TODO: When we can support Python 2.7 and 3.4 with a single dep we'll put
-#       this back in. For now, we conditionally install this via
-#       dev-requirements-27.txt in .travis.yml, tests/run_tests.sh, and
-#       docs/make_docs.sh
-# Google library for Google Cloud Datastore
-# googledatastore==v1beta2-rev1-2.1.2
+# Google Cloud Datastore support
+# GCD currently only supported for Python 2.7 - see dev-requirements-27.txt

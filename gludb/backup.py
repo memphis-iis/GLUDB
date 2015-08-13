@@ -6,7 +6,7 @@ archival to Glacier)
 
 import sys
 import os
-import os.path as pth
+# import os.path as pth
 import datetime
 import pkgutil
 import tarfile
@@ -15,7 +15,7 @@ from importlib import import_module
 from inspect import getmembers, isclass, getmro
 from tempfile import NamedTemporaryFile
 
-from boto.s3.connection import S3Connection
+from boto.s3.connection import S3Connection, OrdinaryCallingFormat
 from boto.s3.key import Key
 
 from .config import get_mapping
@@ -163,22 +163,18 @@ class Backup(object):
 
         # upload archive to s3
         if os.environ.get('DEBUG', False) or os.environ.get('travis', False):
-            # TODO: running locally or Travis - we need to mock/stub/etc
-            class TestingKey(object):
-                def __init__(self):
-                    self.key = key_name
-
-                def set_contents_from_filename(subself, fn):
-                    if not pth.isfile(fn):
-                        raise ValueError(fn + " is not a file")
-                    self.log("DEBUG/TRAVIS backup - no S3 xfer")
-                    self.log("Would have transmitted %s", fn)
-            key = TestingKey()
+            # Local or CI - connect to our mock s3 service
+            conn = S3Connection(
+                '', '',
+                is_secure=False, port=8888, host='localhost',
+                calling_format=OrdinaryCallingFormat()
+            )
         else:
             conn = S3Connection(self.aws_access_key, self.aws_secret_key)
-            bucket = conn.get_bucket(self.bucketname)
-            key = Key(bucket)
-            key.key = key_name
+
+        bucket = conn.get_bucket(self.bucketname)
+        key = Key(bucket)
+        key.key = key_name
 
         self.log(
             "Sending %s [size=%d bytes] with key name %s",
@@ -187,6 +183,7 @@ class Backup(object):
             key_name
         )
 
+        # TODO: should probably look into a multi-part upload for larger backup
         key.set_contents_from_filename(backup_file.name)
         self.log("Sent %s", backup_file.name)
 
