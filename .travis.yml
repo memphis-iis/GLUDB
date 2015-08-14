@@ -8,6 +8,10 @@ env:
         DATASTORE_HOST="http://localhost:8080"
         DATASTORE_DATASET="gcd-data"
 
+# Travis CI services we use
+services:
+  - mongodb
+
 # we have some dev dependencies to install, and we run some services needed for
 # testing. Currently that's dynalite to emulate DynamoDB and gcd to emulate
 # Google Cloud Datastore. We use supervisord to manage these processes, so see
