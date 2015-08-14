@@ -2,6 +2,7 @@
 build_env/
 tests/env2/
 tests/env3/
+tests/test_services_env/
 docs/env
 site/
 

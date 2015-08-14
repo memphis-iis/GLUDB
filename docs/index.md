@@ -24,7 +24,3 @@ To claim version 1.0 status, we will need to implement backend adaptors for:
 We are currently planning on supporting both Python 2 (2.7+) and Python 3
 (3.4+). *However*, please keep in mind that we will be emphasizing Python 3
 going forward.
-
-TODO: Send them to overview
-
-TODO: insure API/docstring is included

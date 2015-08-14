@@ -26,13 +26,20 @@ execute the tests. That currently means:
  * The gcd test server
  * s3server.sh as provided in the tests directory.
 
-We are currently working on a script for workstations, but in the mean time
-you might find inspiration in the `start_ci_services.sh` script that we use
-for CI on travis-ci.org.
+You can do this via the script `./tests/local_test_services.sh` which will
+setup an environment to run all of the above for you. Note that changes to
+this script might *also* involve changes to tests/supervisord.conf; *however*,
+that configuration file is also used by the Travis-CI script (see below).
+Proceed with caution!
 
 ## Travis CI Testing
 
 Check out .travis.yml for details.
+
+Perhaps the most important part is that we use the script
+`./tests/start_ci_services.sh` to run all the mock backends we need for testing.
+As mentioned above, this script shares tests/supervisord.conf with the "local"
+testing script.
 
 **Important**: We set the environment variables `travis` to `1` and do NOT
 set the `DEBUG` variable. If you need to differentiate between local and
