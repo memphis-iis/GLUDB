@@ -12,8 +12,8 @@ required parameter specifying the Python version (2 or 3) and optionally
 parameters to be passed to `nosetests`. For example, to test against Python
 2 "normally" and then against Python 3 with extra verbose output:
 
-    user@GLUDB $ ./tests/run_tests.sh 2
-    user@GLUDB $ ./tests/run_tests.sh 3 -v -v
+    user@GLUDB:~/gludb $ ./tests/run_tests.sh 2
+    user@GLUDB:~/gludb $ ./tests/run_tests.sh 3 -v -v
 
 **Important**: We set the environment variables `DEBUG` to `1` in
 `run_tests.sh`. This isn't currently in *many* places, but there *are* tests
