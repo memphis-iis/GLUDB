@@ -28,7 +28,10 @@ rm -fr build_env/
 virtualenv -p python3 build_env
 . build_env/bin/activate
 pip install --upgrade pip wheel
-pip install --upgrade twine
+pip install --upgrade twine pandoc
+
+echo "Creating RST readme from readme.md"
+pandoc --from=markdown --to=rst --output=README.rst README.md
 
 echo "Building source distribution"
 python setup.py sdist
@@ -38,3 +41,6 @@ python setup.py bdist_wheel --universal
 
 echo "Uploading to PyPI using twine"
 twine upload dist/*
+
+echo "Removing RST readme"
+rm -f README.rst

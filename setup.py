@@ -7,13 +7,15 @@ from setuptools import setup
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+# Note that we are using README.rst - it is generated from README.md in
+# build.sh
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 
 setup(
     name='gludb',
-    version='0.1.0a1',
+    version='0.1.0a2',
     description='A simple database wrapper',
     long_description=long_description,
     url='https://github.com/memphis-iis/GLUDB',
@@ -57,7 +59,8 @@ setup(
         'dev': [],
         'test': ['coverage', 'nose', 'tornado'],
         'dynamodb': ['boto'],
-        'gcd': ['googledatastore']
+        'gcd': ['googledatastore'],
+        'backups': ['boto'],
     },
 
     package_data={},
