@@ -7,6 +7,8 @@ echo "Note that it is assumed that you have a recent version of"
 echo "   pip, wheel, and twine"
 echo "Currently installed."
 echo ""
+echo "You should also have pandoc installed"
+echo ""
 echo "You should have an account on PyPI that is able to deploy"
 echo "gludb (and you'll need to enter your username and password"
 echo "if you don't have a ~/.pypirc file)"
@@ -28,7 +30,7 @@ rm -fr build_env/
 virtualenv -p python3 build_env
 . build_env/bin/activate
 pip install --upgrade pip wheel
-pip install --upgrade twine pandoc
+pip install --upgrade twine
 
 echo "Creating RST readme from readme.md"
 pandoc --from=markdown --to=rst --output=README.rst README.md
@@ -41,6 +43,3 @@ python setup.py bdist_wheel --universal
 
 echo "Uploading to PyPI using twine"
 twine upload dist/*
-
-echo "Removing RST readme"
-rm -f README.rst
