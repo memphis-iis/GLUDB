@@ -13,7 +13,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='gludb',
-    version='0.1.0',
+    version='0.1.0a1',
     description='A simple database wrapper',
     long_description=long_description,
     url='https://github.com/memphis-iis/GLUDB',
@@ -42,7 +42,8 @@ setup(
 
     keywords='database versioning backup'
              'sqlite dynamodb cloud datastore mongodb',
-    packages=['gludb'],
+
+    packages=['gludb', 'gludb.backends'],
 
     install_requires=[
         "json_delta>=1.1.3",

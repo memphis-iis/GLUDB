@@ -1,4 +1,5 @@
 # Project specific
+build_env/
 tests/env2/
 tests/env3/
 docs/env
