@@ -11,3 +11,6 @@ boto==2.38.0
 
 # Google Cloud Datastore support
 # GCD currently only supported for Python 2.7 - see dev-requirements-27.txt
+
+# MongoDB support
+pymongo==3.0.3

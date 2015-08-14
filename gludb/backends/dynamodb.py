@@ -3,8 +3,6 @@
 
 import os
 
-from uuid import uuid4
-
 import boto.exception
 import boto.dynamodb2  # NOQA
 
@@ -15,9 +13,7 @@ from boto.dynamodb2.items import Item
 from boto.dynamodb2.exceptions import ResourceNotFoundException, ItemNotFound
 from boto.exception import JSONResponseError
 
-
-def uuid():
-    return uuid4().hex
+from ..utils import uuid
 
 
 def get_conn():

@@ -2,7 +2,8 @@
 """
 
 import sys
-from uuid import uuid4
+
+from ..utils import uuid
 
 if sys.version_info >= (3, 0):
     raise ImportError("GLUDB GCD Backend only supports Python 2.7")
@@ -123,10 +124,6 @@ def read_by_indexes(table_name, index_name_values=None):
             have_more = True
             end_cursor = resp.batch.end_cursor
             query.start_cursor.CopyFrom(end_cursor)
-
-
-def uuid():
-    return uuid4().hex
 
 
 def delete_table(table_name):

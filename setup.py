@@ -60,6 +60,7 @@ setup(
         'test': ['coverage', 'nose', 'tornado'],
         'dynamodb': ['boto'],
         'gcd': ['googledatastore'],
+        'mongodb': ['pymongo'],
         'backups': ['boto'],
     },
 

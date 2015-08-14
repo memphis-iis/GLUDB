@@ -6,8 +6,6 @@ archival to Glacier)
 
 import sys
 import os
-# import os.path as pth
-import datetime
 import pkgutil
 import tarfile
 
@@ -18,6 +16,7 @@ from tempfile import NamedTemporaryFile
 from boto.s3.connection import S3Connection, OrdinaryCallingFormat
 from boto.s3.key import Key
 
+from .utils import now_field
 from .config import get_mapping
 from .data import Storable
 from .simple import DBObject, Field
@@ -25,12 +24,6 @@ from .simple import DBObject, Field
 # TODO: need the back to check for previous backups and only run if enough time
 #       has elapsed. Best way is probably: store json for backup after
 #       success. Then we read it back to get date/time of last backup
-
-
-# TODO: we need to refactor this now_field stuff into a single place
-def now_field():
-    """Return a string we use for storing our date time values"""
-    return 'UTC:' + datetime.datetime.utcnow().isoformat()
 
 
 def is_backup_class(cls):

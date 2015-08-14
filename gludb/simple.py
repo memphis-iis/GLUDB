@@ -45,15 +45,10 @@ you should use `Field(default=dict)`.
 # TODO: provide a version history method that uses .versioning.parse_diff_hist
 
 import json
-import datetime
 
+from .utils import now_field
 from .data import Storable, DatabaseEnabled, orig_version
 from .versioning import VersioningTypes, record_diff, append_diff_hist
-
-
-def now_field():
-    """Return a string we use for storing our date time values"""
-    return 'UTC:' + datetime.datetime.utcnow().isoformat()
 
 
 class _NO_VAL:

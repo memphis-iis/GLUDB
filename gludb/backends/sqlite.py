@@ -3,11 +3,7 @@
 
 import sqlite3
 
-from uuid import uuid4
-
-
-def uuid():
-    return uuid4().hex
+from ..utils import uuid
 
 
 class Backend(object):
