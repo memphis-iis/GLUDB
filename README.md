@@ -10,25 +10,23 @@ Generalized Learning Utilities Database Library
 For more GLU, see also
 [SuperGLU](https://github.com/GeneralizedLearningUtilities/SuperGLU)
 
-GLUDB is meant to provide a fairly simple way to read/write data to some
-popular datastores (like DynamoDB and Google Cloud Datastore). Depending on
-the data backend, we hope to provide:
+GLUDB provides a fairly simple way to read/write data to some popular datastores
+like Amazon's DynamoDB and Google Cloud Datastore. We provide:
 
 * A simple abstraction layer for annotating classes that should be stored in
   the database
-* Support for versioning by automatically storing change history when possible
-* A lightweight permissions module for handling authenticated read and write
-* Limited query support
-* Automated, configurable backup scheduling
+* Support for versioning by automatically storing change history with the data
+* Automated "indexing", which includes querying on the value of indexes
+* Automated, configurable backup to Amazon's S3 (and Glacier depending on how
+  you configure the S3 buckets)
 
-To claim version 1.0 status, we will need to implement backend adaptors for:
+We currently support Python 2 (2.7 and greater) and 3 (3.4 and greater). The
+data stores currently supported are:
+
+* sqlite
 * DynamoDB
 * Google Cloud Datastore
 * MongoDB
-
-We are currently planning on supporting both Python 2 (2.7+) and Python 3
-(3.4+). *However*, please keep in mind that we will be emphasizing Python 3
-going forward.
 
 Installing
 ------------
