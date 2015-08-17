@@ -4,6 +4,10 @@ GLUDB
 ![Travis CI Build State](https://travis-ci.org/memphis-iis/GLUDB.svg?branch=master)
 [Travis CI Details](https://travis-ci.org/memphis-iis/GLUDB)
 
+![Documentation State](https://readthedocs.org/projects/gludb/?badge=latest)
+See our documentation at [http://gludb.readthedocs.org/](http://gludb.readthedocs.org/)
+
+
 Generalized Learning Utilities Database Library
 --------------------------------------------------
 
