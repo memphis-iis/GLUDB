@@ -4,7 +4,7 @@ GLUDB
 ![Travis CI Build State](https://travis-ci.org/memphis-iis/GLUDB.svg?branch=master)
 [Travis CI Details](https://travis-ci.org/memphis-iis/GLUDB)
 
-![Documentation State](https://readthedocs.org/projects/gludb/?badge=latest)
+![Documentation State](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)
 See our documentation at [http://gludb.readthedocs.org/](http://gludb.readthedocs.org/)
 
 
