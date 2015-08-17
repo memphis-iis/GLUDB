@@ -3,6 +3,7 @@
 
 import json
 
+S3_DIR = '/tmp/s3'
 BACKUP_BUCKET_NAME = 'backup-testing-bucket'
 
 

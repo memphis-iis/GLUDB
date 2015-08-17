@@ -2,12 +2,18 @@
 """
 
 import unittest
+import tarfile
+import os.path as pth
+
+from itertools import chain
 
 import gludb.config
 from gludb.simple import DBObject, Field
-from gludb.backup import Backup, is_backup_class
+from gludb.backup import Backup, is_backup_class, backup_name, strip_line
 
-from utils import compare_data_objects, BACKUP_BUCKET_NAME
+# Note that we expect our s3server.py mock server to be running, which will
+# automatically created the bucket BACKUP_BUCKET_NAME
+from utils import compare_data_objects, S3_DIR, BACKUP_BUCKET_NAME
 
 
 @DBObject(table_name='SimpleTest')
@@ -26,6 +32,34 @@ class ComplexData(object):
 @DBObject(table_name='InheritedTest')
 class InheritedData(SimpleData, ComplexData):
     only_inherited = Field(42)
+
+
+def no_blanks(t):
+    return list(filter(None, t))
+
+
+def extract_backup(bucketname, keyname):
+    """Return a dict of (table-name, JSON-list) from the specified backup"""
+    filename = pth.join(S3_DIR, bucketname, keyname)
+    print("Opening backup archive %s" % filename)
+
+    backup_dict = dict()
+
+    with tarfile.open(filename, mode="r:gz") as backup:
+        for member in backup:
+            file = backup.extractfile(member)
+            data = no_blanks([strip_line(i) for i in file.readlines()])
+            backup_dict[member.name] = data
+            file.close()
+
+    return backup_dict
+
+
+def extract_one(backup_dict, cls):
+    """Given the dict from extract_backup and a class, return a list of objects
+    from the backup"""
+    name = backup_name(cls) + '.json'  # Don't forget file extension
+    return [cls.from_data(i) for i in backup_dict[name]]
 
 
 class BackupPlumbingTesting(unittest.TestCase):
@@ -81,10 +115,9 @@ class BackupRunTesting(unittest.TestCase):
         ComplexData.ensure_table()
         InheritedData.ensure_table()
 
-        # TODO: all of these values are wrong - replace when we have a mock S3
         self.backup = Backup(
-            aws_access_key='TODO',
-            aws_secret_key='TODO',
+            aws_access_key='testing',
+            aws_secret_key='testing',
             bucketname=BACKUP_BUCKET_NAME
         )
 
@@ -96,10 +129,24 @@ class BackupRunTesting(unittest.TestCase):
     def assertObjEq(self, obj1, obj2):
         self.assertTrue(compare_data_objects(obj1, obj2))
 
+    def assertObjListsEq(self, lst1, lst2):
+        def key(obj):
+            return getattr(obj, 'id', '')
+        for o1, o2 in zip(sorted(lst1, key=key), sorted(lst2, key=key)):
+            self.assertObjEq(o1, o2)
+
     def test_simple_backup(self):
-        for i in range(7):
-            SimpleData(name='Name', descrip='Descrip', age=i).save()
-            ComplexData(name='Name'+str(i), complex_data={'a': i}).save()
+        simple = [
+            SimpleData(name='Name', descrip='Descrip', age=i)
+            for i in range(7)
+        ]
+        complex = [
+            ComplexData(name='Name'+str(i), complex_data={'a': i})
+            for i in range(7)
+        ]
+
+        for obj in chain(simple, complex):
+            obj.save()
 
         self.assertEquals(
             1,
@@ -112,13 +159,25 @@ class BackupRunTesting(unittest.TestCase):
 
         self.assertEquals(2, len(self.backup.classes))
 
-        self.backup.run_backup()  # TODO: check results
+        bucketname, keyname = self.backup.run_backup()
+        backups = extract_backup(bucketname, keyname)
+
+        self.assertObjListsEq(simple, extract_one(backups, SimpleData))
+        self.assertObjListsEq(complex, extract_one(backups, ComplexData))
 
     def test_include_bases_backup(self):
-        for i in range(7):
-            SimpleData(name='Name', descrip='Descrip', age=i).save()
-            ComplexData(name='Name'+str(i), complex_data={'a': i}).save()
-            InheritedData(only_inherited=i).save()
+        simple = [
+            SimpleData(name='Name', descrip='Descrip', age=i)
+            for i in range(7)
+        ]
+        complex = [
+            ComplexData(name='Name'+str(i), complex_data={'a': i})
+            for i in range(7)
+        ]
+        inherited = [InheritedData(only_inherited=i) for i in range(7)]
+
+        for obj in chain(simple, complex, inherited):
+            obj.save()
 
         self.assertEquals(
             3,
@@ -127,7 +186,12 @@ class BackupRunTesting(unittest.TestCase):
 
         self.assertEquals(3, len(self.backup.classes))
 
-        self.backup.run_backup()  # TODO: check results
+        bucketname, keyname = self.backup.run_backup()
+        backups = extract_backup(bucketname, keyname)
+
+        self.assertObjListsEq(simple, extract_one(backups, SimpleData))
+        self.assertObjListsEq(complex, extract_one(backups, ComplexData))
+        self.assertObjListsEq(inherited, extract_one(backups, InheritedData))
 
     def test_include_package(self):
         from testpkg.module import TopData
@@ -135,13 +199,21 @@ class BackupRunTesting(unittest.TestCase):
         from testpkg.subpkg2.module import MidData2
         from testpkg.subpkg1.subsubpkg.module import BottomData
 
+        expected_dict = dict()
         for cls in [TopData, MidData1, MidData2, BottomData]:
             cls.ensure_table()
-            for i in range(7):
-                cls(name='Name'+str(i)).save()
+            data = [cls(name='Name'+str(i)) for i in range(7)]
+            for d in data:
+                d.save()
+            expected_dict[backup_name(cls)] = data
 
         self.backup.add_package("testpkg")
 
         self.assertEquals(4, len(self.backup.classes))
 
-        self.backup.run_backup()  # TODO: check results
+        bucketname, keyname = self.backup.run_backup()
+        backups = extract_backup(bucketname, keyname)
+
+        for cls in [TopData, MidData1, MidData2, BottomData]:
+            expected = expected_dict[backup_name(cls)]
+            self.assertObjListsEq(expected, extract_one(backups, cls))

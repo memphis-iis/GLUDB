@@ -37,13 +37,22 @@ def is_backup_class(cls):
 def backup_name(cls):
     return cls.__name__ + '--' + cls.get_table_name()
 
+# write_line is used below for Python 2&3 compatibility. We provide strip_line
+# as a convenience for people reading backups (since it includes implicit
+# encoding)
 if sys.version_info >= (3, 0):
     def write_line(file_obj, line):
         file_obj.write(bytes(str(line) + '\n', 'UTF-8'))
+
+    def strip_line(line):
+        return str(line, 'UTF-8').strip()
 else:
     def write_line(file_obj, line):
         file_obj.write(str(line))
         file_obj.write('\n')
+
+    def strip_line(line):
+        return str(line).strip()
 
 
 # Turns out the library qualname doesn't handle annotated classes and we need
@@ -183,6 +192,9 @@ class Backup(object):
         # All done
         backup_file.close()
         self.log("Backup completed")
+
+        # return the bucket name and key name for the completed backup
+        return self.bucketname, key_name
 
 # TODO: return to an annotation when we can use Python3 for our doc generation
 Backup = DBObject(table_name='BackupHistory')(Backup)

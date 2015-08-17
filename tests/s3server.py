@@ -55,7 +55,7 @@ from tornado import ioloop
 from tornado import web
 
 
-def start(port, root_directory="/tmp/s3", bucket_depth=0):
+def start(port, root_directory, bucket_depth=0):
     """Starts the mock S3 server on the given port at the given path."""
     application = S3Application(root_directory, bucket_depth)
     http_server = httpserver.HTTPServer(application)
@@ -147,7 +147,7 @@ class RootHandler(BaseRequestHandler):
 class BucketHandler(BaseRequestHandler):
     SUPPORTED_METHODS = ("PUT", "GET", "DELETE", "HEAD")
 
-    def get(self, bucket_name):
+    def get(self, bucket_name):  # NOQA
         prefix = self.get_argument("prefix", u"")
         marker = self.get_argument("marker", u"")
         max_keys = int(self.get_argument("max-keys", 50000))
@@ -264,7 +264,10 @@ class ObjectHandler(BaseRequestHandler):
         self.set_header("Last-Modified", datetime.datetime.utcfromtimestamp(
             info.st_mtime))
         object_file = open(path, "rb")
-        self.set_header('x-amz-server-side-encryption-customer-algorithm', 'testing')
+        self.set_header(
+            'x-amz-server-side-encryption-customer-algorithm',
+            'testing'
+        )
         try:
             self.finish(object_file.read())
         finally:
@@ -288,7 +291,10 @@ class ObjectHandler(BaseRequestHandler):
         object_file.close()
         self.object_file_name = path
         self.set_etag_header()
-        self.set_header('x-amz-server-side-encryption-customer-algorithm', 'testing')
+        self.set_header(
+            'x-amz-server-side-encryption-customer-algorithm',
+            'testing'
+        )
         self.finish()
 
     def delete(self, bucket, object_name):
@@ -301,13 +307,15 @@ class ObjectHandler(BaseRequestHandler):
         self.set_etag_header()
         os.unlink(path)
         self.set_status(204)
-        self.set_header('x-amz-server-side-encryption-customer-algorithm', 'testing')
+        self.set_header(
+            'x-amz-server-side-encryption-customer-algorithm',
+            'testing'
+        )
         self.finish()
 
 
 def main():
-    S3_DIR = '/tmp/s3'
-    from utils import BACKUP_BUCKET_NAME
+    from utils import BACKUP_BUCKET_NAME, S3_DIR
     bucket_path = os.path.join(S3_DIR, BACKUP_BUCKET_NAME)
     if not os.path.isdir(bucket_path):
         os.makedirs(bucket_path)
