@@ -43,11 +43,19 @@ from gludb.backup import Backup
 
 
 def main():
+    AWS_ACCESS_KEY = 'Enter-Yours-Here'
+    AWS_SECRET_KEY = 'Enter-Yours-Here'
+    BUCKET_NAME = 'Enter-Yours-Here'
+
+    if 'Enter-Yours-Here' in [AWS_ACCESS_KEY, AWS_SECRET_KEY, BUCKET_NAME]:
+        print("You need to chnage this file and supply some AWS information")
+        return
+
     # TODO: we need some AWS info
     backup = Backup(
-        aws_access_key='need-an-access-key-id',
-        aws_secret_key='need-a-secret-key',
-        bucketname='need-a-bucket-name'
+        aws_access_key=AWS_ACCESS_KEY,
+        aws_secret_key=AWS_SECRET_KEY,
+        bucketname=BUCKET_NAME
     )
 
     backup.add_class(MyData)

@@ -96,12 +96,7 @@ name from the class
 
 ### function *uuid*
 
-None
-
-
-### function *uuid4*
-
-Generate a random UUID.
+Return a decent UUID as a string
 
 
 
@@ -165,17 +160,49 @@ None
 
 ### function *uuid*
 
-None
-
-
-### function *uuid4*
-
-Generate a random UUID.
+Return a decent UUID as a string
 
 
 ### function *write_rec*
 
 None
+
+
+
+## module gludb.backends.mongodb
+
+(in pkg gludb.backends)
+
+MongoDB backend
+
+### class Backend
+
+Full qualified name: gludb.backends.mongodb.Backend
+
+None
+Class members that aren't methods
+
+ + \_\_init\_\_
+ + ensure\_table
+ + find\_all
+ + find\_by\_index
+ + find\_one
+ + get\_collection
+ + save
+
+
+
+
+
+
+### function *delete_collection*
+
+Almost exclusively for testing
+
+
+### function *uuid*
+
+Return a decent UUID as a string
 
 
 
@@ -202,12 +229,7 @@ Class members that aren't methods
 
 ### function *uuid*
 
-None
-
-
-### function *uuid4*
-
-Generate a random UUID.
+Return a decent UUID as a string
 
 
 
@@ -332,6 +354,11 @@ Class objects provide these attributes:
 ### function *now_field*
 
 Return a string we use for storing our date time values
+
+
+### function *strip_line*
+
+None
 
 
 ### function *write_line*
@@ -625,6 +652,28 @@ Return a JSON-compatible structure capable turn the `new` record back
 into the `old` record. The parameters must be structures compatible with
 json.dumps *or* strings compatible with json.loads. Note that by design,
 `old == record_patch(new, record_diff(old, new))`
+
+
+
+## module gludb.utils
+
+(in pkg gludb)
+
+Central place for misc utilities
+
+### function *now_field*
+
+Return a string we use for storing our date time values
+
+
+### function *uuid*
+
+Return a decent UUID as a string
+
+
+### function *uuid4*
+
+Generate a random UUID.
 
 
 

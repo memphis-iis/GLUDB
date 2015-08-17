@@ -39,6 +39,13 @@ The [API document](api.md) is created via our script `docs/make_api_docs.py`,
 which should be executed via documentation helper script `docs/make_docs.sh`.
 This is done as part of the "Making a release" section below.
 
+If you want to see what the documentation looks like, then you can use the
+document script with the 'serve' command: `docs/make_docs.sh serve`. To include
+the latest docstrings, you might want to combine the 'api' and 'serve' commands:
+
+    $ ./docs/make_docs.sh api
+    $ ./docs/make_docs.sh serve
+
 ## Making a release
 
 Making a release is fairly simple, but is currently a multi-step process:
