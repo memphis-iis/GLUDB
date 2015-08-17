@@ -2,11 +2,25 @@
 
 ## General Dev guidelines
 
-TODO: flake8 and code formatting
+Since everyone has space preferences, here's ours:
+
+    Indentation is 4 spaces. No tabs. No trailing whitespace.
+
+Pull requests not following this guideline will be reformatted without asking
+permission. You have been warned :)
+
+Regarding style, format, and non-lint code, we:
+
+* Follow PEP 8
+* Expect the PyFlakes lint tool to provide no warnings
+* Expect Ned Batchelder's McCabe script to provide no warnings
+
+The best way to conform to the above is to use Flake8, which combines warnings
+from all three.
 
 ## Testing
 
-Please see the testing
+Please see our [testing document](testing.md)
 
 ## Creating a new backend
 
@@ -14,7 +28,16 @@ TODO: walkthru
 
 ## Documentation
 
-TODO: documentation, docstrings, generating API doc
+Please see the "Making a release" section below for the actual steps in
+involved in creating documentation for a release (including our API documents)
+
+This documentation is maintained in Markdown format in the docs directory. It
+is served to the public via ReadTheDocs, which processes our documentation
+using mkdocs (see `mkdocs.yml` in the root of this project).
+
+The [API document](api.md) is created via our script `docs/make_api_docs.py`,
+which should be executed via documentation helper script `docs/make_docs.sh`.
+This is done as part of the "Making a release" section below.
 
 ## Making a release
 

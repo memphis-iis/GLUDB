@@ -8,7 +8,7 @@ cd "$SCRIPT_DIR"
 set -e
 
 # TODO: switch from python2 to python3 once we don't need special Python2-only
-#       req's for Google Datastore
+#       req's for Google Datastore. This means we can also remove qualname below
 
 # Use our virtualenv (and create if necessary)
 VE_DIR="$SCRIPT_DIR/env"
@@ -24,7 +24,7 @@ else
     pip install --upgrade git+https://github.com/mkdocs/mkdocs
     pip install --upgrade -r ../dev-requirements.txt
     pip install --upgrade -r ../dev-requirements-27.txt
-    pip install qualname  # TODO: remove this when we go back to Python 3
+    pip install qualname
     pip install -e ..
 fi
 
