@@ -60,7 +60,7 @@ class _NO_VAL:
 class Field(object):
     """Support for class-level field declaration.
     """
-    def __init__(self, default='', indexed=False):
+    def __init__(self, default=''):
         self.name = None
         self.default = default
 
