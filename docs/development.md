@@ -9,7 +9,7 @@ Since everyone has space preferences, here's ours:
 Pull requests not following this guideline will be reformatted without asking
 permission. You have been warned :)
 
-Regarding style, format, and non-lint code, we:
+Regarding style, format, and linted code, we:
 
 * Follow PEP 8
 * Expect the PyFlakes lint tool to provide no warnings
