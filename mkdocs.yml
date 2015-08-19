@@ -8,6 +8,7 @@ pages:
 - User Guide:
     - Using gludb.simple: simple.md
     - Configuration and Mapping: config.md
+    - Versioning: versioning.md
     - Backing Up: backups.md
     - Advanced Use: advanced.md
     - API: api.md

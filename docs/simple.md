@@ -53,22 +53,94 @@ be referring to throughout this article:
 
 ## Fields
 
-TODO: default values
+While the `DBObject` annotations adds magic to your class, it's up to you to
+define what will be stored. You do this by declaring class level `Field`
+variables. Those variables (by name) become actual values for instances of
+your class. All you have to do is specify a default value (and an empty string
+is just fine).
 
-TODO: complete walkthrough with sqlite and some very simple mapping,
-      including complex field, indexes, and a setup method
+Unlike some ways of declaring data, there is no "native type" associated with
+a field. The only restriction in place is that a field must have a value that
+can be persisted in JSON. That means strings, numbers, booleans, lists, and
+dictionaries.
+
+Since you can have a "complex" field that is a dictionary, you might be tempted
+to define such a field like this:
+
+    class BadMove(object):
+        DoNoDoThis = Field({})
+        OrThis = Field([])
+
+This will cause side-effects that you almost certainly do not want. For a
+complete explanation, check out this
+[article](http://effbot.org/zone/default-values.htm).
+
+So what do you do?
+
+Luckily you can supply a function as a default value. So instead of the BadMove
+class, we can use:
+
+    def special_default():
+        if moon.is_full():
+            return moon.get_phases()
+        else:
+            return []
+
+    class SmoothMove(object):
+        DictValue = Field(dict)
+        ListValue = Field(list)
+        SpecialMoonValue = Field(special_default)
+
+You'll notice that any function will do, as we've illustrated with our silly
+and poorly named function `special_default`.
 
 ## DBObject annotation
 
-TODO: table name and ensure_table
+Any class that you want to persist to the database should have at least one
+Field defined as we described above. You also need to annotate it with
+DBObject and specify `table_name`. That's the name that will be used in the
+actual data backend that you specify in your configuration (see below). Also
+keep in mind that not every datastore has the concept of a table; for
+instance, in MongoDB the table_name will actually become the collection name.
 
-TODO: versioning
+The other parameter available (not shown here) is the type of versioning to be
+used. You may specify a versioning type (currently only DELTA_HISTORY is
+available) if you want a change history of each object to be stored with the
+object. Please see [Versioning](versioning.md) for more details.
 
-TODO: ctor and fields
+In addition to an `__init__` methods, properties with defaults, and other
+features, you get the following methods for free:
 
-TODO: to/from data
+ * to_data - Return a serialized version of the instance in JSON
+ * from_data - _classmethod_ that constructs an instance of the class from JSON
+ * ensure_table - _classmethod_ that creates the table/indexes if necessary
+ * find_one - _classmethod_ that returns an instance of the class matching
+   the ID specified (or None if not in the datastore)
+ * find_all - _classmethod_ that returns all stored instances of the class
+ * find_by_index - _classmethod_ that returns all stored instances of the class
+   where the index matching the name given has the same value specified
+ * save - Saves the current instance of the class
 
-TODO: Data storage methods
+## The setup method
+
+All of this magic is nice, but what if you actually have some logic you need
+to run when an instance of a class is created? Luckily, you can specify a
+`setup` method which will be called after __init__ has finished but before it
+returns. You just need to make sure that your setup method is an instance
+method and that it accepts both positional arguments and keyword arguments:
+
+    class SetupData(object):
+        name = Field('default name')
+
+        def setup(self, *args, **kwrds):
+            self.not_saved = kwrds.get('not_saved', 'won't save anyway')
+
+    example = SetupData(name='song', not_saved='simple minds')
+
+You'll note the signature of `setup`. The args and keywords passed in are
+exactly what's passed to `__init__`. In this case, we want to able to specify
+a value for the property `not_saved`. Unsurprisingly, this value won't be
+saved to the database because it's not defined as a field.
 
 ## Indexes
 
@@ -84,13 +156,15 @@ are looking for. The index name is the name of the function that you wrote.
 Although they aren't requirements, there are a few guidelines that you should
 keep in mind:
 
-* Too many indexes can slow your database down needlessly. Some backends might
-  even limit the number indexes allowed. In general, five or fewer is always OK
-  and 100 is always too many :)
-* Although not strictly necessary, it's usually a good idea to design index
-  functions that always return the same value for the same data object.
-* All index functions are called every time an object is saved, so you probably
-  don't want long-running logic in an index function.
+ * Whatever you return from an index function will be treated as a _string_, so
+   do yourself a favor and only return strings from index functions
+ * Too many indexes can slow your database down needlessly. Some backends might
+   even limit the number indexes allowed. In general, five or fewer is always OK
+   and 100 is always too many :)
+ * Although not strictly necessary, it's usually a good idea to design index
+   functions that always return the same value for the same data object.
+ * All index functions are called every time an object is saved, so you probably
+   don't want long-running logic in an index function.
 
 If you have an index function that seems to violate one or both of the last
 two guidelines, you probably want a Field and an Index that returns the value
@@ -110,7 +184,6 @@ of that field:
 This way you call `perform_hard_calc` when necessary (if at all), and you don't
 need to worry about how often the object is saved (at least from the standpoint
 of calling your index function).
-
 
 ## Configuration
 
