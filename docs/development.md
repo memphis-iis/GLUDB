@@ -24,7 +24,7 @@ Please see our [testing document](testing.md)
 
 ## Creating a new backend
 
-TODO: walkthru
+TODO: walkthrough
 
 ## Documentation
 

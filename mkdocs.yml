@@ -6,7 +6,6 @@ dev_addr: 127.0.0.1:4000
 pages:
 - Home: index.md
 - User Guide:
-    - Overview: overview.md
     - Using gludb.simple: simple.md
     - Configuration and Mapping: config.md
     - Backing Up: backups.md

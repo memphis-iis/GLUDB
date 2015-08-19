@@ -1,10 +1,6 @@
 # GLUDB
 
-For more GLU, see also
-[SuperGLU](https://github.com/GeneralizedLearningUtilities/SuperGLU)
-
-Generalized Learning Utilities Database Library
---------------------------------------------------
+## Generalized Learning Utilities Database Library
 
 For more GLU, see also
 [SuperGLU](https://github.com/GeneralizedLearningUtilities/SuperGLU)
@@ -27,8 +23,7 @@ data stores currently supported are:
 * Google Cloud Datastore
 * MongoDB
 
-Installing
-------------
+## Installing
 
 You can install from PyPI using pip:
 
@@ -51,3 +46,60 @@ support into a virtualenv using Python 3 like this:
     user@host:~$ . env/bin/activate
     user@host:~$ pip install --upgrade pip wheel
     user@host:~$ pip install gludb[dynamodb,backups]
+
+You can also view the [release notes](relnotes.md)
+
+## The easy intro
+
+To get started, check out the simple interface provided:
+[Using gludb.simple](simple.md)
+
+The basic idea is that you define "fields" in your class with a default value
+and you annotate your class. GLUDB provides an ID field, a default constructor
+(`__init__` method), functions to serialize/deserialize you class to/from JSON,
+and data store methods to read/write records. Here a simple example:
+
+    from gludb.simple import DBObject, Field, Index
+    from gludb.config import default_database, Database
+
+    @DBObject(table_name='SomeTableName')
+    class DemoObject(object):
+        name = Field('default name')
+
+        @Index
+        def rev_name(self):
+            return ''.join(reversed(self.name.lower()))
+
+    # Perform initial configuration (only needed when your program starts us)
+    default_database(Database('sqlite', filename=':memory:'))
+    # Make sure our table (and any indexes) exists
+    DemoObject.ensure_table()
+
+    # Create a new object with default values in the fields
+    obj1 = DemoObject()
+    # Create an object and specify fields
+    obj2 = DemoObject(name='Bob')
+    # You can change fields
+    obj1.name = 'Alice'
+
+    # Save objects
+    obj1.save()
+    obj2.save()
+
+    # You can use the serialization methods directly
+    json_data = obj1.to_data()
+    copy_obj = DemoObject.from_data(json_data)
+
+    # You can read the objects back from the database
+    found = DemoObject.find_one(obj1.id)
+    # You can find all objects stored
+    object_list = DemoObject.find_all()
+    # You can read using your defined indexes
+    idx_obj = DemoObject.find_by_index('rev_name', 'ecila')
+
+For further details see [Using gludb.simple](simple.md)
+
+## Development
+
+Check out the [development page](development.md) and the
+[testing overview](testing.md)
