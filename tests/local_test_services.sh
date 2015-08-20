@@ -32,7 +32,7 @@ else
     # gcd install for google cloud datastore testing
     mkdir -p ./test_services_env/gcd
     pushd ./test_services_env/gcd
-    wget http://storage.googleapis.com/gcd/tools/${GCD_BASE}.zip
+    wget https://s3.amazonaws.com/public-service/${GCD_BASE}.zip
     rm ./${GCD_BASE}/ ./gcd-data/ -fr
     unzip ${GCD_BASE}.zip
     ./${GCD_BASE}/gcd.sh create -d gcd-data ./gcd-data

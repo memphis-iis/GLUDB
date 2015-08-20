@@ -13,7 +13,7 @@ npm install -g dynalite
 # have a better solution, Craig saved a copy of the ZIP file in question. See
 # him to work around Google's buffoonery.
 GCD_BASE=gcd-v1beta2-rev1-2.1.1
-wget http://storage.googleapis.com/gcd/tools/${GCD_BASE}.zip
+wget https://s3.amazonaws.com/public-service/${GCD_BASE}.zip
 unzip ${GCD_BASE}.zip
 ${SCRIPT_DIR}/${GCD_BASE}/gcd.sh create -d gcd-data ${SCRIPT_DIR}/gcd-data
 echo "#!/bin/bash" > /tmp/gcdrun
