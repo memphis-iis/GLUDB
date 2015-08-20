@@ -67,6 +67,7 @@ export DATASTORE_HOST="http://localhost:8080"
 export DATASTORE_DATASET="gcd-data"
 
 # Some notes
-echo "Be sure DynamoDB Local is running for dyanmodb backend tests"
+echo "Be sure local versions of DynamoDB, GCD, and S3 are running!"
+echo "Hint: you can use local_test_services.sh for that"
 
 nosetests -w "$SCRIPT_DIR" $*
