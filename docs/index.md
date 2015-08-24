@@ -23,6 +23,25 @@ data stores currently supported are:
 * Google Cloud Datastore
 * MongoDB
 
+## Who is this for?
+
+GLUDB is for people who want a document-oriented storage solution for the major
+cloud providers (and some other back ends), but also want it dead simple. This
+is *NOT* meant to be a replacement for sqlalchemy or Django Models. If you
+think that you need a relational database or if you might need advanced functionality,
+then GLUDB might not be for you. (Although it's open source, so you should feel
+free to steal what you can use.)
+
+However, this might be the library for you if:
+
+* You want to be able to switch between MongoDB, Amazon DynamoDB, and/or
+  Google Cloud Datastore (and don't forget sqlite for caching!)
+* You want a dead-simple way to read and write data
+* You don't plan on having tremendously complicated queries
+* You want to keep a history of changes to your objects
+* You want a manual backup/snapshot mechanism to AWS S3
+
+
 ## Installing
 
 You can install from PyPI using pip:
