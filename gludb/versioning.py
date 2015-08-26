@@ -71,14 +71,14 @@ def parse_diff_hist(curr_obj, diff_hist):
     """Given a diff_hist as created, appended by append_diff_hist, yield the
     versions of the object start with curr_obj and working backwards in time.
     Each instance yielded is of the form (obj, date-string) where obj is the
-    JSON-compatible version of the object created by applying a diff in the
+    JSON version of the object created by applying a diff in the
     diff history and date-string is a string representing the date/time that
     the diff was taken"""
     curr_obj, diff_hist = _norm_json_params(curr_obj, diff_hist)
 
-    yield (curr_obj, None)
+    yield (json.dumps(curr_obj), None)
 
     last_obj = curr_obj
     for one in reversed(diff_hist):
         last_obj = record_patch(last_obj, one['diff'])
-        yield last_obj, one['diff_date']
+        yield json.dumps(last_obj), one['diff_date']

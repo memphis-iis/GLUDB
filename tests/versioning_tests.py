@@ -98,7 +98,7 @@ class DiffHistoryTesting(unittest.TestCase):
         obj_hist = list(parse_diff_hist(self.start, diff_hist))
 
         self.assertEquals(1, len(obj_hist))
-        self.assertEquals(self.start, obj_hist[0][0])
+        self.assertEquals(self.start, json.loads(obj_hist[0][0]))
         self.assertIsNone(obj_hist[0][1])
 
     def test_full_history(self):
@@ -111,7 +111,7 @@ class DiffHistoryTesting(unittest.TestCase):
 
         obj_hist = list(parse_diff_hist(self.final, diff_hist))
         self.assertEquals(4, len(obj_hist))
-        obj_list = list(reversed([ver for ver, verdate in obj_hist]))
+        obj_list = list(reversed([json.loads(ver) for ver, _ in obj_hist]))
         self.assertEquals(self.series, obj_list)
 
 
@@ -160,7 +160,10 @@ class VersionSavedTesting(unittest.TestCase):
 
             self.assertTrue(compare_data_objects(exp, actobj))
 
+        print(type(obj_hist[0][0]), obj_hist[0][0])
+        obj_hist_dct = [json.loads(o) for o, _ in obj_hist]
+
         # a little sanity checking
-        self.assertEquals("last new name", obj_hist[0][0]['name'])
-        self.assertEquals("first new name", obj_hist[1][0]['name'])
-        self.assertEquals("default name", obj_hist[2][0]['name'])
+        self.assertEquals("last new name", obj_hist_dct[0]['name'])
+        self.assertEquals("first new name", obj_hist_dct[1]['name'])
+        self.assertEquals("default name", obj_hist_dct[2]['name'])
