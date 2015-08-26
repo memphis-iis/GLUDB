@@ -88,12 +88,14 @@ this example:
 
 The printed results would be something like:
 
-    Current Version
-    C
-    Historical Version from: UTC:2015-08-26T20:43:30.210610
-    B
-    Historical Version from: UTC:2015-08-26T20:43:30.208385
-    A
+````Text
+Current Version
+C
+Historical Version from: UTC:2015-08-26T20:43:30.210610
+B
+Historical Version from: UTC:2015-08-26T20:43:30.208385
+A
+````
 
 Of course, the date/time stamps would be different.
 
@@ -123,7 +125,7 @@ classes, please see the source code for
 At the lowest level, `gludb.versioning` supplies the functions `record_diff`
 and `record_patch` to create and apply delta's, respectively. Currently this
 functionality is provided by the excellent library
-(json_delta)[http://json-delta.readthedocs.org].
+[json_delta](http://json-delta.readthedocs.org).
 
 You can use `record_diff` in conjunction with the function `append_diff_hist`
 in order to maintain a list that is parsable by `parse_diff_hist`.
