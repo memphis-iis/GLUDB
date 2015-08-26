@@ -1,5 +1,10 @@
 # GLUDB Release Notes
 
+## 0.1.1
+
+Finished the bulk of the documentation, and cleaned up versioning (including
+a new helper method for simple classes)
+
 ## v0.1.0a2
 
 Second alpha release. Mainly a README and procedural update to the previous
