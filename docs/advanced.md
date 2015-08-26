@@ -15,9 +15,6 @@ The methods you need to implement are:
 
 * The classmethod get_table_name - you need to return the name of the "table"
   where the data will be stored
-* The classmethod get_versioning - you need to return the type of versioning
-  your class should use. This should be a value from
-  gludb.versioning.VersioningTypes
 * The instancemethod get_id - which should return the ID for the current
   object. If you return a "falsey" value on save, then a new ID will be created
   and set via a call to self.set_id
@@ -37,4 +34,12 @@ A class with all these methods implemented that descends from
 gludb.data.Storable (either via actual inheritance or duck typing and
 registration) may be decorated with gludb.data.DatabaseEnabled, which supplies
 the persistance methods as described in the "DBObject annotation" of [Using
-gludb.simple](simple.md)
+gludb.simple](simple.md).
+
+Of course, there's very little reason to go through the trouble of implementing
+all of the above functionality if you're *not* going to annotate your class
+with DBObject.
+
+One final note: *you* are responsible for implementing versioning (if you need
+it). You can use the functions provides by gludb.versioning if you wish.
+See [Versioning](versioning.md) for details.
