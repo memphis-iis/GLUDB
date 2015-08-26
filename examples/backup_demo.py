@@ -17,6 +17,7 @@ Dependencies you'll need installed when this is running:
 
 from gludb.simple import DBObject, Field
 
+
 @DBObject(table_name='MyDataTable')
 class MyData(object):
     name = Field('')
@@ -48,10 +49,9 @@ def main():
     BUCKET_NAME = 'Enter-Yours-Here'
 
     if 'Enter-Yours-Here' in [AWS_ACCESS_KEY, AWS_SECRET_KEY, BUCKET_NAME]:
-        print("You need to chnage this file and supply some AWS information")
+        print("You need to change this file and supply some AWS information")
         return
 
-    # TODO: we need some AWS info
     backup = Backup(
         aws_access_key=AWS_ACCESS_KEY,
         aws_secret_key=AWS_SECRET_KEY,
