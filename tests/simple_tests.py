@@ -50,7 +50,7 @@ class BasicAbstractionTesting(unittest.TestCase):
     def test_storage_metadata(self):
         s = SimpleData()
         self.assertEquals('SimpleTest', s.get_table_name())
-        self.assertEquals(VersioningTypes.NONE, s.get_versioning())
+        self.assertEquals(VersioningTypes.NONE, s.__versioning__)
 
     def test_setup_called(self):
         s = SetupData('passthru', name='R')

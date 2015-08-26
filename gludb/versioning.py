@@ -8,6 +8,8 @@ import datetime
 
 import json_delta  # External dependency
 
+from .utils import now_field
+
 
 # Yes, this could be an enum, but we're supporting Python 2.7
 class VersioningTypes(object):
@@ -58,12 +60,7 @@ def append_diff_hist(diff, diff_hist=list()):
     if not diff_hist:
         diff_hist = list()
 
-    # TODO: factor out the diff_date format (see also .simple's now_date)
-    diff_hist.append({
-        'diff': diff,
-        'diff_date': 'UTC:' + datetime.datetime.utcnow().isoformat()
-    })
-
+    diff_hist.append({'diff': diff, 'diff_date': now_field()})
     return diff_hist
 
 

@@ -30,6 +30,16 @@ class VersionedData(object):
     age = Field(42)
 
 
+@DBObject(table_name='UnVersionedDataTest')
+class UnVersionedData(object):
+    name = Field('default name')
+
+
+@DBObject(table_name='BadNews', versioning='nope-thats-not-right')
+class BadVersionData(object):
+    name = Field()
+
+
 def cmpfilt(o):
     return json.loads(o) if _isstr(o) else o
 
@@ -148,7 +158,7 @@ class VersionSavedTesting(unittest.TestCase):
         d.age = 2
         do_save()
 
-        obj_hist = list(parse_diff_hist(d.to_data(), d._version_hist))
+        obj_hist = list(parse_diff_hist(d.to_data(), d.get_version_hist()))
         self.assertEquals(3, len(obj_hist))
         self.assertEquals(len(expected), len(obj_hist))
 
@@ -167,3 +177,34 @@ class VersionSavedTesting(unittest.TestCase):
         self.assertEquals("last new name", obj_hist_dct[0]['name'])
         self.assertEquals("first new name", obj_hist_dct[1]['name'])
         self.assertEquals("default name", obj_hist_dct[2]['name'])
+
+
+class VersionTypesTesting(unittest.TestCase):
+    def setUp(self):
+        gludb.config.default_database(gludb.config.Database(
+            'sqlite',
+            filename=':memory:'
+        ))
+        UnVersionedData.ensure_table()
+
+    def tearDown(self):
+        # Undo any database setup
+        gludb.config.clear_database_config()
+
+    # Note no delta history checking - that's testing above in
+    # VersionSavedTesting.test_versions_saved
+
+    def test_no_versioning(self):
+        obj = UnVersionedData(name='a')
+        self.assertIsNone(obj.get_version_hist())
+
+        obj.save()
+        obj.name = 'B'
+        obj.save()
+
+        self.assertIsNone(obj.get_version_hist())
+
+    def test_bad_versioning(self):
+        def try_op():
+            return BadVersionData(name='etc').get_version_hist()
+        self.assertRaises(ValueError, try_op)

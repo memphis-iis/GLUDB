@@ -42,8 +42,6 @@ a function that will be called to retreive a default value. In this example
 you should use `Field(default=dict)`.
 """
 
-# TODO: provide a version history method that uses .versioning.parse_diff_hist
-
 import json
 
 from .utils import now_field
@@ -87,10 +85,6 @@ def _auto_init(self, *args, **kwrds):
 
 def _get_table_name(cls):
     return cls.__table_name__
-
-
-def _get_versioning(cls):
-    return cls.__versioning__
 
 
 def _get_id(self):
@@ -152,13 +146,22 @@ def _delta_save(save_method):
 
         # Need to save changes?
         if diff:
-            ver_hist = getattr(self, '_version_hist', list())
+            ver_hist = self.get_version_hist()
             ver_hist = append_diff_hist(diff, ver_hist)
             setattr(self, '_version_hist', ver_hist)
 
         return save_method(self)
 
     return wrapper
+
+
+def _get_version_hist(self):
+    if self.__versioning__ == VersioningTypes.NONE:
+        return None
+    elif self.__versioning__ == VersioningTypes.DELTA_HISTORY:
+        return getattr(self, '_version_hist', list())
+    else:
+        raise ValueError("Unknown versioning type")
 
 
 def DBObject(table_name, versioning=VersioningTypes.NONE):
@@ -195,13 +198,14 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
 
         # Duck-type the class for our data methods
         cls.get_table_name = classmethod(_get_table_name)
-        cls.get_versioning = classmethod(_get_versioning)
         cls.get_id = _get_id
         cls.set_id = _set_id
         cls.to_data = _to_data
         cls.from_data = classmethod(_from_data)
         cls.index_names = classmethod(_index_names)
         cls.indexes = _indexes
+        # Bonus methods they get for using gludb.simple
+        cls.get_version_hist = _get_version_hist
 
         # Register with our abc since we actually implement all necessary
         # functionality

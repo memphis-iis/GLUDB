@@ -43,13 +43,6 @@ class Storable(_with_metaclass(ABCMeta)):
         be saved/loaded"""
         pass
 
-    @classmethod
-    @abstractmethod
-    def get_versioning(self):
-        """Return the type of versioning to be used - should be one of the
-        values defined in gludb.versioning"""
-        pass
-
     @abstractmethod
     def get_id(self):
         """The instance should return the current key/ID for the instance. If
