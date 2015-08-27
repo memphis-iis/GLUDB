@@ -69,7 +69,7 @@ class Backup(object):
         # We don't ever store this name-to-class mapping
         self.classes = dict()
 
-        # If we they didn't manually specify AWS creds when we were created,
+        # If they didn't manually specify AWS creds when we were created,
         # then we read them from the AWS-documented environ variables that
         # boto would use anyway
         if not self.aws_access_key:
@@ -98,7 +98,12 @@ class Backup(object):
                         self.add_class(member, include_bases=include_bases)
             elif recurse:
                 # Package and we're supposed to recurse
-                self.add_package(pkg_name + '.' + name, True)
+                self.add_package(
+                    pkg_name + '.' + name,
+                    recurse=True,
+                    include_bases=include_bases,
+                    parent_pkg=parent_pkg
+                )
 
     def add_class(self, cls, include_bases=True):
         if not is_backup_class(cls):
