@@ -8,7 +8,7 @@ cd "$SCRIPT_DIR"
 set -e
 
 # TODO: switch from python2 to python3 once we don't need special Python2-only
-#       req's for Google Datastore. This means we can also remove qualname below
+#       req's for Google Datastore. This means we can remove qualname below
 
 # Use our virtualenv (and create if necessary)
 VE_DIR="$SCRIPT_DIR/env"

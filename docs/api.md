@@ -1,11 +1,29 @@
 
 # Package gludb
 
-glubdb - A simple database wrapper
+GLUDB provides a fairly simple way to read/write data to some popular
+datastores like Amazon's DynamoDB and Google Cloud Datastore. We provide:
+
+* A simple abstraction layer for annotating classes that should be stored in
+  the database
+* Support for versioning by automatically storing change history with the data
+* Automated "indexing", which includes querying on the value of indexes
+* Automated, configurable backup to Amazon's S3 (and Glacier depending on how
+  you configure the S3 buckets)
+
+We currently support Python 2 (2.7 and greater) and 3 (3.4 and greater). The
+data stores currently supported are:
+
+* sqlite
+* DynamoDB
+* Google Cloud Datastore
+* MongoDB
 
 # Package gludb.backends
 
-glubdb.backends - implementation of actual db backends
+This sub-package contains all backends available in gludb. In general,
+you shouldn't need to directly use any of the classes here since they will be
+created and managed for you via the mappings available in gludb.config
 
 ## module gludb.backends.dynamodb
 
@@ -247,7 +265,12 @@ archival to Glacier)
 
 Full qualified name: gludb.backup.Backup
 
-None
+This is the main interface to gludb.backup functionality. When creating
+the instance must specify a bucket_name for backups. You may optionally
+specify a name, AWS access ID, and AWS secret key. Note that if you don't
+specify AWS credentials the environment variables AWS_ACCESS_KEY_ID and
+AWS_SECRET_ACCESS_KEY will checked. If those aren't defined, then empty
+strings will be used
 Class members that aren't methods
 
  + \_\_init\_\_
@@ -309,7 +332,7 @@ when it is closed unless the 'delete' argument is set to False.
 
 ### function *backup_name*
 
-None
+Return a usable name for the data stored for a class
 
 
 ### function *get_mapping*
@@ -339,7 +362,9 @@ relative import to an absolute import.
 
 ### function *is_backup_class*
 
-None
+Return true if given class supports back up. Currently this means a
+gludb.data.Storable-derived class that has a mapping as defined in
+gludb.config
 
 
 ### function *isclass*
@@ -358,12 +383,15 @@ Return a string we use for storing our date time values
 
 ### function *strip_line*
 
-None
+Return a stripped (trimmed) version of the line read
+back from a file assuming that the line was originally written with the
+write_line function UTF-8 encoding is assumed
 
 
 ### function *write_line*
 
-None
+Write the given line to the given file-like
+object with a terminating linefeed character. UTF-8 encoding is assumed
 
 
 

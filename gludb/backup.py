@@ -27,6 +27,9 @@ from .simple import DBObject, Field
 
 
 def is_backup_class(cls):
+    """Return true if given class supports back up. Currently this means a
+    gludb.data.Storable-derived class that has a mapping as defined in
+    gludb.config"""
     return True if (
         isclass(cls) and
         issubclass(cls, Storable) and
@@ -35,6 +38,7 @@ def is_backup_class(cls):
 
 
 def backup_name(cls):
+    """Return a usable name for the data stored for a class"""
     return cls.__name__ + '--' + cls.get_table_name()
 
 # write_line is used below for Python 2&3 compatibility. We provide strip_line
@@ -54,10 +58,26 @@ else:
     def strip_line(line):
         return str(line).strip()
 
+# Maintain only one copy of the doc string for functions that have different
+# versions for Python 2 and 3
+write_line.__doc__ = """Write the given line to the given file-like
+object with a terminating linefeed character. UTF-8 encoding is assumed"""
+
+strip_line.__doc__ = """Return a stripped (trimmed) version of the line read
+back from a file assuming that the line was originally written with the
+write_line function UTF-8 encoding is assumed"""
+
 
 # Turns out the library qualname doesn't handle annotated classes and we need
 # Python 2 for gcd docs .... so we'll force-annotated Backup below
 class Backup(object):
+    """This is the main interface to gludb.backup functionality. When creating
+    the instance must specify a bucket_name for backups. You may optionally
+    specify a name, AWS access ID, and AWS secret key. Note that if you don't
+    specify AWS credentials the environment variables AWS_ACCESS_KEY_ID and
+    AWS_SECRET_ACCESS_KEY will checked. If those aren't defined, then empty
+    strings will be used"""
+
     name = Field('backup')
     timestamp = Field(now_field)
     aws_access_key = Field('')
@@ -84,6 +104,30 @@ class Backup(object):
         include_bases=True,
         parent_pkg=None
     ):
+        """Add all classes to the backup in the specified package (including
+        all modules and all sub-packages) for which is_backup_class returns
+        True. Note that self.add_class is used, so base classes will added as
+        well.
+
+        Parameters:
+        * pkg_name - a string representing the package name. It may be
+          relative _if_ parent_pkg is supplied as well
+        * recurse - (default value of True) if False, sub-packages will _not_
+          be examined
+        * include_bases - (default value of True) is passed directly to
+          add_class for every class added
+        * parent_pkg - a string representing the parent package of the relative
+          package specified in pkg_name. Note that you should specify
+          parent_pkg _only_ if pkg_name should be interpreted as relative
+
+        An an example of both relative and absolute package imports, these
+        are equivalent:
+
+        ````
+        backup.add_package('toppackage.subpackage')
+        backup.add_package('subpackage', parent_pkg='toppackage')
+        ````
+        """
         if parent_pkg:
             pkg = import_module('.' + pkg_name, parent_pkg)
         else:
@@ -106,6 +150,13 @@ class Backup(object):
                 )
 
     def add_class(self, cls, include_bases=True):
+        """Add the specified class (which should be a class object, _not_ a
+        string). By default all base classes for which is_backup_class returns
+        True will also be added. `include_bases=False` may be spcified to
+        suppress this behavior. The total number of classes added is returned.
+        Note that if is_backup_class does not return True for the class object
+        passed in, 0 will be returned. If you specify include_bases=False, then
+        the maximum value that can be returned is 1."""
         if not is_backup_class(cls):
             return 0
 
@@ -126,11 +177,22 @@ class Backup(object):
         return added
 
     def log(self, entry, *args):
+        """Append the string supplied to the log (a list of strings). If
+        additional arguments are supplied, then first string is assumed to be
+        a format string and the other args are used for string interpolation.
+        For instance `backup.log("%d + %d == %d", 1, 1, 2)` would result in the
+        string `'1 + 1 == 2'` being logged"""
         if args:
             entry = entry % args
         self.backup_log.append(entry)
 
     def run_backup(self):
+        """The actual backup is performed. The data for all added classes is
+        extracted and written to a file per class where each line (terminated
+        by a line feed character) is the JSON representing a single object.
+        Those files are all archived in a single gzip'ed tarball which is
+        stored in the AWS S3 bucket specified when the current instance of
+        Backup was created"""
         self.log("Starting backup at %s", now_field())
         self.log("Backup config object created at %s", self.timestamp)
 
