@@ -90,7 +90,8 @@ def _post_load(obj):
     # Perform all necessary post load operations we want done when reading
     # from the database. We return the changed object, but make NO EFFORT
     # to keep from mutating the original object.
-    setattr(obj, Storable.ORIG_VER_FIELD_NAME, obj.to_data())
+    if obj:
+        setattr(obj, Storable.ORIG_VER_FIELD_NAME, obj.to_data())
     return obj
 
 

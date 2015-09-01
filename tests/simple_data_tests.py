@@ -60,6 +60,9 @@ class DefaultStorageTesting(unittest.TestCase):
         orig_ver = obj.__class__.from_data(orig_version(read_back))
         self.assertObjEq(obj, orig_ver)
 
+    def test_missing(self):
+        self.assertIsNone(SimpleStorage.find_one('not there'))
+
     def test_readwrite(self):
         s = SimpleStorage(name='Pre', descrip='Testing', age=-1)
         self.assertEquals('', s.id)
