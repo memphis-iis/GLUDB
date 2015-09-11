@@ -66,6 +66,7 @@ class DefaultStorageTesting(unittest.TestCase):
     def test_extra_fields(self):
         s = SimpleStorage()
         s.save()
+
         # TODO: test _create_date and _last_update
 
     def test_readwrite(self):
