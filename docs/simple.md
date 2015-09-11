@@ -100,12 +100,12 @@ A gludb simple class also receives some automatically created fields:
 
 * id - Created and used to identify instances of the object. If the id Field is
   blank on save, one will be automatically created (using a uuid).
-* _version_hist - If you elect to use versioning, it will be maintained in this
+* `_version_hist` - If you elect to use versioning, it will be maintained in this
   field. You shouldn't really ever need to worry about this field because you
   can use helper functions provided for dealing with version history. See
   [Versioning](versioning.md)
-* _create_date - The creation date of the object. See below.
-* _last_update - The date of the last update of the object. See below.
+* `_create_date` - The creation date of the object. See below.
+* `_last_update` - The date of the last update of the object. See below.
 
 If you need to access the `_create_date` and `_last_update` fields, you can
 parse their contents with `gludb.utils.parse_now_field`. However, please keep
@@ -148,17 +148,19 @@ features, you get the following methods for free:
 
 All of this magic is nice, but what if you actually have some logic you need
 to run when an instance of a class is created? Luckily, you can specify a
-`setup` method which will be called after __init__ has finished but before it
+`setup` method which will be called after `__init__` has finished but before it
 returns. You just need to make sure that your setup method is an instance
 method and that it accepts both positional arguments and keyword arguments:
 
-    class SetupData(object):
-        name = Field('default name')
+````
+class SetupData(object):
+    name = Field('default name')
 
-        def setup(self, *args, **kwrds):
-            self.not_saved = kwrds.get('not_saved', 'won't save anyway')
+    def setup(self, *args, **kwrds):
+        self.not_saved = kwrds.get('not_saved', 'won't save anyway')
 
-    example = SetupData(name='song', not_saved='simple minds')
+example = SetupData(name='song', not_saved='simple minds')
+````
 
 You'll note the signature of `setup`. The args and keywords passed in are
 exactly what's passed to `__init__`. In this case, we want to able to specify

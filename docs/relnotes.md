@@ -1,5 +1,11 @@
 # GLUDB Release Notes
 
+## v0.1.3
+
+Made the automatic date-time fields `_create_date` and `_last_update` official
+(including docs on how they differ from versioning dates). Also added a small
+util function to parse `now_field()` results.
+
 ## v0.1.2
 
 Bug-fix only version - has fix for missing records when `find_one` is called:
