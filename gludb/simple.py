@@ -102,14 +102,13 @@ def _to_data(self):
             val = fld.get_default_val()
         return val
 
+    # Update the datetime fields that we add automatically
+    now = now_field()
+    setattr(self, '_last_update', now)
+    if not getattr(self, '_create_date', ''):
+        setattr(self, '_create_date', now)
+
     data = dict([(fld.name, getval(fld)) for fld in self.__fields__])
-
-    # TODO: use the actual fields
-
-    if '_create_date' not in data:
-        data['_create_date'] = now_field()
-
-    data['_last_update'] = now_field()
 
     return json.dumps(data)
 
@@ -179,19 +178,20 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
                 all_fields.append(fld)
                 field_names.add(name)
 
-        if 'id' not in field_names:
-            fld = Field(default='')
-            fld.name = 'id'
-            all_fields.insert(0, fld)
+        def add_missing_field(name, default='', insert_pos=None):
+            if name not in field_names:
+                fld = Field(default=default)
+                fld.name = name
+                all_fields.insert(
+                    len(all_fields) if insert_pos is None else insert_pos,
+                    fld
+                )
 
-        # Create & update date fields
-        # TODO: if missing create _create_date and _last_update
-
-        # If we have versioning, add a version history field
+        add_missing_field('id', insert_pos=0)
+        add_missing_field('_create_date')
+        add_missing_field('_last_update')
         if versioning == VersioningTypes.DELTA_HISTORY:
-            fld = Field(default=list)
-            fld.name = '_version_hist'
-            all_fields.append(fld)
+            add_missing_field('_version_hist', default=list)
 
         # Things we count on as part of our processing
         cls.__table_name__ = table_name

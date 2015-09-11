@@ -2,12 +2,15 @@
 testing of the rest of gludb.simple functionality)"""
 
 import unittest
+import datetime
+import time
 
 import gludb.config
 
 from gludb.versioning import VersioningTypes
 from gludb.data import orig_version
 from gludb.simple import DBObject, Field
+from gludb.utils import parse_now_field
 
 from utils import compare_data_objects
 
@@ -60,14 +63,47 @@ class DefaultStorageTesting(unittest.TestCase):
         orig_ver = obj.__class__.from_data(orig_version(read_back))
         self.assertObjEq(obj, orig_ver)
 
+    def assertCloseTimes(self, d1, d2, eps=0.15):
+        self.assertTrue(abs((d1 - d2).total_seconds()) < eps)
+
+    def assertNotCloseTimes(self, d1, d2, eps=0.15):
+        self.assertTrue(abs((d1 - d2).total_seconds()) >= eps)
+
     def test_missing(self):
         self.assertIsNone(SimpleStorage.find_one('not there'))
 
     def test_extra_fields(self):
-        s = SimpleStorage()
+        s = SimpleStorage(name='TimeTracking', descrip='FirstSave')
         s.save()
 
-        # TODO: test _create_date and _last_update
+        create1 = parse_now_field(s._create_date)
+        update1 = parse_now_field(s._last_update)
+
+        self.assertCloseTimes(datetime.datetime.utcnow(), update1)
+        self.assertCloseTimes(create1, update1)
+
+        # Sucks, but we need to space out our timestamps
+        time.sleep(0.3)
+
+        s.descrip = 'SecondSave'
+        s.save()
+
+        create2 = parse_now_field(s._create_date)
+        update2 = parse_now_field(s._last_update)
+
+        self.assertCloseTimes(datetime.datetime.utcnow(), update2)
+        self.assertCloseTimes(create1, create2)
+        self.assertNotCloseTimes(update1, update2)
+
+        s2 = SimpleStorage.find_one(s.id)
+        create3 = parse_now_field(s2._create_date)
+        update3 = parse_now_field(s2._last_update)
+
+        # Note that we DON'T check for string equality - that's because
+        # _last_update is updated every time the instance method to_data is
+        # called. See simple.md for extra details on auto fields
+        self.assertCloseTimes(create2, create3)
+        self.assertCloseTimes(update2, update3)
 
     def test_readwrite(self):
         s = SimpleStorage(name='Pre', descrip='Testing', age=-1)

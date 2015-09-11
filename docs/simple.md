@@ -94,6 +94,29 @@ class, we can use:
 You'll notice that any function will do, as we've illustrated with our silly
 and poorly named function `special_default`.
 
+## Automatically created fields
+
+A gludb simple class also receives some automatically created fields:
+
+* id - Created and used to identify instances of the object. If the id Field is
+  blank on save, one will be automatically created (using a uuid).
+* _version_hist - If you elect to use versioning, it will be maintained in this
+  field. You shouldn't really ever need to worry about this field because you
+  can use helper functions provided for dealing with version history. See
+  [Versioning](versioning.md)
+* _create_date - The creation date of the object. See below.
+* _last_update - The date of the last update of the object. See below.
+
+If you need to access the `_create_date` and `_last_update` fields, you can
+parse their contents with `gludb.utils.parse_now_field`. However, please keep
+in mind that these dates are handled whenever `to_data` is called (by design).
+That means that they won't exactly match the date/time of database saves, and
+that `_last_update` may have some jitter.
+
+You can get more stable update times by using [Versioning](versioning.md) and
+looking at the versioning history (which is handled at save). That's kind of
+what the versioning stuff is for.
+
 ## DBObject annotation
 
 Any class that you want to persist to the database should have at least one
