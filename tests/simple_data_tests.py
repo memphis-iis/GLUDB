@@ -63,6 +63,11 @@ class DefaultStorageTesting(unittest.TestCase):
     def test_missing(self):
         self.assertIsNone(SimpleStorage.find_one('not there'))
 
+    def test_extra_fields(self):
+        s = SimpleStorage()
+        s.save()
+        # TODO: test _create_date and _last_update
+
     def test_readwrite(self):
         s = SimpleStorage(name='Pre', descrip='Testing', age=-1)
         self.assertEquals('', s.id)

@@ -104,7 +104,9 @@ def _to_data(self):
 
     data = dict([(fld.name, getval(fld)) for fld in self.__fields__])
 
-    if 'create_date' not in data:
+    # TODO: use the actual fields
+
+    if '_create_date' not in data:
         data['_create_date'] = now_field()
 
     data['_last_update'] = now_field()
@@ -181,6 +183,9 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
             fld = Field(default='')
             fld.name = 'id'
             all_fields.insert(0, fld)
+
+        # Create & update date fields
+        # TODO: if missing create _create_date and _last_update
 
         # If we have versioning, add a version history field
         if versioning == VersioningTypes.DELTA_HISTORY:
