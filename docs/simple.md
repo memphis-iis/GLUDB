@@ -20,7 +20,7 @@ be referring to throughout this article:
         extra_data = Field(dict)
 
         @Index
-        def rev_name(self):
+        def reversed_name(self):
             return ''.join(reversed(self.name.lower()))
 
     # Perform initial configuration (only needed when your program starts us)
@@ -49,7 +49,7 @@ be referring to throughout this article:
     # You can find all objects stored
     object_list = SimpleObject.find_all()
     # You can read using your defined indexes
-    idx_obj = SimpleObject.find_by_index('rev_name', 'ecila')
+    idx_obj = SimpleObject.find_by_index('reversed_name', 'ecila')
 
 ## Fields
 

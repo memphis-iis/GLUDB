@@ -86,7 +86,7 @@ and data store methods to read/write records. Here a simple example:
         name = Field('default name')
 
         @Index
-        def rev_name(self):
+        def reversed_name(self):
             return ''.join(reversed(self.name.lower()))
 
     # Perform initial configuration (only needed when your program starts us)
@@ -114,7 +114,7 @@ and data store methods to read/write records. Here a simple example:
     # You can find all objects stored
     object_list = DemoObject.find_all()
     # You can read using your defined indexes
-    idx_obj = DemoObject.find_by_index('rev_name', 'ecila')
+    idx_obj = DemoObject.find_by_index('reversed_name', 'ecila')
 
 For further details see [Using gludb.simple](simple.md)
 
