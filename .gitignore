@@ -63,3 +63,20 @@ docs/_build/
 
 # PyBuilder
 target/
+
+*.pyc
+.sconsign.dblite
+
+Thumbs.db
+
+*.aux
+*.fls
+*.log
+*.out
+
+*.bbl
+*.blg
+*.nav
+*.snm
+*.toc
+*.vrb

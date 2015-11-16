@@ -1,0 +1,218 @@
+\documentclass[t,handout]{beamer}
+
+\usepackage[symbol*]{footmisc}
+\DefineFNsymbolsTM{myfnsymbols}{% def. from footmisc.sty "bringhurst" symbols
+  \textasteriskcentered *
+}%
+\setfnsymbol{myfnsymbols}
+
+\usepackage{verbatim}
+\usepackage{beamerthemeCopenhagen}
+\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+
+\title{Dist, Docs, and Testing with OSS on GitHub}
+\author{Craig Kelly}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\section{Introduction}
+    \subsection{Me and GLUDB}
+        \frame {
+            \frametitle{Hello}
+            I'm Craig, a Research Developer for the Institute for Intelligent Systems
+            at the University of Memphis (http://www.memphis.edu/iis/).
+
+            \vspace{\baselineskip}
+
+            Our mission depends on an interdisciplinary approach that brings together
+            researchers from many different research areas in the cognitive sciences,
+            including biology, communication sciences and disorders, computer science,
+            education, engineering, linguistics, philosophy, physics, and psychology.
+        }
+
+        \frame {
+            \frametitle{Why Does This Matter?}
+            Grad students!
+
+            \vspace{\baselineskip}
+
+            They generally aren't experienced coders. In some cases they are just
+            learning to program. And they're generally more concerned with DOE
+            than making the database work. So...
+        }
+
+        \frame {
+            \frametitle{What is GLUDB?}
+            (And why should you care?)
+            \begin{itemize}
+                \item Simplified for the demands of working academics and grad students
+                \item Annotate and go!
+                \item Active Record (-ish)
+                \item Documented-oriented data store with support for indexing
+                \item Includes optional functionality for object change history and backups
+                \item Allows easily moving from dev to server to cloud
+                \item Supports sqlite, MongoDB, Google Cloud Datastore, and Amazon DynamoDB
+            \end{itemize}
+        }
+
+        \frame {
+            \frametitle{Is GLUDB for you?}
+            Probably not.
+
+            \vspace{\baselineskip}
+
+            If you want a good, solid ORM then use SQLAlchemy. Or Django's ORM
+            is you're Django'ing. Especially if you care about migrations.
+
+            \vspace{\baselineskip}
+
+            GLUDB can be useful for rapid iteration, hobby projects, or when
+            you need a nice ``object store''
+        }
+
+    \subsection{Overview}
+        \frame {
+            \frametitle{Dist, Docs, and Testing}
+            \begin{itemize}
+                \item Dist via PiPy (pipy.python.org)
+                \item Docs via Read The Docs (readthedocs.org)
+                \item Testing via Travis CI
+            \end{itemize}
+        }
+
+\section{Read The Docs}
+    \subsection{Overview}
+        \frame {
+            \frametitle{Overview}
+            \begin{itemize}
+                \item Free account!
+                \item Pulls from your repo automatically when you push changes
+                \item Supports different doc types
+                \item Has a nice template, and provides downloads
+            \end{itemize}
+        }
+    \subsection{Implementation}
+        \frame {
+            \frametitle{How to Implement}
+            \begin{itemize}
+                \item You write docs in reStructuredText or Markdown
+                \item You push the docs to your GitHub repo
+                \item RTD pull the docs, builds them, and shows them on the web
+            \end{itemize}
+        }
+    \subsection{Example from GLUDB}
+        \frame {
+            \frametitle{Working Example}
+            \begin{itemize}
+                \item We used Markdown - you should probably use Sphinx
+                \item See our mkdocs.yml and our docs directory
+                \item Published at http://gludb.readthedocs.org/en/latest/
+            \end{itemize}
+        }
+
+\section{Travis CI}
+    \subsection{Overview}
+        \frame {
+            \frametitle{Overview}
+            \begin{itemize}
+                \item Continuous Integration for free! (for open source repos on GitHub)
+                \item Pulls from your repo automatically when you push changes
+                \item Multiple environments (e.g. test both Python 2 and 3)
+                \item Supports lots of languages
+                \item Provides lots of services for testing (http://docs.travis-ci.com/user/database-setup/)
+                \item Allows for container customization if what need isn't in the box
+            \end{itemize}
+        }
+    \subsection{Implementation}
+        \frame {
+            \frametitle{How to Implement}
+            \begin{itemize}
+                \item You have tests to run!
+                \item You log in to travis-ci.org with your GitHub account
+                \item You set up your repository
+                \item You create a .travis.yml file
+                \item When you push to your repository your tests are run
+            \end{itemize}
+        }
+    \subsection{Example from GLUDB}
+        \frame {
+            \frametitle{Working Example}
+            \begin{itemize}
+                \item See our travis.yml and tests
+                \item We run tests for both Python 2.7 and 3.4
+                \item We use the Travis CI MongoDB service
+                \item We use a manual process to run backing services that we
+                      need using supervisor. See start\_ci\_services.sh
+                      (See next slide)
+            \end{itemize}
+        }
+
+        \frame {
+            \frametitle{Test Services Startup Script}
+            \begin{itemize}
+                \item Uses npm to install the dynalite server
+                \item Uses wget to download and extract the gcd test server
+                \item Uses virtualenv and pip to set up a Python 2.7 environment for supervisor and our S3 test server
+                \item We even run a Python script as a service (s3server.py) that we copied from Facebook and modified!
+                \item This is all very cool, but also check out our sleep hack :)
+            \end{itemize}
+        }
+
+\section{PyPI}
+    \subsection{Overview}
+        \frame {
+            \frametitle{Overview}
+            Do you want to do \texttt{pip install my-cool-package}?
+
+            \vspace{\baselineskip}
+
+            Then you need to be on PyPI (https://pypi.python.org/pypi)
+
+            \vspace{\baselineskip}
+
+            Not to be confused with the PyPy project at pypy.org
+        }
+    \subsection{Implementation}
+        \frame {
+            \frametitle{How to Implement}
+            \begin{itemize}
+                \item You get your account at pypi.python.org
+                \item You create a setup script for your package
+                \item You upload to PyPI
+            \end{itemize}
+        }
+    \subsection{Example from GLUDB}
+        \frame {
+            \frametitle{Working Example}
+            \begin{itemize}
+                \item First we need a steup script - setup.py (and setup.cfg)
+                      that includes dependencies. (IMPORTANT: your requirements.txt
+                      file will not get used)
+                \item It also helps to have a wrapper script like build.sh
+                \item You can handle uploads using twine
+                \item If you like Markdown for your README (who doesn't), you
+                      can use pandoc for conversion
+                \item Note that you probably won't need the extras
+            \end{itemize}
+        }
+
+\section{Conclusion}
+    \subsection{Conclusion}
+        \frame {
+            \frametitle{Don't Panic}
+            RTD and Travis have excellent documentation (and PyPI's isn't bad).
+
+            \vspace{\baselineskip}
+
+            They're also well-covered at StackOverflow and the usual places
+        }
+        \frame {
+            \frametitle{Thank You!}
+            Thanks for listening
+        }
+
+\end{document}
