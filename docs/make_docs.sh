@@ -25,6 +25,8 @@ else
     pip install --upgrade -r ../dev-requirements.txt
     pip install --upgrade -r ../dev-requirements-27.txt
     pip install qualname
+    pip install argparse
+    pip install pdoc
     pip install -e ..
 fi
 
@@ -34,8 +36,8 @@ echo "In $(pwd), running:"
 if [ "$1" == "api" ];
 then
     shift
-    echo "  python2 docs/make_api_docs.py $* > docs/api.md"
-    python2 docs/make_api_docs.py $* > docs/api.md
+    echo "   pdoc --overwrite --html --all-submodules --html-dir ./docs ./gludb"
+    pdoc --overwrite --html --all-submodules --html-dir ./docs ./gludb
 else
     echo "  mkdocs $*"
     mkdocs $*

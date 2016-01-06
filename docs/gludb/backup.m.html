@@ -1,0 +1,2316 @@
+<!doctype html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+    <title>gludb.backup API documentation</title>
+    <meta name="description" content="Supply backup functionality for gludb. Note that we mainly provide a way for
+users to create a small..." />
+
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+  
+  <style type="text/css">
+  
+* {
+  box-sizing: border-box;
+}
+/*! normalize.css v1.1.1 | MIT License | git.io/normalize */
+
+/* ==========================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+/**
+ * Correct `block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+    display: block;
+}
+
+/**
+ * Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+audio,
+canvas,
+video {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+
+/**
+ * Prevent modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Firefox 3, and Safari 4.
+ * Known issue: no IE 6 support.
+ */
+
+[hidden] {
+    display: none;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+/**
+ * 1. Prevent system color scheme's background color being used in Firefox, IE,
+ *    and Opera.
+ * 2. Prevent system color scheme's text color being used in Firefox, IE, and
+ *    Opera.
+ * 3. Correct text resizing oddly in IE 6/7 when body `font-size` is set using
+ *    `em` units.
+ * 4. Prevent iOS text size adjust after orientation change, without disabling
+ *    user zoom.
+ */
+
+html {
+    background: #fff; /* 1 */
+    color: #000; /* 2 */
+    font-size: 100%; /* 3 */
+    -webkit-text-size-adjust: 100%; /* 4 */
+    -ms-text-size-adjust: 100%; /* 4 */
+}
+
+/**
+ * Address `font-family` inconsistency between `textarea` and other form
+ * elements.
+ */
+
+html,
+button,
+input,
+select,
+textarea {
+    font-family: sans-serif;
+}
+
+/**
+ * Address margins handled incorrectly in IE 6/7.
+ */
+
+body {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+/**
+ * Address `outline` inconsistency between Chrome and other browsers.
+ */
+
+a:focus {
+    outline: thin dotted;
+}
+
+/**
+ * Improve readability when focused and also mouse hovered in all browsers.
+ */
+
+a:active,
+a:hover {
+    outline: 0;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+/**
+ * Address font sizes and margins set differently in IE 6/7.
+ * Address font sizes within `section` and `article` in Firefox 4+, Safari 5,
+ * and Chrome.
+ */
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0.83em 0;
+}
+
+h3 {
+    font-size: 1.17em;
+    margin: 1em 0;
+}
+
+h4 {
+    font-size: 1em;
+    margin: 1.33em 0;
+}
+
+h5 {
+    font-size: 0.83em;
+    margin: 1.67em 0;
+}
+
+h6 {
+    font-size: 0.67em;
+    margin: 2.33em 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Safari 5, and Chrome.
+ */
+
+abbr[title] {
+    border-bottom: 1px dotted;
+}
+
+/**
+ * Address style set to `bolder` in Firefox 3+, Safari 4/5, and Chrome.
+ */
+
+b,
+strong {
+    font-weight: bold;
+}
+
+blockquote {
+    margin: 1em 40px;
+}
+
+/**
+ * Address styling not present in Safari 5 and Chrome.
+ */
+
+dfn {
+    font-style: italic;
+}
+
+/**
+ * Address differences between Firefox and other browsers.
+ * Known issue: no IE 6/7 normalization.
+ */
+
+hr {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 6/7/8/9.
+ */
+
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+p,
+pre {
+    margin: 1em 0;
+}
+
+/**
+ * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
+ */
+
+code,
+kbd,
+pre,
+samp {
+    font-family: monospace, serif;
+    _font-family: 'courier new', monospace;
+    font-size: 1em;
+}
+
+/**
+ * Improve readability of pre-formatted text in all browsers.
+ */
+
+pre {
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/**
+ * Address CSS quotes not supported in IE 6/7.
+ */
+
+q {
+    quotes: none;
+}
+
+/**
+ * Address `quotes` property not supported in Safari 4.
+ */
+
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+
+small {
+    font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* ==========================================================================
+   Lists
+   ========================================================================== */
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+dl,
+menu,
+ol,
+ul {
+    margin: 1em 0;
+}
+
+dd {
+    margin: 0 0 0 40px;
+}
+
+/**
+ * Address paddings set differently in IE 6/7.
+ */
+
+menu,
+ol,
+ul {
+    padding: 0 0 0 40px;
+}
+
+/**
+ * Correct list images handled incorrectly in IE 7.
+ */
+
+nav ul,
+nav ol {
+    list-style: none;
+    list-style-image: none;
+}
+
+/* ==========================================================================
+   Embedded content
+   ========================================================================== */
+
+/**
+ * 1. Remove border when inside `a` element in IE 6/7/8/9 and Firefox 3.
+ * 2. Improve image quality when scaled in IE 7.
+ */
+
+img {
+    border: 0; /* 1 */
+    -ms-interpolation-mode: bicubic; /* 2 */
+}
+
+/**
+ * Correct overflow displayed oddly in IE 9.
+ */
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Figures
+   ========================================================================== */
+
+/**
+ * Address margin not present in IE 6/7/8/9, Safari 5, and Opera 11.
+ */
+
+figure {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+/**
+ * Correct margin displayed oddly in IE 6/7.
+ */
+
+form {
+    margin: 0;
+}
+
+/**
+ * Define consistent border, margin, and padding.
+ */
+
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/**
+ * 1. Correct color not being inherited in IE 6/7/8/9.
+ * 2. Correct text not wrapping in Firefox 3.
+ * 3. Correct alignment displayed oddly in IE 6/7.
+ */
+
+legend {
+    border: 0; /* 1 */
+    padding: 0;
+    white-space: normal; /* 2 */
+    *margin-left: -7px; /* 3 */
+}
+
+/**
+ * 1. Correct font size not being inherited in all browsers.
+ * 2. Address margins set differently in IE 6/7, Firefox 3+, Safari 5,
+ *    and Chrome.
+ * 3. Improve appearance and consistency in all browsers.
+ */
+
+button,
+input,
+select,
+textarea {
+    font-size: 100%; /* 1 */
+    margin: 0; /* 2 */
+    vertical-align: baseline; /* 3 */
+    *vertical-align: middle; /* 3 */
+}
+
+/**
+ * Address Firefox 3+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+
+button,
+input {
+    line-height: normal;
+}
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Chrome, Safari 5+, and IE 6+.
+ * Correct `select` style inheritance in Firefox 4+ and Opera.
+ */
+
+button,
+select {
+    text-transform: none;
+}
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ * 4. Remove inner spacing in IE 7 without affecting normal text inputs.
+ *    Known issue: inner spacing remains in IE 6.
+ */
+
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+    -webkit-appearance: button; /* 2 */
+    cursor: pointer; /* 3 */
+    *overflow: visible;  /* 4 */
+}
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+
+button[disabled],
+html input[disabled] {
+    cursor: default;
+}
+
+/**
+ * 1. Address box sizing set to content-box in IE 8/9.
+ * 2. Remove excess padding in IE 8/9.
+ * 3. Remove excess padding in IE 7.
+ *    Known issue: excess padding remains in IE 6.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+    *height: 13px; /* 3 */
+    *width: 13px; /* 3 */
+}
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari 5 and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari 5 and Chrome
+ *    (include `-moz` to future-proof).
+ */
+
+input[type="search"] {
+    -webkit-appearance: textfield; /* 1 */
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box; /* 2 */
+    box-sizing: content-box;
+}
+
+/**
+ * Remove inner padding and search cancel button in Safari 5 and Chrome
+ * on OS X.
+ */
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/**
+ * Remove inner padding and border in Firefox 3+.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/**
+ * 1. Remove default vertical scrollbar in IE 6/7/8/9.
+ * 2. Improve readability and alignment in all browsers.
+ */
+
+textarea {
+    overflow: auto; /* 1 */
+    vertical-align: top; /* 2 */
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+/**
+ * Remove most spacing between table cells.
+ */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+  </style>
+
+  <style type="text/css">
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  body {
+    background: #fff;
+    font-family: "Source Sans Pro", "Helvetica Neueue", Helvetica, sans;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.6em;
+  }
+  #content {
+    width: 70%;
+    max-width: 850px;
+    float: left;
+    padding: 30px 60px;
+    border-left: 1px solid #ddd;
+  }
+  #sidebar {
+    width: 25%;
+    float: left;
+    padding: 30px;
+    overflow: hidden;
+  }
+  #nav {
+    font-size: 130%;
+    margin: 0 0 15px 0;
+  }
+
+  #top {
+    display: block;
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    font-size: .85em;
+    text-transform: uppercase;
+  }
+
+  #footer {
+    font-size: .75em;
+    padding: 5px 30px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+  }
+    #footer p {
+      margin: 0 0 0 30px;
+      display: inline-block;
+    }
+
+  h1, h2, h3, h4, h5 {
+    font-weight: 300;
+  }
+  h1 {
+    font-size: 2.5em;
+    line-height: 1.1em;
+    margin: 0 0 .50em 0;
+  }
+
+  h2 {
+    font-size: 1.75em;
+    margin: 1em 0 .50em 0;
+  }
+
+  h3 {
+    margin: 25px 0 10px 0;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 105%;
+  }
+
+  a {
+    color: #058;
+    text-decoration: none;
+    transition: color .3s ease-in-out;
+  }
+
+  a:hover {
+    color: #e08524;
+    transition: color .3s ease-in-out;
+  }
+
+  pre, code, .mono, .name {
+    font-family: "Ubuntu Mono", "Cousine", "DejaVu Sans Mono", monospace;
+  }
+
+  .title .name {
+    font-weight: bold;
+  }
+  .section-title {
+    margin-top: 2em;
+  }
+  .ident {
+    color: #900;
+  }
+
+  code {
+    background: #f9f9f9;
+  } 
+
+  pre {
+    background: #fefefe;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 0 #f3f3f3;
+    margin: 0 30px;
+    padding: 15px 30px;
+  }
+
+  .codehilite {
+    margin: 0 30px 10px 30px;
+  }
+
+    .codehilite pre {
+      margin: 0;
+    }
+    .codehilite .err { background: #ff3300; color: #fff !important; } 
+
+  table#module-list {
+    font-size: 110%;
+  }
+
+    table#module-list tr td:first-child {
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+
+    table#module-list td {
+      vertical-align: top;
+      padding-bottom: 8px;
+    }
+
+      table#module-list td p {
+        margin: 0 0 7px 0;
+      }
+
+  .def {
+    display: table;
+  }
+
+    .def p {
+      display: table-cell;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .def p:first-child {
+      white-space: nowrap;
+    }
+
+    .def p:last-child {
+      width: 100%;
+    }
+
+
+  #index {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+    ul#index .class_name {
+      /* font-size: 110%; */
+      font-weight: bold;
+    }
+    #index ul {
+      margin: 0;
+    }
+
+  .item {
+    margin: 0 0 15px 0;
+  }
+
+    .item .class {
+      margin: 0 0 25px 30px;
+    }
+
+      .item .class ul.class_list {
+        margin: 0 0 20px 0;
+      }
+
+    .item .name {
+      background: #fafafa;
+      margin: 0;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 3px;
+      display: inline-block;
+      min-width: 40%;
+    }
+      .item .name:hover {
+        background: #f6f6f6;
+      }
+
+    .item .empty_desc {
+      margin: 0 0 5px 0;
+      padding: 0;
+    }
+
+    .item .inheritance {
+      margin: 3px 0 0 30px;
+    }
+
+    .item .inherited {
+      color: #666;
+    }
+
+    .item .desc {
+      padding: 0 8px;
+      margin: 0;
+    }
+
+      .item .desc p {
+        margin: 0 0 10px 0;
+      }
+
+    .source_cont {
+      margin: 0;
+      padding: 0;
+    }
+
+    .source_link a {
+      background: #ffc300;
+      font-weight: 400;
+      font-size: .75em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 1px 1px 0 #f4b700;
+      
+      padding: 3px 8px;
+      border-radius: 2px;
+      transition: background .3s ease-in-out;
+    }
+      .source_link a:hover {
+        background: #FF7200;
+        text-shadow: none;
+        transition: background .3s ease-in-out;
+      }
+
+    .source {
+      display: none;
+      max-height: 600px;
+      overflow-y: scroll;
+      margin-bottom: 15px;
+    }
+
+      .source .codehilite {
+        margin: 0;
+      }
+
+  .desc h1, .desc h2, .desc h3 {
+    font-size: 100% !important;
+  }
+  .clear {
+    clear: both;
+  }
+
+  @media all and (max-width: 950px) {
+    #sidebar {
+      width: 35%;
+    }
+    #content {
+      width: 65%;
+    }
+  }
+  @media all and (max-width: 650px) {
+    #top {
+      display: none;
+    }
+    #sidebar {
+      float: none;
+      width: auto;
+    }
+    #content {
+      float: none;
+      width: auto;
+      padding: 30px;
+    }
+
+    #index ul {
+      padding: 0;
+      margin-bottom: 15px;
+    }
+    #index ul li {
+      display: inline-block;
+      margin-right: 30px;
+    }
+    #footer {
+      text-align: left;
+    }
+    #footer p {
+      display: block;
+      margin: inherit;
+    }
+  }
+
+  /*****************************/
+
+  </style>
+
+
+  <style type="text/css">
+  
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
+
+@media print,
+       (-o-min-device-pixel-ratio: 5/4),
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid required HTTP connection: h5bp.com/r
+   ========================================================================== */
+
+@media print {
+    * {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links for images, or javascript/internal links
+     */
+
+    .ir a:after,
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group; /* h5bp.com/t */
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    @page {
+        margin: 0.5cm;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+  </style>
+
+  <script type="text/javascript">
+  function toggle(id, $link) {
+    $node = document.getElementById(id);
+    if (!$node)
+    return;
+    if (!$node.style.display || $node.style.display == 'none') {
+    $node.style.display = 'block';
+    $link.innerHTML = 'Hide source &nequiv;';
+    } else {
+    $node.style.display = 'none';
+    $link.innerHTML = 'Show source &equiv;';
+    }
+  }
+  </script>
+</head>
+<body>
+<a href="#" id="top">Top</a>
+
+<div id="container">
+    
+  
+  <div id="sidebar">
+    <h1>Index</h1>
+    <ul id="index">
+
+    <li class="set"><h3><a href="#header-functions">Functions</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#gludb.backup.backup_name">backup_name</a></li>
+    <li class="mono"><a href="#gludb.backup.is_backup_class">is_backup_class</a></li>
+    <li class="mono"><a href="#gludb.backup.strip_line">strip_line</a></li>
+    <li class="mono"><a href="#gludb.backup.write_line">write_line</a></li>
+  </ul>
+
+    </li>
+
+    <li class="set"><h3><a href="#header-classes">Classes</a></h3>
+      <ul>
+        <li class="mono">
+        <span class="class_name"><a href="#gludb.backup.Backup">Backup</a></span>
+        
+          
+  <ul>
+    <li class="mono"><a href="#gludb.backup.Backup.__init__">__init__</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.add_class">add_class</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.add_package">add_package</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.ensure_table">ensure_table</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.find_all">find_all</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.find_by_index">find_by_index</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.find_one">find_one</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.from_data">from_data</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.get_id">get_id</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.get_table_name">get_table_name</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.get_version_hist">get_version_hist</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.index_names">index_names</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.indexes">indexes</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.log">log</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.run_backup">run_backup</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.save">save</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.set_id">set_id</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.setup">setup</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.to_data">to_data</a></li>
+  </ul>
+
+        </li>
+      </ul>
+    </li>
+
+    </ul>
+  </div>
+
+    <article id="content">
+      
+  
+
+  
+
+
+  <header id="section-intro">
+  <h1 class="title"><span class="name">gludb.backup</span> module</h1>
+  <p>Supply backup functionality for gludb. Note that we mainly provide a way for
+users to create a small script that backs up their data to S3. We are assuming
+that the S3 bucket used will be configured for archival (either deletion or
+archival to Glacier)</p>
+  
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup" class="source">
+    <pre><code>"""Supply backup functionality for gludb. Note that we mainly provide a way for
+users to create a small script that backs up their data to S3. We are assuming
+that the S3 bucket used will be configured for archival (either deletion or
+archival to Glacier)
+"""
+
+import sys
+import os
+import pkgutil
+import tarfile
+
+from importlib import import_module
+from inspect import getmembers, isclass, getmro
+from tempfile import NamedTemporaryFile
+
+from boto.s3.connection import S3Connection, OrdinaryCallingFormat
+from boto.s3.key import Key
+
+from .utils import now_field
+from .config import get_mapping
+from .data import Storable
+from .simple import DBObject, Field
+
+# TODO: need the back to check for previous backups and only run if enough time
+#       has elapsed. Best way is probably: store json for backup after
+#       success. Then we read it back to get date/time of last backup
+
+
+def is_backup_class(cls):
+    """Return true if given class supports back up. Currently this means a
+    gludb.data.Storable-derived class that has a mapping as defined in
+    gludb.config"""
+    return True if (
+        isclass(cls) and
+        issubclass(cls, Storable) and
+        get_mapping(cls, no_mapping_ok=True)
+    ) else False
+
+
+def backup_name(cls):
+    """Return a usable name for the data stored for a class"""
+    return cls.__name__ + '--' + cls.get_table_name()
+
+# write_line is used below for Python 2&3 compatibility. We provide strip_line
+# as a convenience for people reading backups (since it includes implicit
+# encoding)
+if sys.version_info >= (3, 0):
+    def write_line(file_obj, line):
+        file_obj.write(bytes(str(line) + '\n', 'UTF-8'))
+
+    def strip_line(line):
+        return str(line, 'UTF-8').strip()
+else:
+    def write_line(file_obj, line):
+        file_obj.write(str(line))
+        file_obj.write('\n')
+
+    def strip_line(line):
+        return str(line).strip()
+
+# Maintain only one copy of the doc string for functions that have different
+# versions for Python 2 and 3
+write_line.__doc__ = """Write the given line to the given file-like
+object with a terminating linefeed character. UTF-8 encoding is assumed"""
+
+strip_line.__doc__ = """Return a stripped (trimmed) version of the line read
+back from a file assuming that the line was originally written with the
+write_line function UTF-8 encoding is assumed"""
+
+
+# Turns out the library qualname doesn't handle annotated classes and we need
+# Python 2 for gcd docs .... so we'll force-annotated Backup below
+class Backup(object):
+    """This is the main interface to gludb.backup functionality. When creating
+    the instance must specify a bucket_name for backups. You may optionally
+    specify a name, AWS access ID, and AWS secret key. Note that if you don't
+    specify AWS credentials the environment variables AWS_ACCESS_KEY_ID and
+    AWS_SECRET_ACCESS_KEY will checked. If those aren't defined, then empty
+    strings will be used"""
+
+    name = Field('backup')
+    timestamp = Field(now_field)
+    aws_access_key = Field('')
+    aws_secret_key = Field('')
+    bucketname = Field('')
+    backup_log = Field(list)
+
+    def setup(self, *args, **kwrds):
+        # We don't ever store this name-to-class mapping
+        self.classes = dict()
+
+        # If they didn't manually specify AWS creds when we were created,
+        # then we read them from the AWS-documented environ variables that
+        # boto would use anyway
+        if not self.aws_access_key:
+            self.aws_access_key = os.environ.get('AWS_ACCESS_KEY_ID', '')
+        if not self.aws_secret_key:
+            self.aws_secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+
+    def add_package(
+        self,
+        pkg_name,
+        recurse=True,
+        include_bases=True,
+        parent_pkg=None
+    ):
+        """Add all classes to the backup in the specified package (including
+        all modules and all sub-packages) for which is_backup_class returns
+        True. Note that self.add_class is used, so base classes will added as
+        well.
+
+        Parameters:
+        * pkg_name - a string representing the package name. It may be
+          relative _if_ parent_pkg is supplied as well
+        * recurse - (default value of True) if False, sub-packages will _not_
+          be examined
+        * include_bases - (default value of True) is passed directly to
+          add_class for every class added
+        * parent_pkg - a string representing the parent package of the relative
+          package specified in pkg_name. Note that you should specify
+          parent_pkg _only_ if pkg_name should be interpreted as relative
+
+        An an example of both relative and absolute package imports, these
+        are equivalent:
+
+        ````
+        backup.add_package('toppackage.subpackage')
+        backup.add_package('subpackage', parent_pkg='toppackage')
+        ````
+        """
+        if parent_pkg:
+            pkg = import_module('.' + pkg_name, parent_pkg)
+        else:
+            pkg = import_module(pkg_name)
+
+        for module_loader, name, ispkg in pkgutil.walk_packages(pkg.__path__):
+            if not ispkg:
+                # Module
+                mod = import_module('.' + name, pkg_name)
+                for name, member in getmembers(mod):
+                    if is_backup_class(member):
+                        self.add_class(member, include_bases=include_bases)
+            elif recurse:
+                # Package and we're supposed to recurse
+                self.add_package(
+                    pkg_name + '.' + name,
+                    recurse=True,
+                    include_bases=include_bases,
+                    parent_pkg=parent_pkg
+                )
+
+    def add_class(self, cls, include_bases=True):
+        """Add the specified class (which should be a class object, _not_ a
+        string). By default all base classes for which is_backup_class returns
+        True will also be added. `include_bases=False` may be spcified to
+        suppress this behavior. The total number of classes added is returned.
+        Note that if is_backup_class does not return True for the class object
+        passed in, 0 will be returned. If you specify include_bases=False, then
+        the maximum value that can be returned is 1."""
+        if not is_backup_class(cls):
+            return 0
+
+        added = 0
+
+        cls_name = backup_name(cls)
+        if cls_name not in self.classes:
+            self.classes[cls_name] = cls
+            self.log("Added class for backup: %s", cls_name)
+            added = 1
+
+        if include_bases:
+            for candidate_cls in getmro(cls):
+                if is_backup_class(cls):
+                    # Note that we don't keep recursing on base classes
+                    added += self.add_class(candidate_cls, include_bases=False)
+
+        return added
+
+    def log(self, entry, *args):
+        """Append the string supplied to the log (a list of strings). If
+        additional arguments are supplied, then first string is assumed to be
+        a format string and the other args are used for string interpolation.
+        For instance `backup.log("%d + %d == %d", 1, 1, 2)` would result in the
+        string `'1 + 1 == 2'` being logged"""
+        if args:
+            entry = entry % args
+        self.backup_log.append(entry)
+
+    def run_backup(self):
+        """The actual backup is performed. The data for all added classes is
+        extracted and written to a file per class where each line (terminated
+        by a line feed character) is the JSON representing a single object.
+        Those files are all archived in a single gzip'ed tarball which is
+        stored in the AWS S3 bucket specified when the current instance of
+        Backup was created"""
+        self.log("Starting backup at %s", now_field())
+        self.log("Backup config object created at %s", self.timestamp)
+
+        # Make sure we're good to go
+        for fld in ['aws_access_key', 'aws_secret_key', 'bucketname']:
+            val = getattr(self, fld, None)
+            if not val:
+                self.log("Backup cannot start: %s is a required field", fld)
+                raise ValueError(self.backup_log[-1])
+
+        # Start the compressed tarball our data is stored in
+        backup_file = NamedTemporaryFile(suffix=".tar.gz")
+        backup_tarfile = tarfile.open(fileobj=backup_file, mode='w:gz')
+
+        for cls_name, cls in self.classes.items():
+            self.log("Backing up %s", cls_name)
+
+            rec_count = 0
+
+            with NamedTemporaryFile() as record_file:
+                for rec in cls.find_all():
+                    write_line(record_file, rec.to_data())
+                    rec_count += 1
+
+                record_file.flush()
+                backup_tarfile.add(record_file.name, arcname=cls_name+'.json')
+
+            self.log("%s => %d records backed up", cls_name, rec_count)
+
+        # Finalize archive
+        backup_tarfile.close()
+        backup_file.flush()
+        backup_size = os.stat(backup_file.name)[6]
+
+        # Figure out key name for archived file
+        key_name = ('Backup_' + now_field() + '.tar.gz').replace(':', '_')
+
+        # upload archive to s3
+        if os.environ.get('DEBUG', False) or os.environ.get('travis', False):
+            # Local or CI - connect to our mock s3 service
+            conn = S3Connection(
+                '', '',
+                is_secure=False, port=8888, host='localhost',
+                calling_format=OrdinaryCallingFormat()
+            )
+        else:
+            conn = S3Connection(self.aws_access_key, self.aws_secret_key)
+
+        bucket = conn.get_bucket(self.bucketname)
+        key = Key(bucket)
+        key.key = key_name
+
+        self.log(
+            "Sending %s [size=%d bytes] with key name %s",
+            backup_file.name,
+            backup_size,
+            key_name
+        )
+
+        # TODO: should probably look into a multi-part upload for larger backup
+        key.set_contents_from_filename(backup_file.name)
+        self.log("Sent %s", backup_file.name)
+
+        # All done
+        backup_file.close()
+        self.log("Backup completed")
+
+        # return the bucket name and key name for the completed backup
+        return self.bucketname, key_name
+
+# TODO: return to an annotation when we can use Python3 for our doc generation
+Backup = DBObject(table_name='BackupHistory')(Backup)
+</code></pre>
+  </div>
+
+  </header>
+
+  <section id="section-items">
+
+    <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="gludb.backup.backup_name">
+    <p>def <span class="ident">backup_name</span>(</p><p>cls)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Return a usable name for the data stored for a class</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.backup_name', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.backup_name" class="source">
+    <pre><code>def backup_name(cls):
+    """Return a usable name for the data stored for a class"""
+    return cls.__name__ + '--' + cls.get_table_name()
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="gludb.backup.is_backup_class">
+    <p>def <span class="ident">is_backup_class</span>(</p><p>cls)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Return true if given class supports back up. Currently this means a
+gludb.data.Storable-derived class that has a mapping as defined in
+gludb.config</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.is_backup_class', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.is_backup_class" class="source">
+    <pre><code>def is_backup_class(cls):
+    """Return true if given class supports back up. Currently this means a
+    gludb.data.Storable-derived class that has a mapping as defined in
+    gludb.config"""
+    return True if (
+        isclass(cls) and
+        issubclass(cls, Storable) and
+        get_mapping(cls, no_mapping_ok=True)
+    ) else False
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="gludb.backup.strip_line">
+    <p>def <span class="ident">strip_line</span>(</p><p>line)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Return a stripped (trimmed) version of the line read
+back from a file assuming that the line was originally written with the
+write_line function UTF-8 encoding is assumed</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.strip_line', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.strip_line" class="source">
+    <pre><code>def strip_line(line):
+    return str(line).strip()
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="gludb.backup.write_line">
+    <p>def <span class="ident">write_line</span>(</p><p>file_obj, line)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Write the given line to the given file-like
+object with a terminating linefeed character. UTF-8 encoding is assumed</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.write_line', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.write_line" class="source">
+    <pre><code>def write_line(file_obj, line):
+    file_obj.write(str(line))
+    file_obj.write('\n')
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+
+    <h2 class="section-title" id="header-classes">Classes</h2>
+      
+      <div class="item">
+      <p id="gludb.backup.Backup" class="name">class <span class="ident">Backup</span></p>
+      
+  
+    <div class="desc"><p>This is the main interface to gludb.backup functionality. When creating
+the instance must specify a bucket_name for backups. You may optionally
+specify a name, AWS access ID, and AWS secret key. Note that if you don't
+specify AWS credentials the environment variables AWS_ACCESS_KEY_ID and
+AWS_SECRET_ACCESS_KEY will checked. If those aren't defined, then empty
+strings will be used</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup" class="source">
+    <pre><code>class Backup(object):
+    """This is the main interface to gludb.backup functionality. When creating
+    the instance must specify a bucket_name for backups. You may optionally
+    specify a name, AWS access ID, and AWS secret key. Note that if you don't
+    specify AWS credentials the environment variables AWS_ACCESS_KEY_ID and
+    AWS_SECRET_ACCESS_KEY will checked. If those aren't defined, then empty
+    strings will be used"""
+
+    name = Field('backup')
+    timestamp = Field(now_field)
+    aws_access_key = Field('')
+    aws_secret_key = Field('')
+    bucketname = Field('')
+    backup_log = Field(list)
+
+    def setup(self, *args, **kwrds):
+        # We don't ever store this name-to-class mapping
+        self.classes = dict()
+
+        # If they didn't manually specify AWS creds when we were created,
+        # then we read them from the AWS-documented environ variables that
+        # boto would use anyway
+        if not self.aws_access_key:
+            self.aws_access_key = os.environ.get('AWS_ACCESS_KEY_ID', '')
+        if not self.aws_secret_key:
+            self.aws_secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+
+    def add_package(
+        self,
+        pkg_name,
+        recurse=True,
+        include_bases=True,
+        parent_pkg=None
+    ):
+        """Add all classes to the backup in the specified package (including
+        all modules and all sub-packages) for which is_backup_class returns
+        True. Note that self.add_class is used, so base classes will added as
+        well.
+
+        Parameters:
+        * pkg_name - a string representing the package name. It may be
+          relative _if_ parent_pkg is supplied as well
+        * recurse - (default value of True) if False, sub-packages will _not_
+          be examined
+        * include_bases - (default value of True) is passed directly to
+          add_class for every class added
+        * parent_pkg - a string representing the parent package of the relative
+          package specified in pkg_name. Note that you should specify
+          parent_pkg _only_ if pkg_name should be interpreted as relative
+
+        An an example of both relative and absolute package imports, these
+        are equivalent:
+
+        ````
+        backup.add_package('toppackage.subpackage')
+        backup.add_package('subpackage', parent_pkg='toppackage')
+        ````
+        """
+        if parent_pkg:
+            pkg = import_module('.' + pkg_name, parent_pkg)
+        else:
+            pkg = import_module(pkg_name)
+
+        for module_loader, name, ispkg in pkgutil.walk_packages(pkg.__path__):
+            if not ispkg:
+                # Module
+                mod = import_module('.' + name, pkg_name)
+                for name, member in getmembers(mod):
+                    if is_backup_class(member):
+                        self.add_class(member, include_bases=include_bases)
+            elif recurse:
+                # Package and we're supposed to recurse
+                self.add_package(
+                    pkg_name + '.' + name,
+                    recurse=True,
+                    include_bases=include_bases,
+                    parent_pkg=parent_pkg
+                )
+
+    def add_class(self, cls, include_bases=True):
+        """Add the specified class (which should be a class object, _not_ a
+        string). By default all base classes for which is_backup_class returns
+        True will also be added. `include_bases=False` may be spcified to
+        suppress this behavior. The total number of classes added is returned.
+        Note that if is_backup_class does not return True for the class object
+        passed in, 0 will be returned. If you specify include_bases=False, then
+        the maximum value that can be returned is 1."""
+        if not is_backup_class(cls):
+            return 0
+
+        added = 0
+
+        cls_name = backup_name(cls)
+        if cls_name not in self.classes:
+            self.classes[cls_name] = cls
+            self.log("Added class for backup: %s", cls_name)
+            added = 1
+
+        if include_bases:
+            for candidate_cls in getmro(cls):
+                if is_backup_class(cls):
+                    # Note that we don't keep recursing on base classes
+                    added += self.add_class(candidate_cls, include_bases=False)
+
+        return added
+
+    def log(self, entry, *args):
+        """Append the string supplied to the log (a list of strings). If
+        additional arguments are supplied, then first string is assumed to be
+        a format string and the other args are used for string interpolation.
+        For instance `backup.log("%d + %d == %d", 1, 1, 2)` would result in the
+        string `'1 + 1 == 2'` being logged"""
+        if args:
+            entry = entry % args
+        self.backup_log.append(entry)
+
+    def run_backup(self):
+        """The actual backup is performed. The data for all added classes is
+        extracted and written to a file per class where each line (terminated
+        by a line feed character) is the JSON representing a single object.
+        Those files are all archived in a single gzip'ed tarball which is
+        stored in the AWS S3 bucket specified when the current instance of
+        Backup was created"""
+        self.log("Starting backup at %s", now_field())
+        self.log("Backup config object created at %s", self.timestamp)
+
+        # Make sure we're good to go
+        for fld in ['aws_access_key', 'aws_secret_key', 'bucketname']:
+            val = getattr(self, fld, None)
+            if not val:
+                self.log("Backup cannot start: %s is a required field", fld)
+                raise ValueError(self.backup_log[-1])
+
+        # Start the compressed tarball our data is stored in
+        backup_file = NamedTemporaryFile(suffix=".tar.gz")
+        backup_tarfile = tarfile.open(fileobj=backup_file, mode='w:gz')
+
+        for cls_name, cls in self.classes.items():
+            self.log("Backing up %s", cls_name)
+
+            rec_count = 0
+
+            with NamedTemporaryFile() as record_file:
+                for rec in cls.find_all():
+                    write_line(record_file, rec.to_data())
+                    rec_count += 1
+
+                record_file.flush()
+                backup_tarfile.add(record_file.name, arcname=cls_name+'.json')
+
+            self.log("%s => %d records backed up", cls_name, rec_count)
+
+        # Finalize archive
+        backup_tarfile.close()
+        backup_file.flush()
+        backup_size = os.stat(backup_file.name)[6]
+
+        # Figure out key name for archived file
+        key_name = ('Backup_' + now_field() + '.tar.gz').replace(':', '_')
+
+        # upload archive to s3
+        if os.environ.get('DEBUG', False) or os.environ.get('travis', False):
+            # Local or CI - connect to our mock s3 service
+            conn = S3Connection(
+                '', '',
+                is_secure=False, port=8888, host='localhost',
+                calling_format=OrdinaryCallingFormat()
+            )
+        else:
+            conn = S3Connection(self.aws_access_key, self.aws_secret_key)
+
+        bucket = conn.get_bucket(self.bucketname)
+        key = Key(bucket)
+        key.key = key_name
+
+        self.log(
+            "Sending %s [size=%d bytes] with key name %s",
+            backup_file.name,
+            backup_size,
+            key_name
+        )
+
+        # TODO: should probably look into a multi-part upload for larger backup
+        key.set_contents_from_filename(backup_file.name)
+        self.log("Sent %s", backup_file.name)
+
+        # All done
+        backup_file.close()
+        self.log("Backup completed")
+
+        # return the bucket name and key name for the completed backup
+        return self.bucketname, key_name
+</code></pre>
+  </div>
+</div>
+
+
+      <div class="class">
+          <h3>Ancestors (in MRO)</h3>
+          <ul class="class_list">
+          <li><a href="#gludb.backup.Backup">Backup</a></li>
+          <li>__builtin__.object</li>
+          </ul>
+          <h3>Class variables</h3>
+            <div class="item">
+            <p id="gludb.backup.Backup.aws_access_key" class="name">var <span class="ident">aws_access_key</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="gludb.backup.Backup.aws_secret_key" class="name">var <span class="ident">aws_secret_key</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="gludb.backup.Backup.backup_log" class="name">var <span class="ident">backup_log</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="gludb.backup.Backup.bucketname" class="name">var <span class="ident">bucketname</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="gludb.backup.Backup.name" class="name">var <span class="ident">name</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="gludb.backup.Backup.timestamp" class="name">var <span class="ident">timestamp</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+          <h3>Methods</h3>
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.__init__">
+    <p>def <span class="ident">__init__</span>(</p><p>self, *args, **kwrds)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Our decorator will add this as <strong>init</strong> to target classes</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.__init__', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.__init__" class="source">
+    <pre><code>def _auto_init(self, *args, **kwrds):
+    """Our decorator will add this as __init__ to target classes
+    """
+    for fld in getattr(self, '__fields__', []):
+        val = kwrds.get(fld.name, _NO_VAL)
+        if val is _NO_VAL:
+            val = fld.get_default_val()
+        setattr(self, fld.name, val)
+
+    if callable(getattr(self, 'setup', None)):
+        self.setup(*args, **kwrds)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.add_class">
+    <p>def <span class="ident">add_class</span>(</p><p>self, cls, include_bases=True)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Add the specified class (which should be a class object, <em>not</em> a
+string). By default all base classes for which is_backup_class returns
+True will also be added. <code>include_bases=False</code> may be spcified to
+suppress this behavior. The total number of classes added is returned.
+Note that if is_backup_class does not return True for the class object
+passed in, 0 will be returned. If you specify include_bases=False, then
+the maximum value that can be returned is 1.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.add_class', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.add_class" class="source">
+    <pre><code>def add_class(self, cls, include_bases=True):
+    """Add the specified class (which should be a class object, _not_ a
+    string). By default all base classes for which is_backup_class returns
+    True will also be added. `include_bases=False` may be spcified to
+    suppress this behavior. The total number of classes added is returned.
+    Note that if is_backup_class does not return True for the class object
+    passed in, 0 will be returned. If you specify include_bases=False, then
+    the maximum value that can be returned is 1."""
+    if not is_backup_class(cls):
+        return 0
+    added = 0
+    cls_name = backup_name(cls)
+    if cls_name not in self.classes:
+        self.classes[cls_name] = cls
+        self.log("Added class for backup: %s", cls_name)
+        added = 1
+    if include_bases:
+        for candidate_cls in getmro(cls):
+            if is_backup_class(cls):
+                # Note that we don't keep recursing on base classes
+                added += self.add_class(candidate_cls, include_bases=False)
+    return added
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.add_package">
+    <p>def <span class="ident">add_package</span>(</p><p>self, pkg_name, recurse=True, include_bases=True, parent_pkg=None)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Add all classes to the backup in the specified package (including
+all modules and all sub-packages) for which is_backup_class returns
+True. Note that self.add_class is used, so base classes will added as
+well.</p>
+<p>Parameters:
+<em> pkg_name - a string representing the package name. It may be
+  relative <em>if</em> parent_pkg is supplied as well</em> recurse - (default value of True) if False, sub-packages will <em>not</em>
+  be examined
+<em> include_bases - (default value of True) is passed directly to
+  add_class for every class added
+</em> parent_pkg - a string representing the parent package of the relative
+  package specified in pkg_name. Note that you should specify
+  parent_pkg <em>only</em> if pkg_name should be interpreted as relative</p>
+<p>An an example of both relative and absolute package imports, these
+are equivalent:</p>
+<p><code>backup.add_package('toppackage.subpackage')
+backup.add_package('subpackage', parent_pkg='toppackage')</code></p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.add_package', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.add_package" class="source">
+    <pre><code>def add_package(
+    self,
+    pkg_name,
+    recurse=True,
+    include_bases=True,
+    parent_pkg=None
+):
+    """Add all classes to the backup in the specified package (including
+    all modules and all sub-packages) for which is_backup_class returns
+    True. Note that self.add_class is used, so base classes will added as
+    well.
+    Parameters:
+    * pkg_name - a string representing the package name. It may be
+      relative _if_ parent_pkg is supplied as well
+    * recurse - (default value of True) if False, sub-packages will _not_
+      be examined
+    * include_bases - (default value of True) is passed directly to
+      add_class for every class added
+    * parent_pkg - a string representing the parent package of the relative
+      package specified in pkg_name. Note that you should specify
+      parent_pkg _only_ if pkg_name should be interpreted as relative
+    An an example of both relative and absolute package imports, these
+    are equivalent:
+    ````
+    backup.add_package('toppackage.subpackage')
+    backup.add_package('subpackage', parent_pkg='toppackage')
+    ````
+    """
+    if parent_pkg:
+        pkg = import_module('.' + pkg_name, parent_pkg)
+    else:
+        pkg = import_module(pkg_name)
+    for module_loader, name, ispkg in pkgutil.walk_packages(pkg.__path__):
+        if not ispkg:
+            # Module
+            mod = import_module('.' + name, pkg_name)
+            for name, member in getmembers(mod):
+                if is_backup_class(member):
+                    self.add_class(member, include_bases=include_bases)
+        elif recurse:
+            # Package and we're supposed to recurse
+            self.add_package(
+                pkg_name + '.' + name,
+                recurse=True,
+                include_bases=include_bases,
+                parent_pkg=parent_pkg
+            )
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.ensure_table">
+    <p>def <span class="ident">ensure_table</span>(</p><p>cls)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.ensure_table', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.ensure_table" class="source">
+    <pre><code>def _ensure_table(cls):
+    get_mapping(cls).ensure_table(cls)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.find_all">
+    <p>def <span class="ident">find_all</span>(</p><p>cls)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.find_all', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.find_all" class="source">
+    <pre><code>def _find_all(cls):
+    return [
+        _post_load(obj)
+        for obj in get_mapping(cls).find_all(cls)
+    ]
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.find_by_index">
+    <p>def <span class="ident">find_by_index</span>(</p><p>cls, index_name, value)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.find_by_index', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.find_by_index" class="source">
+    <pre><code>def _find_by_index(cls, index_name, value):
+    return [
+        _post_load(obj)
+        for obj in get_mapping(cls).find_by_index(cls, index_name, value)
+    ]
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.find_one">
+    <p>def <span class="ident">find_one</span>(</p><p>cls, id)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.find_one', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.find_one" class="source">
+    <pre><code>def _find_one(cls, id):
+    return _post_load(get_mapping(cls).find_one(cls, id))
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.from_data">
+    <p>def <span class="ident">from_data</span>(</p><p>cls, data)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.from_data', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.from_data" class="source">
+    <pre><code>def _from_data(cls, data):
+    data_dict = json.loads(data)
+    return cls(**data_dict)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.get_id">
+    <p>def <span class="ident">get_id</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.get_id', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.get_id" class="source">
+    <pre><code>def _get_id(self):
+    return self.id
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.get_table_name">
+    <p>def <span class="ident">get_table_name</span>(</p><p>cls)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.get_table_name', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.get_table_name" class="source">
+    <pre><code>def _get_table_name(cls):
+    return cls.__table_name__
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.get_version_hist">
+    <p>def <span class="ident">get_version_hist</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.get_version_hist', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.get_version_hist" class="source">
+    <pre><code>def _get_version_hist(self):
+    if self.__versioning__ == VersioningTypes.NONE:
+        return None
+    elif self.__versioning__ == VersioningTypes.DELTA_HISTORY:
+        return getattr(self, '_version_hist', list())
+    else:
+        raise ValueError("Unknown versioning type")
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.index_names">
+    <p>def <span class="ident">index_names</span>(</p><p>cls)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.index_names', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.index_names" class="source">
+    <pre><code>def _index_names(cls):
+    def is_index(name):
+        attr = getattr(cls, name, None)
+        return getattr(attr, 'is_index', False)
+
+    return [name for name in dir(cls) if is_index(name)]
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.indexes">
+    <p>def <span class="ident">indexes</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.indexes', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.indexes" class="source">
+    <pre><code>def _indexes(self):
+    def get_val(name):
+        attr = getattr(self, name, None)
+        while callable(attr):
+            attr = attr()
+        return attr
+
+    return dict([
+        (name, get_val(name)) for name in self.__class__.index_names()
+    ])
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.log">
+    <p>def <span class="ident">log</span>(</p><p>self, entry, *args)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Append the string supplied to the log (a list of strings). If
+additional arguments are supplied, then first string is assumed to be
+a format string and the other args are used for string interpolation.
+For instance <code>backup.log("%d + %d == %d", 1, 1, 2)</code> would result in the
+string <code>'1 + 1 == 2'</code> being logged</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.log', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.log" class="source">
+    <pre><code>def log(self, entry, *args):
+    """Append the string supplied to the log (a list of strings). If
+    additional arguments are supplied, then first string is assumed to be
+    a format string and the other args are used for string interpolation.
+    For instance `backup.log("%d + %d == %d", 1, 1, 2)` would result in the
+    string `'1 + 1 == 2'` being logged"""
+    if args:
+        entry = entry % args
+    self.backup_log.append(entry)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.run_backup">
+    <p>def <span class="ident">run_backup</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>The actual backup is performed. The data for all added classes is
+extracted and written to a file per class where each line (terminated
+by a line feed character) is the JSON representing a single object.
+Those files are all archived in a single gzip'ed tarball which is
+stored in the AWS S3 bucket specified when the current instance of
+Backup was created</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.run_backup', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.run_backup" class="source">
+    <pre><code>def run_backup(self):
+    """The actual backup is performed. The data for all added classes is
+    extracted and written to a file per class where each line (terminated
+    by a line feed character) is the JSON representing a single object.
+    Those files are all archived in a single gzip'ed tarball which is
+    stored in the AWS S3 bucket specified when the current instance of
+    Backup was created"""
+    self.log("Starting backup at %s", now_field())
+    self.log("Backup config object created at %s", self.timestamp)
+    # Make sure we're good to go
+    for fld in ['aws_access_key', 'aws_secret_key', 'bucketname']:
+        val = getattr(self, fld, None)
+        if not val:
+            self.log("Backup cannot start: %s is a required field", fld)
+            raise ValueError(self.backup_log[-1])
+    # Start the compressed tarball our data is stored in
+    backup_file = NamedTemporaryFile(suffix=".tar.gz")
+    backup_tarfile = tarfile.open(fileobj=backup_file, mode='w:gz')
+    for cls_name, cls in self.classes.items():
+        self.log("Backing up %s", cls_name)
+        rec_count = 0
+        with NamedTemporaryFile() as record_file:
+            for rec in cls.find_all():
+                write_line(record_file, rec.to_data())
+                rec_count += 1
+            record_file.flush()
+            backup_tarfile.add(record_file.name, arcname=cls_name+'.json')
+        self.log("%s => %d records backed up", cls_name, rec_count)
+    # Finalize archive
+    backup_tarfile.close()
+    backup_file.flush()
+    backup_size = os.stat(backup_file.name)[6]
+    # Figure out key name for archived file
+    key_name = ('Backup_' + now_field() + '.tar.gz').replace(':', '_')
+    # upload archive to s3
+    if os.environ.get('DEBUG', False) or os.environ.get('travis', False):
+        # Local or CI - connect to our mock s3 service
+        conn = S3Connection(
+            '', '',
+            is_secure=False, port=8888, host='localhost',
+            calling_format=OrdinaryCallingFormat()
+        )
+    else:
+        conn = S3Connection(self.aws_access_key, self.aws_secret_key)
+    bucket = conn.get_bucket(self.bucketname)
+    key = Key(bucket)
+    key.key = key_name
+    self.log(
+        "Sending %s [size=%d bytes] with key name %s",
+        backup_file.name,
+        backup_size,
+        key_name
+    )
+    # TODO: should probably look into a multi-part upload for larger backup
+    key.set_contents_from_filename(backup_file.name)
+    self.log("Sent %s", backup_file.name)
+    # All done
+    backup_file.close()
+    self.log("Backup completed")
+    # return the bucket name and key name for the completed backup
+    return self.bucketname, key_name
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.save">
+    <p>def <span class="ident">save</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.save', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.save" class="source">
+    <pre><code>def _save(self):
+    # Actual save
+    get_mapping(self.__class__).save(self)
+
+    # Now we have a new original version
+    setattr(self, Storable.ORIG_VER_FIELD_NAME, self.to_data())
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.set_id">
+    <p>def <span class="ident">set_id</span>(</p><p>self, new_id)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.set_id', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.set_id" class="source">
+    <pre><code>def _set_id(self, new_id):
+    self.id = new_id
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.setup">
+    <p>def <span class="ident">setup</span>(</p><p>self, *args, **kwrds)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.setup', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.setup" class="source">
+    <pre><code>def setup(self, *args, **kwrds):
+    # We don't ever store this name-to-class mapping
+    self.classes = dict()
+    # If they didn't manually specify AWS creds when we were created,
+    # then we read them from the AWS-documented environ variables that
+    # boto would use anyway
+    if not self.aws_access_key:
+        self.aws_access_key = os.environ.get('AWS_ACCESS_KEY_ID', '')
+    if not self.aws_secret_key:
+        self.aws_secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.to_data">
+    <p>def <span class="ident">to_data</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.to_data', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.to_data" class="source">
+    <pre><code>def _to_data(self):
+    def getval(fld):
+        val = getattr(self, fld.name, _NO_VAL)
+        if val is _NO_VAL:
+            val = fld.get_default_val()
+        return val
+
+    # Update the datetime fields that we add automatically
+    now = now_field()
+    setattr(self, '_last_update', now)
+    if not getattr(self, '_create_date', ''):
+        setattr(self, '_create_date', now)
+
+    data = dict([(fld.name, getval(fld)) for fld in self.__fields__])
+
+    return json.dumps(data)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+      </div>
+      </div>
+
+  </section>
+
+    </article>
+  <div class="clear"> </div>
+  <footer id="footer">
+    <p>
+      Documentation generated by
+      <a href="https://github.com/BurntSushi/pdoc">pdoc 0.3.1</a>
+    </p>
+
+    <p>pdoc is in the public domain with the
+      <a href="http://unlicense.org">UNLICENSE</a></p>
+
+    <p>Design by <a href="http://nadh.in">Kailash Nadh</a></p>
+  </footer>
+</div>
+</body>
+</html>
