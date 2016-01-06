@@ -65,8 +65,8 @@ Making a release is simple, but is a multi-step process:
    [PEP 440](https://www.python.org/dev/peps/pep-0440/)
 3. Make sure that there is a matching entry in the [release notes](relnotes.md)
 4. Make sure that the [API documentation](api.md) is up to date by running
-   `docs/make_docs.py api`. You can also get an idea of what the current
-   documentation will look like by running `docs/make_docs.py serve`
+   `docs/make_docs.sh api`. You can also get an idea of what the current
+   documentation will look like by running `docs/make_docs.sh serve`
 5. Build and deploy to PyPI by running `./build.sh`. Note that you'll need to
    install some tools, including pandoc. You'll also need a PyPI account
    that has the correct rights to deploy gludb.
@@ -75,7 +75,7 @@ Making a release is simple, but is a multi-step process:
 Assuming that the version number is 1.1.1 and you've already updated files as
 per steps 2 and 3, then steps 4 and following would like this:
 
-    user@GLUDB:~/gludb $ docs/make_docs.py api
+    user@GLUDB:~/gludb $ docs/make_docs.sh api
     user@GLUDB:~/gludb $ ./build.sh
     user@GLUDB:~/gludb $ git add -A
     user@GLUDB:~/gludb $ git commit -m "release 1.1.1"
