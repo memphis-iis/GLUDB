@@ -44,10 +44,10 @@ you should use `Field(default=dict)`.
 
 import json
 
+from .config import get_db_application_prefix
 from .utils import now_field
 from .data import Storable, DatabaseEnabled, orig_version
 from .versioning import VersioningTypes, record_diff, append_diff_hist
-
 
 class _NO_VAL:
     """Simple helper we use instead of None (in case they want to use a default
@@ -84,8 +84,11 @@ def _auto_init(self, *args, **kwrds):
 
 
 def _get_table_name(cls):
-    return cls.__table_name__
-
+    prefix = get_db_application_prefix()
+    if prefix is not None:
+        return sep.join([prefix, cls.__table_name__])
+    else:
+        return cls.__table_name__
 
 def _get_id(self):
     return self.id
@@ -203,6 +206,7 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
 
         # Duck-type the class for our data methods
         cls.get_table_name = classmethod(_get_table_name)
+        cls.set_table_name = classmethod(_set_table_name)
         cls.get_id = _get_id
         cls.set_id = _set_id
         cls.to_data = _to_data

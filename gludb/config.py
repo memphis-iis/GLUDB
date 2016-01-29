@@ -45,6 +45,9 @@ would work *sort of*. Some notes:
 from inspect import getmro
 from importlib import import_module
 
+_APPLICATION_PREFIX = None
+_APPLICATION_SEP = '_'
+
 
 class Database(object):
     """Configuration class representing a database instance supported by one
@@ -127,3 +130,11 @@ def clear_database_config():
 def get_mapping(cls, no_mapping_ok=False):
     """Return a database config object for the given class"""
     return _database_mapping.get_mapping(cls, no_mapping_ok)
+
+def get_db_application_prefix():
+    return _APPLICATION_PREFIX
+    
+def set_db_application_prefix(prefix, sep=None):
+    _APPLICATION_PREFIX = prefix
+    if (sep is not None):
+        sep = _APPLICATION_SEP
