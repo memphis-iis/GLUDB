@@ -73,7 +73,7 @@ class DefaultStorageTesting(unittest.TestCase):
         self.assertIsNone(SimpleStorage.find_one('not there'))
         
     def test_table_has_prefix(self):
-        self.assertEqual(SimpleStorage.get_table_name(), cls.__table_name__)
+        self.assertEqual(SimpleStorage.get_table_name(), SimpleStorage.__table_name__)
 
     def test_extra_fields(self):
         s = SimpleStorage(name='TimeTracking', descrip='FirstSave')
@@ -186,5 +186,5 @@ class PrefixedStorageTesting(DefaultStorageTesting):
         gludb.config.set_db_application_prefix(None)
         
     def test_table_has_prefix(self):
-        expectedName = self.PREFIX + gludb.config.APPLICATION_SEP + cls.__table_name__
+        expectedName = self.PREFIX + gludb.config.APPLICATION_SEP + SimpleStorage.__table_name__
         self.assertEqual(SimpleStorage.get_table_name(), expectedName)
