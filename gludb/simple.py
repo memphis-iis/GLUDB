@@ -44,7 +44,7 @@ you should use `Field(default=dict)`.
 
 import json
 
-from .config import get_db_application_prefix
+from .config import apply_db_application_prefix
 from .utils import now_field
 from .data import Storable, DatabaseEnabled, orig_version
 from .versioning import VersioningTypes, record_diff, append_diff_hist
@@ -84,11 +84,7 @@ def _auto_init(self, *args, **kwrds):
 
 
 def _get_table_name(cls):
-    prefix = get_db_application_prefix()
-    if prefix is not None:
-        return sep.join([prefix, cls.__table_name__])
-    else:
-        return cls.__table_name__
+    return apply_db_application_prefix(cls.__table_name__)
 
 def _get_id(self):
     return self.id

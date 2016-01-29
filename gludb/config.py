@@ -131,10 +131,19 @@ def get_mapping(cls, no_mapping_ok=False):
     """Return a database config object for the given class"""
     return _database_mapping.get_mapping(cls, no_mapping_ok)
 
+def apply_db_application_prefix(name):
+    if _APPLICATION_PREFIX is not None:
+        return _APPLICATION_SEP.join([_APPLICATION_PREFIX, name])
+    else:
+        return name
+    
 def get_db_application_prefix():
     return _APPLICATION_PREFIX
     
-def set_db_application_prefix(prefix, sep=None):
+def get_db_application_sep():
+    return _APPLICATION_SEP
+    
+def set_db_application_prefix(prefix, sep = None):
     global _APPLICATION_PREFIX, _APPLICATION_SEP
     _APPLICATION_PREFIX = prefix
     if (sep is not None):
