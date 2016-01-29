@@ -206,7 +206,6 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
 
         # Duck-type the class for our data methods
         cls.get_table_name = classmethod(_get_table_name)
-        cls.set_table_name = classmethod(_set_table_name)
         cls.get_id = _get_id
         cls.set_id = _set_id
         cls.to_data = _to_data
