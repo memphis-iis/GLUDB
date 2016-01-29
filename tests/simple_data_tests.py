@@ -71,6 +71,9 @@ class DefaultStorageTesting(unittest.TestCase):
 
     def test_missing(self):
         self.assertIsNone(SimpleStorage.find_one('not there'))
+        
+    def test_table_has_prefix(self):
+        self.assertIsEqual(SimpleStorage.get_table_name(), cls.__table_name__)
 
     def test_extra_fields(self):
         s = SimpleStorage(name='TimeTracking', descrip='FirstSave')
@@ -162,3 +165,26 @@ class SpecificStorageTesting(DefaultStorageTesting):
     def tearDown(self):
         # Undo any database setup
         gludb.config.clear_database_config()
+
+        
+# Same tests as DefaultStorageTesting but with differnt setUp/tearDown
+class PrefixedStorageTesting(DefaultStorageTesting):
+    PREFIX = "Prefix"
+    
+    def setUp(self):
+        gludb.config.default_database(None)  # no default database
+        gludb.config.class_database(SimpleStorage, gludb.config.Database(
+            'sqlite',
+            filename=':memory:'
+        ))
+        gludb.config.set_db_application_prefix(self.PREFIX)
+        SimpleStorage.ensure_table()
+
+    def tearDown(self):
+        # Undo any database setup
+        gludb.config.clear_database_config()
+        gludb.config.set_db_application_prefix(None)
+        
+    def test_table_has_prefix(self):
+        expectedName = PREFIX + gludb.config.APPLICATION_SEP + cls.__table_name__
+        self.assertIsEqual(SimpleStorage.get_table_name(), expectedName)
