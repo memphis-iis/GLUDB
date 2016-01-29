@@ -186,5 +186,5 @@ class PrefixedStorageTesting(DefaultStorageTesting):
         gludb.config.set_db_application_prefix(None)
         
     def test_table_has_prefix(self):
-        expectedName = self.PREFIX + gludb.config.APPLICATION_SEP + SimpleStorage.__table_name__
+        expectedName = self.PREFIX + gludb.config._APPLICATION_SEP + SimpleStorage.__table_name__
         self.assertEqual(SimpleStorage.get_table_name(), expectedName)
