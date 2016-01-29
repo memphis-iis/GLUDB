@@ -135,6 +135,7 @@ def get_db_application_prefix():
     return _APPLICATION_PREFIX
     
 def set_db_application_prefix(prefix, sep=None):
+    global _APPLICATION_PREFIX, _APPLICATION_SEP
     _APPLICATION_PREFIX = prefix
     if (sep is not None):
-        sep = _APPLICATION_SEP
+        _APPLICATION_SEP = sep
