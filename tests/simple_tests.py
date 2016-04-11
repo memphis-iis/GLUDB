@@ -35,6 +35,35 @@ class ComplexData(object):
     complex_data = Field(dict)
 
 
+@DBObject(table_name='SetupGrandParentClass')
+class GrandParent(object):
+    gpsetup = Field('oops')
+    def setup(self, *args, **kwrds):
+        self.gpsetup = 'Done'
+
+@DBObject(table_name='SetupParentClass1')
+class Parent1(GrandParent):
+    psetup1 = Field('oops')
+    def setup(self, *args, **kwrds):
+        super(Parent1, self).setup(*args, **kwrds)
+        self.psetup1 = 'Done'
+
+@DBObject(table_name='SetupParentClass2')
+class Parent2(GrandParent):
+    psetup2 = Field('oops')
+    def setup(self, *args, **kwrds):
+        super(Parent2, self).setup(*args, **kwrds)
+        self.psetup2 = 'Done'
+
+@DBObject(table_name='SetupChildClass')
+class Child(Parent1, Parent2):
+    csetup = Field('oops')
+    def setup(self, *args, **kwrds):
+        super(Child, self).setup(*args, **kwrds)
+        self.csetup = 'Done'
+
+
+
 class BasicAbstractionTesting(unittest.TestCase):
     def setUp(self):
         pass
@@ -58,6 +87,13 @@ class BasicAbstractionTesting(unittest.TestCase):
         self.assertEquals('passthru', s.found_arg)
         self.assertEquals('R', s.found_name)
         self.assertEquals("Hello World R", s.extra_data)
+
+    def test_setup_with_subclasses(self):
+        c = Child()
+        self.assertEquals(c.gpsetup, 'Done')
+        self.assertEquals(c.psetup1, 'Done')
+        self.assertEquals(c.psetup2, 'Done')
+        self.assertEquals(c.csetup, 'Done')
 
     def test_fields(self):
         s = SimpleData()
