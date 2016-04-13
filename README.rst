@@ -64,3 +64,4 @@ dynamodb and backup support into a virtualenv using Python 3 like this:
 
 .. |Travis CI Build State| image:: https://travis-ci.org/memphis-iis/GLUDB.svg?branch=master
 .. |Documentation State| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
+
