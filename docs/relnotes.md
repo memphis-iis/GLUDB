@@ -1,5 +1,10 @@
 # GLUDB Release Notes
 
+## v0.1.4
+
+We no longer clobber __init__ in DBObject-annotated classes. We throw
+a TypeError instead.
+
 ## v0.1.3
 
 Made the automatic date-time fields `_create_date` and `_last_update` official

@@ -23,7 +23,7 @@ be referring to throughout this article:
         def reversed_name(self):
             return ''.join(reversed(self.name.lower()))
 
-    # Perform initial configuration (only needed when your program starts us)
+    # Perform initial configuration (needed when your program starts us)
     default_database(Database('sqlite', filename=':memory:'))
     # Make sure our table (and any indexes) exists
     SimpleObject.ensure_table()
@@ -53,32 +53,32 @@ be referring to throughout this article:
 
 ## Fields
 
-While the `DBObject` annotations adds magic to your class, it's up to you to
-define what will be stored. You do this by declaring class level `Field`
-variables. Those variables (by name) become actual values for instances of
-your class. All you have to do is specify a default value (and an empty string
-is just fine).
+While the `DBObject` annotations adds magic to your class, you must define
+what data gets placed in the backend database. You do this by declaring class
+level `Field` variables. Those variables (by name) become actual values for
+instances of your class. All you have to do is specify a default value (and an
+empty string is just fine).
 
 Unlike some ways of declaring data, there is no "native type" associated with
-a field. The only restriction in place is that a field must have a value that
-can be persisted in JSON. That means strings, numbers, booleans, lists, and
-dictionaries.
+a field. Although we don't require type data, each field must have a
+"persistable" value; that is, the Python json library must know how to
+serialize it. That means strings, numbers, booleans, lists, and dictionaries.
 
-Since you can have a "complex" field that is a dictionary, you might be tempted
-to define such a field like this:
+Since you can have a "complex" field that is a dictionary, you might want to
+define such a field like this:
 
     class BadMove(object):
         DoNoDoThis = Field({})
         OrThis = Field([])
 
-This will cause side-effects that you almost certainly do not want. For a
-complete explanation, check out this
+*Don't do that.* This will cause side-effects that you almost certainly do not
+want. For a complete explanation, check out this
 [article](http://effbot.org/zone/default-values.htm).
 
-So what do you do?
+What do you do?
 
-Luckily you can supply a function as a default value. So instead of the BadMove
-class, we can use:
+You can supply a function as a default value. So instead of the BadMove class,
+you can use:
 
     def special_default():
         if moon.is_full():
@@ -101,37 +101,37 @@ A gludb simple class also receives some automatically created fields:
 * id - Created and used to identify instances of the object. If the id Field is
   blank on save, one will be automatically created (using a uuid).
 * `_version_hist` - If you elect to use versioning, it will be maintained in this
-  field. You shouldn't really ever need to worry about this field because you
+  field. You shouldn't ever need to worry about this field because you
   can use helper functions provided for dealing with version history. See
   [Versioning](versioning.md)
 * `_create_date` - The creation date of the object. See below.
 * `_last_update` - The date of the last update of the object. See below.
 
 If you need to access the `_create_date` and `_last_update` fields, you can
-parse their contents with `gludb.utils.parse_now_field`. However, please keep
-in mind that these dates are handled whenever `to_data` is called (by design).
-That means that they won't exactly match the date/time of database saves, and
-that `_last_update` may have some jitter.
+parse their contents with `gludb.utils.parse_now_field`. Please keep in mind
+that gludb handles these dates whenever `to_data` is called (by design). That
+means that they won't always match the date/time of database saves, and that
+`_last_update` may have some jitter.
 
 You can get more stable update times by using [Versioning](versioning.md) and
-looking at the versioning history (which is handled at save). That's kind of
-what the versioning stuff is for.
+looking at the versioning history (handled at save). That's kind of what the
+versioning stuff is for.
 
 ## DBObject annotation
 
 Any class that you want to persist to the database should have at least one
 Field defined as we described above. You also need to annotate it with
-DBObject and specify `table_name`. That's the name that will be used in the
-actual data backend that you specify in your configuration (see below). Also
-keep in mind that not every datastore has the concept of a table; for
-instance, in MongoDB the table_name will actually become the collection name.
+DBObject and specify `table_name`. The actual backend will use the name that
+you specify in your configuration (see below). Also keep in mind that not
+every datastore has the concept of a table; for instance, in MongoDB the
+table_name will actually become the collection name.
 
 The other parameter available (not shown here) is the type of versioning to be
 used. You may specify a versioning type (currently only DELTA_HISTORY is
 available) if you want a change history of each object to be stored with the
 object. Please see [Versioning](versioning.md) for more details.
 
-In addition to an `__init__` methods, properties with defaults, and other
+In addition to an `__init__` method, properties with defaults, and other
 features, you get the following methods for free:
 
  * to_data - Return a serialized version of the instance in JSON
@@ -144,11 +144,15 @@ features, you get the following methods for free:
    where the index matching the name given has the same value specified
  * save - Saves the current instance of the class
 
+***Important Note:*** Any class annotated with DBObject should *not* have a
+user-supplied `__init__ ` method. Older versions of gludb would overwrite
+`__init__` without warning.
+
 ## The setup method
 
 All of this magic is nice, but what if you actually have some logic you need
-to run when an instance of a class is created? Luckily, you can specify a
-`setup` method which will be called after `__init__` has finished but before it
+to run when an instance of a class is created? You can specify a `setup`
+method which will be called after `__init__` has finished but before it
 returns. You just need to make sure that your setup method is an instance
 method and that it accepts both positional arguments and keyword arguments:
 
@@ -169,24 +173,24 @@ saved to the database because it's not defined as a field.
 
 ## Indexes
 
-Indexes are fairly simple to use. You define an instance method on class that
-returns the value you want to be able to use to find the current instance of
-the class. You annotate that function. Whenever you save an instance of that
-class to the database, that index value is saved as well.
+Indexes are simple to use. You define an instance method on class that returns
+the value you want to be able to use to find the current instance of the
+class. You annotate that function. Whenever you save an instance of that class
+to the database, that index value is saved as well.
 
 Later when you want to query that index, you can call `find_by_index` on your
 class. Note that `find_by_index` takes the index name and the value that you
 are looking for. The index name is the name of the function that you wrote.
 
-Although they aren't requirements, there are a few guidelines that you should
+Although they aren't requirements, there are some guidelines that you should
 keep in mind:
 
  * Whatever you return from an index function will be treated as a _string_, so
-   do yourself a favor and only return strings from index functions
+   do yourself a favor and return only strings from index functions
  * Too many indexes can slow your database down needlessly. Some backends might
    even limit the number indexes allowed. In general, five or fewer is always OK
    and 100 is always too many :)
- * Although not strictly necessary, it's usually a good idea to design index
+ * Although not strictly necessary, it's a good idea to design index
    functions that always return the same value for the same data object.
  * All index functions are called every time an object is saved, so you probably
    don't want long-running logic in an index function.
@@ -229,20 +233,19 @@ See [Configuration and Mapping](config.md) for more details.
 
 The gludb.simple package was created with a few assumptions:
 
-* You want to define your model/data classes very simply.
-* You want to be able to map those classes to data storage multiple ways.
+* You want to define your model/data classes as simply as possible.
+* You want to be able to map those classes to different data storage "backends".
 
 As a result, there is a separate configuration step. For instance, you might
 use nothing but sqlite for unit testing, and then use DynamoDB for your "real"
-deployment to Amazon Web Services. You could even have additional, separate
-configs for MongoDB for your local server and GCD for a Google Compute
-deployment.
+deployment to Amazon Web Services. You could even have separate configs for
+MongoDB for your local server and GCD for a Google Compute deployment.
 
 So how should you structure your application? Generally, design your
 model/data classes as you would normally, but using the Field/DBObject help as
 described above. Then, wherever you place code to start and configure your
 application, add a section for configuring the gludb backends used. Use those
-classes however you would normally (for instance, in your Flask routes if
+classes the way you would normally (for instance, in your Flask routes if
 you're writing a Flask-based web app).
 
 For unit testing, you should provide some kind of mapping in a setup method,
@@ -262,5 +265,5 @@ demo code above is in the package `myapp.models`:
             # Undo any database setup
             clear_database_config()
 
-Because the sqlite database is kept in-memory, no files need to be cleaned and
-testing runs very quickly.
+Because the sqlite database is in-memory, no files need to be cleaned and
+testing runs fast.
