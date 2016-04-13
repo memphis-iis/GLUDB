@@ -82,6 +82,24 @@ def _auto_init(self, *args, **kwrds):
     if callable(getattr(self, 'setup', None)):
         self.setup(*args, **kwrds)
 
+# Sneaky trick - we tag __init__ functions that are Ok to be overwritten...
+# this is mainly for Python 2 (in Python 3 we can successfully do an equality
+# comparison between _auto_init and a replaced __init__)
+_auto_init._clobber_ok = True
+
+# Actual check for an overridable __init__ given a class
+def ctor_overridable(cls):
+    prev_init = getattr(cls, "__init__", None)
+    if not callable(prev_init):
+        return True
+    if prev_init in [object.__init__, _auto_init]:
+        return True
+    if getattr(prev_init, '_clobber_ok', False):
+        return True
+
+    print(cls, prev_init, getattr(prev_init, '_clobber_ok', 'missing'))
+    return False  # Not on our list
+
 
 def _get_table_name(cls):
     return cls.__table_name__
@@ -198,7 +216,12 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
         cls.__versioning__ = versioning
         cls.__fields__ = all_fields
 
-        # Give them a ctor for free
+        # Give them a ctor for free - but make sure we aren't clobbering one
+        if not ctor_overridable(cls):
+            raise TypeError(
+                'Classes with user-supplied __init__ should not be decorated '
+                'with DBObject. Use the setup method'
+            )
         cls.__init__ = _auto_init
 
         # Duck-type the class for our data methods

@@ -19,49 +19,10 @@ class SimpleData(object):
     setup = "Dummy variable to make sure optional setup calling doesn't choke"
 
 
-@DBObject(table_name='SetupTest')
-class SetupData(object):
-    name = Field('setup default')
-
-    def setup(self, *args, **kwrds):
-        self.found_arg = args[0] if len(args) == 1 else repr(args)
-        self.found_name = kwrds.get('name', '<NAME MISSING!>')
-        self.extra_data = "Hello World " + self.name
-
-
-@DBObject(table_name='SetupTest')
+@DBObject(table_name='ComplexTest')
 class ComplexData(object):
     name = Field('')
     complex_data = Field(dict)
-
-
-@DBObject(table_name='SetupGrandParentClass')
-class GrandParent(object):
-    gpsetup = Field('oops')
-    def setup(self, *args, **kwrds):
-        self.gpsetup = 'Done'
-
-@DBObject(table_name='SetupParentClass1')
-class Parent1(GrandParent):
-    psetup1 = Field('oops')
-    def setup(self, *args, **kwrds):
-        super(Parent1, self).setup(*args, **kwrds)
-        self.psetup1 = 'Done'
-
-@DBObject(table_name='SetupParentClass2')
-class Parent2(GrandParent):
-    psetup2 = Field('oops')
-    def setup(self, *args, **kwrds):
-        super(Parent2, self).setup(*args, **kwrds)
-        self.psetup2 = 'Done'
-
-@DBObject(table_name='SetupChildClass')
-class Child(Parent1, Parent2):
-    csetup = Field('oops')
-    def setup(self, *args, **kwrds):
-        super(Child, self).setup(*args, **kwrds)
-        self.csetup = 'Done'
-
 
 
 class BasicAbstractionTesting(unittest.TestCase):
@@ -72,7 +33,7 @@ class BasicAbstractionTesting(unittest.TestCase):
         self.assertTrue(compare_data_objects(obj1, obj2))
 
     def test_typing(self):
-        for cls in [SimpleData, SetupData]:
+        for cls in [SimpleData, ComplexData]:
             self.assertTrue(issubclass(cls, Storable))
             self.assertTrue(isinstance(cls(), Storable))
 
@@ -80,20 +41,6 @@ class BasicAbstractionTesting(unittest.TestCase):
         s = SimpleData()
         self.assertEquals('SimpleTest', s.get_table_name())
         self.assertEquals(VersioningTypes.NONE, s.__versioning__)
-
-    def test_setup_called(self):
-        s = SetupData('passthru', name='R')
-        self.assertEquals('', s.id)
-        self.assertEquals('passthru', s.found_arg)
-        self.assertEquals('R', s.found_name)
-        self.assertEquals("Hello World R", s.extra_data)
-
-    def test_setup_with_subclasses(self):
-        c = Child()
-        self.assertEquals(c.gpsetup, 'Done')
-        self.assertEquals(c.psetup1, 'Done')
-        self.assertEquals(c.psetup2, 'Done')
-        self.assertEquals(c.csetup, 'Done')
 
     def test_fields(self):
         s = SimpleData()
