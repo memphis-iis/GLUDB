@@ -3,27 +3,25 @@
 One of things provided by gludb is data versioning. The package
 gludb.versioning provides the raw tools you need to track changes made to
 objects. This can be handy if you're planning on "advanced" use cases. For
-instance, if you're hand-rolling your data classes as described in
-[Advanced Use](advanced.md). However, if you're [using gludb.simple](simple.md)
-then you can just include the correct versioning type in you `DBObject`
-annotation.
+instance, if you're hand-rolling your data classes as described in [Advanced
+Use](advanced.md). If you're [using gludb.simple](simple.md) then you can just
+include the correct versioning type in you `DBObject` annotation.
 
-Currently the only direct type of versioning that we support is DELTA_HISTORY,
-which stores a list of deltas that led to the current version of the object
-(and a date/time stamp for that change). The idea is that you can iteratively
-apply these deltas to deduce the saved state of the object at any point in the
-past.
+DELTA_HISTORY is the single direct versioning type supported. It stores a list
+of deltas that led to the current version of the object (and a date/time stamp
+for that change). The idea is that you can iteratively apply these deltas to
+deduce the saved state of the object at any point in the past.
 
-Other types of versioning are certainly possible, but are not currently
-planned. However, pull requests are always welcome :)
+Other types of versioning are certainly possible, but are not planned. Pull
+requests are always welcome :)
 
 ## Minimal versioning
 
 It's important to note that even "advanced" classes that directly inherit from
-`gludb.data.Storable` get some versioning for free. Any class deriving from
-Storable that has been annotated with `gludb.data.DatabaseEnabled` gets
+`gludb.data.Storable` get some versioning support. Any class deriving from
+Storable annotated with `gludb.data.DatabaseEnabled` gets
 "original version tracking". The idea is that object instances maintain a copy
-of their state from before any in-memory changes have been made. Specifically:
+of their state from before any in-memory changes. Specifically:
 
 * After an object is loaded from a datastore, the state is saved
 * After an object is saved to a datastore, the state is saved
@@ -125,7 +123,7 @@ classes, please see the source code for
 At the lowest level, `gludb.versioning` supplies the functions `record_diff`
 and `record_patch` to create and apply delta's, respectively. Currently this
 functionality is provided by the excellent library
-[json_delta](http://json-delta.readthedocs.org).
+[json_delta](http://json-delta.readthedocs.io).
 
 You can use `record_diff` in conjunction with the function `append_diff_hist`
 in order to maintain a list that is parsable by `parse_diff_hist`.

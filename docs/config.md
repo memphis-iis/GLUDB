@@ -7,44 +7,48 @@ need to configure the back end(s) used by your model classes. That might sound
 like a pain, but it's what allows you to have a single code base but use
 different data storage back ends.
 
-For many (if not most) situations you will just need to specify a default
-location to store your data. You do this by creating a gludb.config.Database
-instance for your chosen back end (see below for back end details) and passing
-it to gludb.config.default_database:
+For most situations you will just need to specify a default location to store
+your data. You do this by creating a gludb.config.Database instance for your
+chosen back end (see below for back end details) and passing it to
+gludb.config.default_database:
 
-    from gludb.config import default_database, Database
+````
+from gludb.config import default_database, Database
 
-    # A couple of examples:
-    default_database(Database('sqlite', filename=':memory:'))
-    default_database(Database('dynamodb'))
+# A couple of examples:
+default_database(Database('sqlite', filename=':memory:'))
+default_database(Database('dynamodb'))
+````
 
 That's all there is to it.
 
 ## Using Method Resolution Order for Classes
 
-However, if you are using multiple back ends then you'll need to specify
-something other than a default. In that case you should use the function
-gludb.config.class_database:
+If you are using more than one back end then you'll need to specify something
+other than a default. In that case you should use the function
+`gludb.config.class_database`:
 
-    from gludb.config import default_database, Database, class_database
+````
+from gludb.config import default_database, Database, class_database
 
-    # By default, everything is in dynamodb, but we store InMemoryClass in
-    # an in-memory database in SQLite
-    default_database(Database('dynamodb'))
-    class_database(InMemoryClass, Database('sqlite', filename=':memory:'))
+# By default, everything is in dynamodb, but we store InMemoryClass in
+# an in-memory database in SQLite
+default_database(Database('dynamodb'))
+class_database(InMemoryClass, Database('sqlite', filename=':memory:'))
+````
 
-So now the question is: What mapping is used for a class that declares
-`InMemoryClass` as a base class?
+So now the question is: If a class declares `InMemoryClass` as a base class,
+how will it get mapped?
 
 The answer is that gludb uses MRO (Method Resolution Order) to resolve class
 to back end mapping. When you use one of the data storage/retrieval methods
 (like `save` or `find_all`), gludb looks for a mapping for the current class.
-If there isn't an explicit mapping, then all the classes in the Method
-Resolution Order are checked. As soon as an explicit mapping is found, it is
-used. If no mapping is found then the default mapping is used.
+If there isn't an explicit mapping, gludb checks all the classes in the Method
+Resolution Order and uses the first explicit mapping found. If gludb fails to
+find a mapping then it choose the default mapping.
 
 It may be easier to see this in an example. Suppose a class Busy derives from
-the three classes X, Y, and Z - all of which derive from class Base:
+the three classes X, Y, and Z - and all those classes derive from class Base:
 
     class Base(object):
         pass
@@ -66,9 +70,9 @@ Busy's super classes is important. This is how Python resolves method calls
 (we didn't just make this up). In fact, we depend on the results of the
 standard library call `inspect.getmro`.
 
-If none of the classes mentioned have a mapping, then the default mapping will
-be used. If there is no default mapping, then the class can't be mapped to a
-database instance and an error will be thrown.
+If none of the classes mentioned have a mapping, then gludb will use the
+default mapping. If there is no default mapping, then no mapping is possible
+and gludb will throw an error.
 
 Astute readers will note that you could map the class `object` to a database
 as a kind of default mapping. We generally don't recommend this, because it
@@ -80,7 +84,7 @@ would work *sort of*. Some notes:
   DB mapping won't work as a default in every case.
 * We always check for the default database mapping last, so mapping to object
   would be the last thing checked before the actual default. So mapping `object`
-  wouldn't actually get you anything unless you have a very strange case.
+  wouldn't actually get you anything unless you have a strange case.
 
 ## DynamoDB Back End
 
@@ -91,18 +95,17 @@ if you are using a DynamoDB backend on an EC2 instance, but Elastic Beanstalk
 should "just work".
 
 If you *do* need to specify environment variables, then you might want to look
-into [Boto configuration](http://boto.readthedocs.org/en/latest/boto_config_tut.html).
+into [Boto configuration](http://boto.readthedocs.io/en/latest/boto_config_tut.html).
 Essentially, you should only need to define two environment variables:
 
 * AWS_ACCESS_KEY_ID
 * AWS_SECRET_ACCESS_KEY
 
-If either of the the environment variables `DEBUG` or `travis` are defined to
-a "truthy" value, then all DynamoDB connections will be forced to use port
-8000 on host localhost with the string 'TEST' used for both the AWS access ID
-and secret key. This should work with the two most popular Dynamo testing
-servers: DynamoDB Local and Dynalite. This used for unit testing both local
-workstations and on Travis-CI.
+If you define one of the two environment variables `DEBUG` and `travis` to a
+"truthy" value, the DynamoDB backend will: use port 8000 on localhost, and use
+string 'TEST' for both the AWS access ID and secret key. This should work with
+the two most popular Dynamo testing servers: DynamoDB Local and Dynalite. This
+used for unit testing both local workstations and on Travis-CI.
 
 ## Google Cloud Datastore Back End
 

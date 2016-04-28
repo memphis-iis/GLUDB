@@ -58,7 +58,7 @@ $ ./docs/make_docs.sh serve
 
 Making a release is simple, but is a multi-step process:
 
-1. Ensure that all everything is checked in, merged in to the master branch,
+1. Ensure that you have checked everything in, merged in to the master branch,
    and tested.
 2. Update the version number in setup.py - be sure that you're following the
    version numbering guidelines from
@@ -97,11 +97,11 @@ Here's a complete breakdown of what you see here (in alphabetical order):
 * dev-requirements.txt - Requirements install into a virtualenv used
   for development on gludb. Mainly used by our testing scripts
 * dev-requirements-27.txt - Development requirements specific to Python 2.7.
-  This is necessary because we only support Google Cloud Datastore on Python
-  2.7 (and not 3.4)
+  This is necessary because we support Google Cloud Datastore on Python
+  2.7 and not 3.4
 * dist - Holds the final output of the ./build.sh command (in .gitignore)
 * docs - Our documentation in mkdocs format (which is one of the two formats
-  used by ReadTheDocs.org)
+  used by ReadTheDocs.io)
 * examples - Simple examples for gludb use
 * gludb - Our actual package info
 * gludb.egg-info - Created as part of a process developing the gludb package
