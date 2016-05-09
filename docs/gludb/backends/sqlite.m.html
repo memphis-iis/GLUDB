@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>gludb.backends.sqlite API documentation</title>
-    <meta name="description" content="gludb.backends.sqlite - backend sqlite database module" />
+    <meta name="description" content="gludb.backends.sqlite - backend sqlite database module." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -1002,12 +1002,13 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">gludb.backends.sqlite</span> module</h1>
-  <p>gludb.backends.sqlite - backend sqlite database module</p>
+  <p>gludb.backends.sqlite - backend sqlite database module.</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite" class="source">
-    <pre><code>"""gludb.backends.sqlite - backend sqlite database module
-"""
+    <pre><code>"""gludb.backends.sqlite - backend sqlite database module."""
+
+import threading
 
 import sqlite3
 
@@ -1015,15 +1016,24 @@ from ..utils import uuid
 
 
 class Backend(object):
+    """SQLite backend for gludb."""
+
     def __init__(self, **kwrds):
+        """Ctor requires filename to be specified."""
         self.filename = kwrds.get('filename', '')
         if not self.filename:
             raise ValueError('sqlite backend requires a filename parameter')
 
-        self.conn = sqlite3.connect(self.filename)
+        # sqlite requires one connection per thread in Python
+        self.thread_local = threading.local()
+
+        conn = getattr(self.thread_local, "conn", None)
+        if not conn:
+            self.thread_local.conn = sqlite3.connect(self.filename)
 
     def ensure_table(self, cls):
-        cur = self.conn.cursor()
+        """Ensure table's existence - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         table_name = cls.get_table_name()
         index_names = cls.index_names() or []
@@ -1044,18 +1054,21 @@ class Backend(object):
                 name
             ))
 
-        self.conn.commit()
+        self.thread_local.conn.commit()
         cur.close()
 
     def find_one(self, cls, id):
+        """Find single keyed row - as per the gludb spec."""
         found = self.find_by_index(cls, 'id', id)
         return found[0] if found else None
 
     def find_all(self, cls):
+        """Find all rows - as per the gludb spec."""
         return self.find_by_index(cls, '1', 1)
 
     def find_by_index(self, cls, index_name, value):
-        cur = self.conn.cursor()
+        """Find all rows matching index query - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         query = 'select id,value from %s where %s = ?' % (
             cls.get_table_name(),
@@ -1074,7 +1087,8 @@ class Backend(object):
         return found
 
     def save(self, obj):
-        cur = self.conn.cursor()
+        """Save current instance - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         tabname = obj.__class__.get_table_name()
 
@@ -1099,7 +1113,7 @@ class Backend(object):
         values += [index_vals.get(name, 'NULL') for name in index_names]
 
         cur.execute(query, tuple(values))
-        self.conn.commit()
+        self.thread_local.conn.commit()
 
         cur.close()
 </code></pre>
@@ -1116,19 +1130,29 @@ class Backend(object):
       <p id="gludb.backends.sqlite.Backend" class="name">class <span class="ident">Backend</span></p>
       
   
+    <div class="desc"><p>SQLite backend for gludb.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite.Backend" class="source">
     <pre><code>class Backend(object):
+    """SQLite backend for gludb."""
+
     def __init__(self, **kwrds):
+        """Ctor requires filename to be specified."""
         self.filename = kwrds.get('filename', '')
         if not self.filename:
             raise ValueError('sqlite backend requires a filename parameter')
 
-        self.conn = sqlite3.connect(self.filename)
+        # sqlite requires one connection per thread in Python
+        self.thread_local = threading.local()
+
+        conn = getattr(self.thread_local, "conn", None)
+        if not conn:
+            self.thread_local.conn = sqlite3.connect(self.filename)
 
     def ensure_table(self, cls):
-        cur = self.conn.cursor()
+        """Ensure table's existence - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         table_name = cls.get_table_name()
         index_names = cls.index_names() or []
@@ -1149,18 +1173,21 @@ class Backend(object):
                 name
             ))
 
-        self.conn.commit()
+        self.thread_local.conn.commit()
         cur.close()
 
     def find_one(self, cls, id):
+        """Find single keyed row - as per the gludb spec."""
         found = self.find_by_index(cls, 'id', id)
         return found[0] if found else None
 
     def find_all(self, cls):
+        """Find all rows - as per the gludb spec."""
         return self.find_by_index(cls, '1', 1)
 
     def find_by_index(self, cls, index_name, value):
-        cur = self.conn.cursor()
+        """Find all rows matching index query - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         query = 'select id,value from %s where %s = ?' % (
             cls.get_table_name(),
@@ -1179,7 +1206,8 @@ class Backend(object):
         return found
 
     def save(self, obj):
-        cur = self.conn.cursor()
+        """Save current instance - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         tabname = obj.__class__.get_table_name()
 
@@ -1204,7 +1232,7 @@ class Backend(object):
         values += [index_vals.get(name, 'NULL') for name in index_names]
 
         cur.execute(query, tuple(values))
-        self.conn.commit()
+        self.thread_local.conn.commit()
 
         cur.close()
 </code></pre>
@@ -1220,7 +1248,7 @@ class Backend(object):
           </ul>
           <h3>Instance variables</h3>
             <div class="item">
-            <p id="gludb.backends.sqlite.Backend.conn" class="name">var <span class="ident">conn</span></p>
+            <p id="gludb.backends.sqlite.Backend.filename" class="name">var <span class="ident">filename</span></p>
             
 
             
@@ -1230,7 +1258,7 @@ class Backend(object):
 
             </div>
             <div class="item">
-            <p id="gludb.backends.sqlite.Backend.filename" class="name">var <span class="ident">filename</span></p>
+            <p id="gludb.backends.sqlite.Backend.thread_local" class="name">var <span class="ident">thread_local</span></p>
             
 
             
@@ -1249,14 +1277,20 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Ctor requires filename to be specified.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend.__init__', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite.Backend.__init__" class="source">
     <pre><code>def __init__(self, **kwrds):
+    """Ctor requires filename to be specified."""
     self.filename = kwrds.get('filename', '')
     if not self.filename:
         raise ValueError('sqlite backend requires a filename parameter')
-    self.conn = sqlite3.connect(self.filename)
+    # sqlite requires one connection per thread in Python
+    self.thread_local = threading.local()
+    conn = getattr(self.thread_local, "conn", None)
+    if not conn:
+        self.thread_local.conn = sqlite3.connect(self.filename)
 </code></pre>
   </div>
 </div>
@@ -1272,11 +1306,13 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Ensure table's existence - as per the gludb spec.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend.ensure_table', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite.Backend.ensure_table" class="source">
     <pre><code>def ensure_table(self, cls):
-    cur = self.conn.cursor()
+    """Ensure table's existence - as per the gludb spec."""
+    cur = self.thread_local.conn.cursor()
     table_name = cls.get_table_name()
     index_names = cls.index_names() or []
     cols = ['id text primary key', 'value text']
@@ -1292,7 +1328,7 @@ class Backend(object):
             table_name,
             name
         ))
-    self.conn.commit()
+    self.thread_local.conn.commit()
     cur.close()
 </code></pre>
   </div>
@@ -1309,10 +1345,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Find all rows - as per the gludb spec.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend.find_all', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite.Backend.find_all" class="source">
     <pre><code>def find_all(self, cls):
+    """Find all rows - as per the gludb spec."""
     return self.find_by_index(cls, '1', 1)
 </code></pre>
   </div>
@@ -1329,11 +1367,13 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Find all rows matching index query - as per the gludb spec.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend.find_by_index', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite.Backend.find_by_index" class="source">
     <pre><code>def find_by_index(self, cls, index_name, value):
-    cur = self.conn.cursor()
+    """Find all rows matching index query - as per the gludb spec."""
+    cur = self.thread_local.conn.cursor()
     query = 'select id,value from %s where %s = ?' % (
         cls.get_table_name(),
         index_name
@@ -1361,10 +1401,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Find single keyed row - as per the gludb spec.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend.find_one', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite.Backend.find_one" class="source">
     <pre><code>def find_one(self, cls, id):
+    """Find single keyed row - as per the gludb spec."""
     found = self.find_by_index(cls, 'id', id)
     return found[0] if found else None
 </code></pre>
@@ -1382,11 +1424,13 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Save current instance - as per the gludb spec.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend.save', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.sqlite.Backend.save" class="source">
     <pre><code>def save(self, obj):
-    cur = self.conn.cursor()
+    """Save current instance - as per the gludb spec."""
+    cur = self.thread_local.conn.cursor()
     tabname = obj.__class__.get_table_name()
     index_names = obj.__class__.index_names() or []
     col_names = ['id', 'value'] + index_names
@@ -1403,7 +1447,7 @@ class Backend(object):
     index_vals = obj.indexes() or {}
     values += [index_vals.get(name, 'NULL') for name in index_names]
     cur.execute(query, tuple(values))
-    self.conn.commit()
+    self.thread_local.conn.commit()
     cur.close()
 </code></pre>
   </div>

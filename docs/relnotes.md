@@ -1,5 +1,10 @@
 # GLUDB Release Notes
 
+## v0.1.5
+
+This release was only to fix the sqlite backend - it nows uses threadlocal
+sqlite connections (mainly for sqlite usage in things like Flask)
+
 ## v0.1.4
 
 We no longer clobber __init__ in DBObject-annotated classes. We throw
