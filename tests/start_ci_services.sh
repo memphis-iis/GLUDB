@@ -6,7 +6,8 @@ cd "$SCRIPT_DIR"
 set -e
 
 # Dynalite install for DynamoDB testing
-npm install -g dynalite
+# The dynalite server has an index error in the 1.0.x series
+npm install -g dynalite@0.19.1
 
 # gcd install for google cloud datastore testing
 # note: if this file should disappear from Google's download site before they

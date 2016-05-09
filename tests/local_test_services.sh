@@ -27,7 +27,7 @@ else
 
     # Dynalite install for DynamoDB testing
     nodeenv -p --prebuilt ${NODE_VER}
-    npm install -g dynalite
+    npm install -g dynalite@0.19.1
 
     # gcd install for google cloud datastore testing
     mkdir -p ./test_services_env/gcd
