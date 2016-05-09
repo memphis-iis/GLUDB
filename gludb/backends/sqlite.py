@@ -1,5 +1,6 @@
-"""gludb.backends.sqlite - backend sqlite database module
-"""
+"""gludb.backends.sqlite - backend sqlite database module."""
+
+import threading
 
 import sqlite3
 
@@ -7,15 +8,24 @@ from ..utils import uuid
 
 
 class Backend(object):
+    """SQLite backend for gludb."""
+
     def __init__(self, **kwrds):
+        """Ctor requires filename to be specified."""
         self.filename = kwrds.get('filename', '')
         if not self.filename:
             raise ValueError('sqlite backend requires a filename parameter')
 
-        self.conn = sqlite3.connect(self.filename)
+        # sqlite requires one connection per thread in Python
+        self.thread_local = threading.local()
+
+        conn = getattr(self.thread_local, "conn", None)
+        if not conn:
+            self.thread_local.conn = sqlite3.connect(self.filename)
 
     def ensure_table(self, cls):
-        cur = self.conn.cursor()
+        """Ensure table's existence - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         table_name = cls.get_table_name()
         index_names = cls.index_names() or []
@@ -36,18 +46,21 @@ class Backend(object):
                 name
             ))
 
-        self.conn.commit()
+        self.thread_local.conn.commit()
         cur.close()
 
     def find_one(self, cls, id):
+        """Find single keyed row - as per the gludb spec."""
         found = self.find_by_index(cls, 'id', id)
         return found[0] if found else None
 
     def find_all(self, cls):
+        """Find all rows - as per the gludb spec."""
         return self.find_by_index(cls, '1', 1)
 
     def find_by_index(self, cls, index_name, value):
-        cur = self.conn.cursor()
+        """Find all rows matching index query - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         query = 'select id,value from %s where %s = ?' % (
             cls.get_table_name(),
@@ -66,7 +79,8 @@ class Backend(object):
         return found
 
     def save(self, obj):
-        cur = self.conn.cursor()
+        """Save current instance - as per the gludb spec."""
+        cur = self.thread_local.conn.cursor()
 
         tabname = obj.__class__.get_table_name()
 
@@ -91,6 +105,6 @@ class Backend(object):
         values += [index_vals.get(name, 'NULL') for name in index_names]
 
         cur.execute(query, tuple(values))
-        self.conn.commit()
+        self.thread_local.conn.commit()
 
         cur.close()
