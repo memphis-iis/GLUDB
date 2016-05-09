@@ -3,6 +3,7 @@ data storage (that's in simple_data_tests.py)
 """
 
 import unittest
+import time
 
 import gludb.config
 
@@ -86,11 +87,13 @@ class IndexReadWriteTesting(unittest.TestCase):
         self.assertEquals(10, s.age)
 
         s.save()
+        time.sleep(0.25)  # This is for some of our slower servers
         self.assertTrue(len(s.id) > 0)
         self.assertReadable(s)
 
         s2 = IndexedData(id=s.id, name='Post', descrip='AtItAgain', age=256)
         s2.save()
+        time.sleep(0.25)  # This is for some of our slower servers
         self.assertReadable(s2)
 
         all_recs = IndexedData.find_all()
