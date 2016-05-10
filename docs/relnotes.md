@@ -1,9 +1,16 @@
 # GLUDB Release Notes
 
+## v0.1.6
+
+Fix for v0.1.5 - we now support the sqlite backend across multiple threads. We
+also detect and raise an error when the in-memory sqlite feature (where
+filename == ":memory:") is used across multiple threads (because each thread
+would receive it's own copy of the database)
+
 ## v0.1.5
 
-This release was only to fix the sqlite backend - it nows uses threadlocal
-sqlite connections (mainly for sqlite usage in things like Flask)
+***Broken Release*** This release was only to fix the sqlite backend - and that
+fix wasn't correct. This is why you write good unit tests!
 
 ## v0.1.4
 
