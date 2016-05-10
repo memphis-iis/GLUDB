@@ -225,3 +225,43 @@ class SpecificStorageTesting(DefaultStorageTesting):
         # Undo any database setup
         gludb.config.clear_database_config()
         os.remove(self.SQLITE_DB)
+
+
+# Insure that use of :memory: across multiple threads fails
+class InMemoryMultiThreadTesting(unittest.TestCase):
+    def setUp(self):
+        gludb.config.default_database(None)  # no default database
+        gludb.config.class_database(SimpleStorage, gludb.config.Database(
+            'sqlite',
+            filename=":memory:"
+        ))
+        SimpleStorage.ensure_table()
+
+    def tearDown(self):
+        # Undo any database setup
+        gludb.config.clear_database_config()
+
+    def test_multithreaded_fail(self):
+        # First insure that a write worked correctly
+        first = SimpleStorage(name='Pre', descrip='Testing', age=-1)
+        first.save()
+
+        errors = []
+
+        def worker_thread():
+            try:
+                SimpleStorage.find_one(first.id)  # Should fail
+                self.assertEquals("Shouldn't be here", "I am here")
+            except ValueError as e:
+                print("Received ValueError - as expected")
+            except:
+                e = 'Exception in thread:' + repr(sys.exc_info())
+                print(e)
+                errors.append(e)
+
+        thread = threading.Thread(target=worker_thread)
+        thread.setDaemon(True)
+        thread.start()
+        thread.join(10.0)
+        self.assertFalse(thread.isAlive())
+        self.assertEquals(0, len(errors))

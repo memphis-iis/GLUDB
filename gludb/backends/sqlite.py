@@ -1,5 +1,7 @@
 """gludb.backends.sqlite - backend sqlite database module."""
 
+# pylama:ignore=E501
+
 import threading
 
 import sqlite3
@@ -18,14 +20,23 @@ class Backend(object):
 
         # sqlite requires one connection per thread in Python
         # We set up our thread local storage and init the connection
+        self.tl_count = 0
         self.thread_local = threading.local()
         self._conn()
 
     def _conn(self):
         conn = getattr(self.thread_local, "conn", None)
+
         if not conn:
             conn = sqlite3.connect(self.filename)
             self.thread_local.conn = conn
+            self.tl_count += 1
+
+            if self.tl_count > 1 and self.filename == ":memory:":
+                err = "SQLite :memory: file not supported across multiple threads"
+                print(err + ". An exception will be thrown.")
+                raise ValueError(err)
+
         return conn
 
     def ensure_table(self, cls):
