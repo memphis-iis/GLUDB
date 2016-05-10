@@ -17,15 +17,20 @@ class Backend(object):
             raise ValueError('sqlite backend requires a filename parameter')
 
         # sqlite requires one connection per thread in Python
+        # We set up our thread local storage and init the connection
         self.thread_local = threading.local()
+        self._conn()
 
+    def _conn(self):
         conn = getattr(self.thread_local, "conn", None)
         if not conn:
-            self.thread_local.conn = sqlite3.connect(self.filename)
+            conn = sqlite3.connect(self.filename)
+            self.thread_local.conn = conn
+        return conn
 
     def ensure_table(self, cls):
         """Ensure table's existence - as per the gludb spec."""
-        cur = self.thread_local.conn.cursor()
+        cur = self._conn().cursor()
 
         table_name = cls.get_table_name()
         index_names = cls.index_names() or []
@@ -46,7 +51,7 @@ class Backend(object):
                 name
             ))
 
-        self.thread_local.conn.commit()
+        self._conn().commit()
         cur.close()
 
     def find_one(self, cls, id):
@@ -60,7 +65,7 @@ class Backend(object):
 
     def find_by_index(self, cls, index_name, value):
         """Find all rows matching index query - as per the gludb spec."""
-        cur = self.thread_local.conn.cursor()
+        cur = self._conn().cursor()
 
         query = 'select id,value from %s where %s = ?' % (
             cls.get_table_name(),
@@ -80,7 +85,7 @@ class Backend(object):
 
     def save(self, obj):
         """Save current instance - as per the gludb spec."""
-        cur = self.thread_local.conn.cursor()
+        cur = self._conn().cursor()
 
         tabname = obj.__class__.get_table_name()
 
@@ -105,6 +110,6 @@ class Backend(object):
         values += [index_vals.get(name, 'NULL') for name in index_names]
 
         cur.execute(query, tuple(values))
-        self.thread_local.conn.commit()
+        self._conn().commit()
 
         cur.close()

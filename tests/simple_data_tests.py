@@ -1,9 +1,21 @@
-"""Testing data storage functionality in gludb.simple (see simple_tests.py for
-testing of the rest of gludb.simple functionality)"""
+"""gludb.simple data storage testing.
 
+Testing data storage functionality in gludb.simple (see simple_tests.py for
+testing of the rest of gludb.simple functionality). This file tests using our
+sqlite backend. Other backends will have classes descending from
+DefaultStorageTesting to include the same test.
+"""
+
+# We skip the warnings on public class docstrings for these tests
+# pylama:ignore=D101,D102
+
+import os
+import sys
 import unittest
 import datetime
 import time
+import threading
+import tempfile
 
 import gludb.config
 
@@ -43,16 +55,19 @@ class MissingMapTesting(unittest.TestCase):
 
 
 class DefaultStorageTesting(unittest.TestCase):
+    SQLITE_DB = os.path.join(tempfile.gettempdir(), 'test_db.sqlite')
+
     def setUp(self):
         gludb.config.default_database(gludb.config.Database(
             'sqlite',
-            filename=':memory:'
+            filename=self.SQLITE_DB
         ))
         SimpleStorage.ensure_table()
 
     def tearDown(self):
         # Undo any database setup
         gludb.config.clear_database_config()
+        os.remove(self.SQLITE_DB)
 
     def assertObjEq(self, obj1, obj2):
         self.assertTrue(compare_data_objects(obj1, obj2))
@@ -134,7 +149,7 @@ class DefaultStorageTesting(unittest.TestCase):
         self.assertEqual(1, len(all_recs))
         self.assertObjEq(s2, all_recs[0])
 
-        # Change the object we read and then insure that the pervious version
+        # Change the object we read and then insure that the previous version
         # saved on load is correct
         read_obj = all_recs[0]
         read_obj.name = 'Pre2'
@@ -148,6 +163,53 @@ class DefaultStorageTesting(unittest.TestCase):
         self.assertEquals(256, s0.age)
         self.assertEquals({}, s0.extra_data)
 
+    def test_multithreaded(self):
+        first = SimpleStorage(name='Pre', descrip='Testing', age=-1)
+        first.save()
+        self.assertReadable(first)
+
+        # Make sure a separate thread can create/write/read AND read previously
+        # saved data
+        errors = []
+
+        def worker_thread(num):
+            try:
+                # Check create and save
+                ss = SimpleStorage(name='Threaded-%d' % (num,))
+                ss.save()
+                self.assertReadable(ss)
+                # Check can read previous object
+                before = SimpleStorage.find_one(first.id)
+                self.assertObjEq(first, before)
+            except:
+                e = 'Exception in thread:' + repr(sys.exc_info())
+                print(e)
+                errors.append(e)
+
+        THREAD_COUNT = 2
+        threads = [
+            threading.Thread(target=worker_thread, args=(n,))
+            for n in range(THREAD_COUNT)
+        ]
+
+        # Daemonize (so test fail/error doesn't leave any threads around)
+        # and start our threads
+        for t in threads:
+            t.setDaemon(True)
+            t.start()
+
+        # We give each thread 10 seconds - after that the test has failed
+        alive_count = 0
+        for t in threads:
+            t.join(10.0)
+            if t.isAlive():
+                alive_count += 1
+        self.assertEquals(0, len(errors))
+        self.assertEquals(0, alive_count)
+
+        # We should one object per thread plus our starting object
+        self.assertEquals(THREAD_COUNT+1, len(SimpleStorage.find_all()))
+
 
 # Same tests as DefaultStorageTesting but with differnt setUp/tearDown
 class SpecificStorageTesting(DefaultStorageTesting):
@@ -155,10 +217,11 @@ class SpecificStorageTesting(DefaultStorageTesting):
         gludb.config.default_database(None)  # no default database
         gludb.config.class_database(SimpleStorage, gludb.config.Database(
             'sqlite',
-            filename=':memory:'
+            filename=self.SQLITE_DB
         ))
         SimpleStorage.ensure_table()
 
     def tearDown(self):
         # Undo any database setup
         gludb.config.clear_database_config()
+        os.remove(self.SQLITE_DB)
