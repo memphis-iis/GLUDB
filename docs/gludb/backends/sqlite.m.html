@@ -979,6 +979,7 @@ table {
           
   <ul>
     <li class="mono"><a href="#gludb.backends.sqlite.Backend.__init__">__init__</a></li>
+    <li class="mono"><a href="#gludb.backends.sqlite.Backend.delete">delete</a></li>
     <li class="mono"><a href="#gludb.backends.sqlite.Backend.ensure_table">ensure_table</a></li>
     <li class="mono"><a href="#gludb.backends.sqlite.Backend.find_all">find_all</a></li>
     <li class="mono"><a href="#gludb.backends.sqlite.Backend.find_by_index">find_by_index</a></li>
@@ -1132,6 +1133,21 @@ class Backend(object):
         self._conn().commit()
 
         cur.close()
+
+    def delete(self, obj):
+        """Required functionality."""
+        del_id = obj.get_id()
+        if not del_id:
+            return
+
+        cur = self._conn().cursor()
+
+        tabname = obj.__class__.get_table_name()
+        query = 'delete from %s where id = ?' % tabname
+        cur.execute(query, (del_id,))
+
+        self._conn().commit()
+        cur.close()
 </code></pre>
   </div>
 
@@ -1265,6 +1281,21 @@ class Backend(object):
         self._conn().commit()
 
         cur.close()
+
+    def delete(self, obj):
+        """Required functionality."""
+        del_id = obj.get_id()
+        if not del_id:
+            return
+
+        cur = self._conn().cursor()
+
+        tabname = obj.__class__.get_table_name()
+        query = 'delete from %s where id = ?' % tabname
+        cur.execute(query, (del_id,))
+
+        self._conn().commit()
+        cur.close()
 </code></pre>
   </div>
 </div>
@@ -1331,6 +1362,36 @@ class Backend(object):
     self.tl_count = 0
     self.thread_local = threading.local()
     self._conn()
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backends.sqlite.Backend.delete">
+    <p>def <span class="ident">delete</span>(</p><p>self, obj)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Required functionality.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.sqlite.Backend.delete', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backends.sqlite.Backend.delete" class="source">
+    <pre><code>def delete(self, obj):
+    """Required functionality."""
+    del_id = obj.get_id()
+    if not del_id:
+        return
+    cur = self._conn().cursor()
+    tabname = obj.__class__.get_table_name()
+    query = 'delete from %s where id = ?' % tabname
+    cur.execute(query, (del_id,))
+    self._conn().commit()
+    cur.close()
 </code></pre>
   </div>
 </div>

@@ -4,10 +4,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>gludb.data API documentation</title>
-    <meta name="description" content="gludb.data
+    <meta name="description" content="gludb.data - "core" functionality.
 
-The "core" functionality. If you're unsure what to use, you should look into
-gludb.simpl..." />
+If you're unsure what to use, you should look into
+gludb.simple...." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -985,6 +985,10 @@ table {
     <li class="set"><h3><a href="#header-classes">Classes</a></h3>
       <ul>
         <li class="mono">
+        <span class="class_name"><a href="#gludb.data.DeleteNotSupported">DeleteNotSupported</a></span>
+        
+        </li>
+        <li class="mono">
         <span class="class_name"><a href="#gludb.data.Storable">Storable</a></span>
         
           
@@ -1014,16 +1018,16 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">gludb.data</span> module</h1>
-  <p>gludb.data</p>
-<p>The "core" functionality. If you're unsure what to use, you should look into
+  <p>gludb.data - "core" functionality.</p>
+<p>If you're unsure what to use, you should look into
 gludb.simple. This module is for those needing advanced functionality or
 customization</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data" class="source">
-    <pre><code>"""gludb.data
+    <pre><code>"""gludb.data - "core" functionality.
 
-The "core" functionality. If you're unsure what to use, you should look into
+If you're unsure what to use, you should look into
 gludb.simple. This module is for those needing advanced functionality or
 customization
 """
@@ -1032,11 +1036,17 @@ from abc import ABCMeta, abstractmethod
 
 from .config import get_mapping
 
+# pylama:ignore=E501
+
+
+class DeleteNotSupported(Exception):  # NOQA
+    """Exception thrown when delete is not supported by the backend."""
+    pass
+
 
 # A little magic for using metaclasses with both Python 2 and 3
 def _with_metaclass(meta, *bases):
-    """Taken from future.utils, who took is from  from jinja2/_compat.py.
-    License: BSD."""
+    """Taken from future.utils, who took it from jinja2/_compat.py (BSD license)."""
     class metaclass(meta):
         __call__ = type.__call__
         __init__ = type.__init__
@@ -1050,10 +1060,12 @@ def _with_metaclass(meta, *bases):
 
 
 class Storable(_with_metaclass(ABCMeta)):
-    """Our abstract base class that marks subclasses as persistable and
-    storable. Note that the DBObject annotation in gludb.simple registers
-    all annotated classes as 'virtual base classes' of Storage so that you
-    can test them with isinstance(obj, Storable)"""
+    """Our abstract base class.
+
+    It marks subclasses as persistable and storable. Note that the DBObject
+    annotation in gludb.simple registers all annotated classes as 'virtual base
+    classes' of Storage so that you can test them with isinstance(obj, Storable)
+    """
 
     # This is field we use for the original version of the object (saved after
     # retrieval and before any edits occur)
@@ -1062,46 +1074,49 @@ class Storable(_with_metaclass(ABCMeta)):
     @classmethod
     @abstractmethod
     def get_table_name(self):
-        """Return the name of the table/collection/etc where objects should
-        be saved/loaded"""
+        """Return the name of the table/collection/etc where objects should be saved/loaded."""
         pass
 
     @abstractmethod
     def get_id(self):
-        """The instance should return the current key/ID for the instance. If
-        a 'falsey' value is return, on save one will be created and set via a
-        call to self.set_id"""
+        """The instance should return the current key/ID for the instance.
+
+        If a 'falsey' value is return, on save one will be created and set via a
+        call to self.set_id
+        """
         pass
 
     @abstractmethod
     def set_id(self, new_id):
-        """The instance should accept a new key/ID. See also get_id"""
+        """The instance should accept a new key/ID. See also get_id."""
         pass
 
     @abstractmethod
     def to_data(self):
-        """The instance should return JSON representation of it's internal
-        state. See also from_data"""
+        """The instance should return JSON representation of it's internal state. See also from_data."""
         pass
 
     @classmethod
     @abstractmethod
     def from_data(self):
-        """This classmethod returns a new instance of the subclass populated
-        from the JSON representation"""
+        """Return a new instance of the subclass populated from the JSON representation."""
         pass
 
     @classmethod
     def index_names(self):
-        """This optional method should return an iterable of index names. These
-        names should correspond to the names used in the dictionary returned by
-        the instance method `indexes` (below)"""
+        """Return an iterable of index names.
+
+        Optional method. These names should correspond to the names used in the
+        dictionary returned by the instance method `indexes` (below).
+        """
         return None
 
     def indexes(self):
-        """This optional method should return a dictionary of index name values
-        that can be used in a query. Note that this is not considered required
-        data, so a backend could ignore indexes if necessary."""
+        """Return a dictionary of index name values that can be used in a query.
+
+        Optional method. Note that this is not considered required data, so a
+        backend could ignore indexes if necessary.
+        """
         return None
 
 
@@ -1144,10 +1159,22 @@ def _save(self):
     setattr(self, Storable.ORIG_VER_FIELD_NAME, self.to_data())
 
 
+def _delete(self):
+    # Actual delete - and note no version changes
+    get_mapping(self.__class__).delete(self)
+
+
+# TODO: we need a function ensure_package_db - it should work mainly like the
+#       package_add functionality in Backup. Once the class list is create,
+#       we would loop over every class and call ensure_table
+
+
 def DatabaseEnabled(cls):
-    """Classes annotated with DatabaseEnabled gain persistence methods. All
-    this really does is add some functions that forward to the mapped database
-    class"""
+    """Given persistence methods to classes with this annotation.
+
+    All this really does is add some functions that forward to the mapped
+    database class.
+    """
     if not issubclass(cls, Storable):
         raise ValueError(
             "%s is not a subclass of gludb.datab.Storage" % repr(cls)
@@ -1158,15 +1185,19 @@ def DatabaseEnabled(cls):
     cls.find_all = classmethod(_find_all)
     cls.find_by_index = classmethod(_find_by_index)
     cls.save = _save
+    cls.delete = _delete
 
     return cls
 
 
 def orig_version(obj):
-    """Return the original version of an object (defined as what was read from
-    the database before any user edits). If there isn't a previous version (for
-    instance, newly created objects don't have a previous version), then None
-    is returned. Mainly useful for testing"""
+    """Return the original version of an object.
+
+    Original version is defined as what was read from the database before any
+    user edits. If there isn't a previous version (for instance, newly created
+    objects don't have a previous version), then None is returned. Mainly useful
+    for testing.
+    """
     return getattr(obj, Storable.ORIG_VER_FIELD_NAME, None)
 </code></pre>
   </div>
@@ -1185,16 +1216,18 @@ def orig_version(obj):
 
     
   
-    <div class="desc"><p>Classes annotated with DatabaseEnabled gain persistence methods. All
-this really does is add some functions that forward to the mapped database
-class</p></div>
+    <div class="desc"><p>Given persistence methods to classes with this annotation.</p>
+<p>All this really does is add some functions that forward to the mapped
+database class.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.DatabaseEnabled', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.DatabaseEnabled" class="source">
     <pre><code>def DatabaseEnabled(cls):
-    """Classes annotated with DatabaseEnabled gain persistence methods. All
-    this really does is add some functions that forward to the mapped database
-    class"""
+    """Given persistence methods to classes with this annotation.
+
+    All this really does is add some functions that forward to the mapped
+    database class.
+    """
     if not issubclass(cls, Storable):
         raise ValueError(
             "%s is not a subclass of gludb.datab.Storage" % repr(cls)
@@ -1205,6 +1238,7 @@ class</p></div>
     cls.find_all = classmethod(_find_all)
     cls.find_by_index = classmethod(_find_by_index)
     cls.save = _save
+    cls.delete = _delete
 
     return cls
 </code></pre>
@@ -1222,18 +1256,22 @@ class</p></div>
 
     
   
-    <div class="desc"><p>Return the original version of an object (defined as what was read from
-the database before any user edits). If there isn't a previous version (for
-instance, newly created objects don't have a previous version), then None
-is returned. Mainly useful for testing</p></div>
+    <div class="desc"><p>Return the original version of an object.</p>
+<p>Original version is defined as what was read from the database before any
+user edits. If there isn't a previous version (for instance, newly created
+objects don't have a previous version), then None is returned. Mainly useful
+for testing.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.orig_version', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.orig_version" class="source">
     <pre><code>def orig_version(obj):
-    """Return the original version of an object (defined as what was read from
-    the database before any user edits). If there isn't a previous version (for
-    instance, newly created objects don't have a previous version), then None
-    is returned. Mainly useful for testing"""
+    """Return the original version of an object.
+
+    Original version is defined as what was read from the database before any
+    user edits. If there isn't a previous version (for instance, newly created
+    objects don't have a previous version), then None is returned. Mainly useful
+    for testing.
+    """
     return getattr(obj, Storable.ORIG_VER_FIELD_NAME, None)
 </code></pre>
   </div>
@@ -1245,21 +1283,71 @@ is returned. Mainly useful for testing</p></div>
     <h2 class="section-title" id="header-classes">Classes</h2>
       
       <div class="item">
+      <p id="gludb.data.DeleteNotSupported" class="name">class <span class="ident">DeleteNotSupported</span></p>
+      
+  
+    <div class="desc"><p>Exception thrown when delete is not supported by the backend.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.DeleteNotSupported', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.data.DeleteNotSupported" class="source">
+    <pre><code>class DeleteNotSupported(Exception):  # NOQA
+    """Exception thrown when delete is not supported by the backend."""
+    pass
+</code></pre>
+  </div>
+</div>
+
+
+      <div class="class">
+          <h3>Ancestors (in MRO)</h3>
+          <ul class="class_list">
+          <li><a href="#gludb.data.DeleteNotSupported">DeleteNotSupported</a></li>
+          <li>exceptions.Exception</li>
+          <li>exceptions.BaseException</li>
+          <li>__builtin__.object</li>
+          </ul>
+          <h3>Class variables</h3>
+            <div class="item">
+            <p id="gludb.data.DeleteNotSupported.args" class="name">var <span class="ident">args</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="gludb.data.DeleteNotSupported.message" class="name">var <span class="ident">message</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+      </div>
+      </div>
+      
+      <div class="item">
       <p id="gludb.data.Storable" class="name">class <span class="ident">Storable</span></p>
       
   
-    <div class="desc"><p>Our abstract base class that marks subclasses as persistable and
-storable. Note that the DBObject annotation in gludb.simple registers
-all annotated classes as 'virtual base classes' of Storage so that you
-can test them with isinstance(obj, Storable)</p></div>
+    <div class="desc"><p>Our abstract base class.</p>
+<p>It marks subclasses as persistable and storable. Note that the DBObject
+annotation in gludb.simple registers all annotated classes as 'virtual base
+classes' of Storage so that you can test them with isinstance(obj, Storable)</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable" class="source">
     <pre><code>class Storable(_with_metaclass(ABCMeta)):
-    """Our abstract base class that marks subclasses as persistable and
-    storable. Note that the DBObject annotation in gludb.simple registers
-    all annotated classes as 'virtual base classes' of Storage so that you
-    can test them with isinstance(obj, Storable)"""
+    """Our abstract base class.
+
+    It marks subclasses as persistable and storable. Note that the DBObject
+    annotation in gludb.simple registers all annotated classes as 'virtual base
+    classes' of Storage so that you can test them with isinstance(obj, Storable)
+    """
 
     # This is field we use for the original version of the object (saved after
     # retrieval and before any edits occur)
@@ -1268,46 +1356,49 @@ can test them with isinstance(obj, Storable)</p></div>
     @classmethod
     @abstractmethod
     def get_table_name(self):
-        """Return the name of the table/collection/etc where objects should
-        be saved/loaded"""
+        """Return the name of the table/collection/etc where objects should be saved/loaded."""
         pass
 
     @abstractmethod
     def get_id(self):
-        """The instance should return the current key/ID for the instance. If
-        a 'falsey' value is return, on save one will be created and set via a
-        call to self.set_id"""
+        """The instance should return the current key/ID for the instance.
+
+        If a 'falsey' value is return, on save one will be created and set via a
+        call to self.set_id
+        """
         pass
 
     @abstractmethod
     def set_id(self, new_id):
-        """The instance should accept a new key/ID. See also get_id"""
+        """The instance should accept a new key/ID. See also get_id."""
         pass
 
     @abstractmethod
     def to_data(self):
-        """The instance should return JSON representation of it's internal
-        state. See also from_data"""
+        """The instance should return JSON representation of it's internal state. See also from_data."""
         pass
 
     @classmethod
     @abstractmethod
     def from_data(self):
-        """This classmethod returns a new instance of the subclass populated
-        from the JSON representation"""
+        """Return a new instance of the subclass populated from the JSON representation."""
         pass
 
     @classmethod
     def index_names(self):
-        """This optional method should return an iterable of index names. These
-        names should correspond to the names used in the dictionary returned by
-        the instance method `indexes` (below)"""
+        """Return an iterable of index names.
+
+        Optional method. These names should correspond to the names used in the
+        dictionary returned by the instance method `indexes` (below).
+        """
         return None
 
     def indexes(self):
-        """This optional method should return a dictionary of index name values
-        that can be used in a query. Note that this is not considered required
-        data, so a backend could ignore indexes if necessary."""
+        """Return a dictionary of index name values that can be used in a query.
+
+        Optional method. Note that this is not considered required data, so a
+        backend could ignore indexes if necessary.
+        """
         return None
 </code></pre>
   </div>
@@ -1341,16 +1432,14 @@ can test them with isinstance(obj, Storable)</p></div>
 
     
   
-    <div class="desc"><p>This classmethod returns a new instance of the subclass populated
-from the JSON representation</p></div>
+    <div class="desc"><p>Return a new instance of the subclass populated from the JSON representation.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable.from_data', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable.from_data" class="source">
     <pre><code>@classmethod
 @abstractmethod
 def from_data(self):
-    """This classmethod returns a new instance of the subclass populated
-    from the JSON representation"""
+    """Return a new instance of the subclass populated from the JSON representation."""
     pass
 </code></pre>
   </div>
@@ -1367,17 +1456,18 @@ def from_data(self):
 
     
   
-    <div class="desc"><p>The instance should return the current key/ID for the instance. If
-a 'falsey' value is return, on save one will be created and set via a
+    <div class="desc"><p>The instance should return the current key/ID for the instance.</p>
+<p>If a 'falsey' value is return, on save one will be created and set via a
 call to self.set_id</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable.get_id', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable.get_id" class="source">
     <pre><code>@abstractmethod
 def get_id(self):
-    """The instance should return the current key/ID for the instance. If
-    a 'falsey' value is return, on save one will be created and set via a
-    call to self.set_id"""
+    """The instance should return the current key/ID for the instance.
+    If a 'falsey' value is return, on save one will be created and set via a
+    call to self.set_id
+    """
     pass
 </code></pre>
   </div>
@@ -1394,16 +1484,14 @@ def get_id(self):
 
     
   
-    <div class="desc"><p>Return the name of the table/collection/etc where objects should
-be saved/loaded</p></div>
+    <div class="desc"><p>Return the name of the table/collection/etc where objects should be saved/loaded.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable.get_table_name', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable.get_table_name" class="source">
     <pre><code>@classmethod
 @abstractmethod
 def get_table_name(self):
-    """Return the name of the table/collection/etc where objects should
-    be saved/loaded"""
+    """Return the name of the table/collection/etc where objects should be saved/loaded."""
     pass
 </code></pre>
   </div>
@@ -1420,17 +1508,18 @@ def get_table_name(self):
 
     
   
-    <div class="desc"><p>This optional method should return an iterable of index names. These
-names should correspond to the names used in the dictionary returned by
-the instance method <code>indexes</code> (below)</p></div>
+    <div class="desc"><p>Return an iterable of index names.</p>
+<p>Optional method. These names should correspond to the names used in the
+dictionary returned by the instance method <code>indexes</code> (below).</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable.index_names', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable.index_names" class="source">
     <pre><code>@classmethod
 def index_names(self):
-    """This optional method should return an iterable of index names. These
-    names should correspond to the names used in the dictionary returned by
-    the instance method `indexes` (below)"""
+    """Return an iterable of index names.
+    Optional method. These names should correspond to the names used in the
+    dictionary returned by the instance method `indexes` (below).
+    """
     return None
 </code></pre>
   </div>
@@ -1447,16 +1536,17 @@ def index_names(self):
 
     
   
-    <div class="desc"><p>This optional method should return a dictionary of index name values
-that can be used in a query. Note that this is not considered required
-data, so a backend could ignore indexes if necessary.</p></div>
+    <div class="desc"><p>Return a dictionary of index name values that can be used in a query.</p>
+<p>Optional method. Note that this is not considered required data, so a
+backend could ignore indexes if necessary.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable.indexes', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable.indexes" class="source">
     <pre><code>def indexes(self):
-    """This optional method should return a dictionary of index name values
-    that can be used in a query. Note that this is not considered required
-    data, so a backend could ignore indexes if necessary."""
+    """Return a dictionary of index name values that can be used in a query.
+    Optional method. Note that this is not considered required data, so a
+    backend could ignore indexes if necessary.
+    """
     return None
 </code></pre>
   </div>
@@ -1473,13 +1563,13 @@ data, so a backend could ignore indexes if necessary.</p></div>
 
     
   
-    <div class="desc"><p>The instance should accept a new key/ID. See also get_id</p></div>
+    <div class="desc"><p>The instance should accept a new key/ID. See also get_id.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable.set_id', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable.set_id" class="source">
     <pre><code>@abstractmethod
 def set_id(self, new_id):
-    """The instance should accept a new key/ID. See also get_id"""
+    """The instance should accept a new key/ID. See also get_id."""
     pass
 </code></pre>
   </div>
@@ -1496,15 +1586,13 @@ def set_id(self, new_id):
 
     
   
-    <div class="desc"><p>The instance should return JSON representation of it's internal
-state. See also from_data</p></div>
+    <div class="desc"><p>The instance should return JSON representation of it's internal state. See also from_data.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.data.Storable.to_data', this);">Show source &equiv;</a></p>
   <div id="source-gludb.data.Storable.to_data" class="source">
     <pre><code>@abstractmethod
 def to_data(self):
-    """The instance should return JSON representation of it's internal
-    state. See also from_data"""
+    """The instance should return JSON representation of it's internal state. See also from_data."""
     pass
 </code></pre>
   </div>

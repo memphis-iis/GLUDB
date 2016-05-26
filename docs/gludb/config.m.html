@@ -4,8 +4,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>gludb.config API documentation</title>
-    <meta name="description" content="Provide gludb configuration. This consists mainly of a mapping from Storable
-classes to a database c..." />
+    <meta name="description" content="Provide gludb configuration.
+
+This consists mainly of a mapping from Storable classes to a database
+..." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -990,6 +992,7 @@ table {
           
   <ul>
     <li class="mono"><a href="#gludb.config.Database.__init__">__init__</a></li>
+    <li class="mono"><a href="#gludb.config.Database.delete">delete</a></li>
     <li class="mono"><a href="#gludb.config.Database.ensure_table">ensure_table</a></li>
     <li class="mono"><a href="#gludb.config.Database.find_all">find_all</a></li>
     <li class="mono"><a href="#gludb.config.Database.find_by_index">find_by_index</a></li>
@@ -1013,9 +1016,10 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">gludb.config</span> module</h1>
-  <p>Provide gludb configuration. This consists mainly of a mapping from Storable
-classes to a database configuration. It also includes a default mapping for
-classes not specifically mapped to a database.</p>
+  <p>Provide gludb configuration.</p>
+<p>This consists mainly of a mapping from Storable classes to a database
+configuration. It also includes a default mapping for classes not specifically
+mapped to a database.</p>
 <p>We check for a mapping for a class in MRO (Method Resolution Order). Suppose
 a class Busy derives from the three classes X, Y, and Z - all of which derive
 from class Base:</p>
@@ -1055,9 +1059,11 @@ would work <em>sort of</em>. Some notes:</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config" class="source">
-    <pre><code>"""Provide gludb configuration. This consists mainly of a mapping from Storable
-classes to a database configuration. It also includes a default mapping for
-classes not specifically mapped to a database.
+    <pre><code>"""Provide gludb configuration.
+
+This consists mainly of a mapping from Storable classes to a database
+configuration. It also includes a default mapping for classes not specifically
+mapped to a database.
 
 We check for a mapping for a class in MRO (Method Resolution Order). Suppose
 a class Busy derives from the three classes X, Y, and Z - all of which derive
@@ -1104,27 +1110,40 @@ from importlib import import_module
 
 
 class Database(object):
-    """Configuration class representing a database instance supported by one
-    of our backends"""
+    """Configuration class.
+
+    Represents a database instance supported by one of our backends.
+    """
+
     def __init__(self, db_driver, **kwrds):
+        """Construct instance for a driver (and optionally parameters)."""
         mod = import_module('.backends.'+db_driver, __package__)
         Backend = getattr(mod, "Backend")
         self.backend = Backend(**kwrds)
 
     def ensure_table(self, cls):
+        """Ensure the table exists - defer to backend."""
         return self.backend.ensure_table(cls)
 
     def find_one(self, cls, id):
+        """Find one record  - defer to backend."""
         return self.backend.find_one(cls, id)
 
     def find_all(self, cls):
+        """Find all records - defer to backend."""
         return self.backend.find_all(cls)
 
     def find_by_index(self, cls, index_name, value):
+        """Find records matching index query - defer to backend."""
         return self.backend.find_by_index(cls, index_name, value)
 
     def save(self, obj):
+        """Save the object instance - defer to backend."""
         self.backend.save(obj)
+
+    def delete(self, obj):
+        """Delete the object instance - defer to backend."""
+        self.backend.delete(obj)
 
 
 # Note our use of a class with a singleton instance - so configuration is
@@ -1164,25 +1183,28 @@ _database_mapping = _DatabaseMapping()
 
 
 def default_database(db):
-    """Set the default database configuration used for classes without a
-    specific mapping"""
+    """Set default database config for classes without a specific mapping."""
     _database_mapping.default_database = db
 
 
 def class_database(cls, db):
-    """Map a class (for which we assume issubclass(cls, Storable)==True) to
-    a database configuration"""
+    """Map a class to a database configuration.
+
+    We assume issubclass(cls, Storable)==True).
+    """
     _database_mapping.add_mapping(cls, db)
 
 
 def clear_database_config():
-    """Reset all mappings to default state. Note that any in-memory databases
-    will be lost"""
+    """Reset all mappings to default state.
+
+    Note that any in-memory databases will be lost.
+    """
     _database_mapping.clear_mappings()
 
 
 def get_mapping(cls, no_mapping_ok=False):
-    """Return a database config object for the given class"""
+    """Return a database config object for the given class."""
     return _database_mapping.get_mapping(cls, no_mapping_ok)
 </code></pre>
   </div>
@@ -1201,14 +1223,16 @@ def get_mapping(cls, no_mapping_ok=False):
 
     
   
-    <div class="desc"><p>Map a class (for which we assume issubclass(cls, Storable)==True) to
-a database configuration</p></div>
+    <div class="desc"><p>Map a class to a database configuration.</p>
+<p>We assume issubclass(cls, Storable)==True).</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.class_database', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.class_database" class="source">
     <pre><code>def class_database(cls, db):
-    """Map a class (for which we assume issubclass(cls, Storable)==True) to
-    a database configuration"""
+    """Map a class to a database configuration.
+
+    We assume issubclass(cls, Storable)==True).
+    """
     _database_mapping.add_mapping(cls, db)
 </code></pre>
   </div>
@@ -1225,14 +1249,16 @@ a database configuration</p></div>
 
     
   
-    <div class="desc"><p>Reset all mappings to default state. Note that any in-memory databases
-will be lost</p></div>
+    <div class="desc"><p>Reset all mappings to default state.</p>
+<p>Note that any in-memory databases will be lost.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.clear_database_config', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.clear_database_config" class="source">
     <pre><code>def clear_database_config():
-    """Reset all mappings to default state. Note that any in-memory databases
-    will be lost"""
+    """Reset all mappings to default state.
+
+    Note that any in-memory databases will be lost.
+    """
     _database_mapping.clear_mappings()
 </code></pre>
   </div>
@@ -1249,14 +1275,12 @@ will be lost</p></div>
 
     
   
-    <div class="desc"><p>Set the default database configuration used for classes without a
-specific mapping</p></div>
+    <div class="desc"><p>Set default database config for classes without a specific mapping.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.default_database', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.default_database" class="source">
     <pre><code>def default_database(db):
-    """Set the default database configuration used for classes without a
-    specific mapping"""
+    """Set default database config for classes without a specific mapping."""
     _database_mapping.default_database = db
 </code></pre>
   </div>
@@ -1273,12 +1297,12 @@ specific mapping</p></div>
 
     
   
-    <div class="desc"><p>Return a database config object for the given class</p></div>
+    <div class="desc"><p>Return a database config object for the given class.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.get_mapping', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.get_mapping" class="source">
     <pre><code>def get_mapping(cls, no_mapping_ok=False):
-    """Return a database config object for the given class"""
+    """Return a database config object for the given class."""
     return _database_mapping.get_mapping(cls, no_mapping_ok)
 </code></pre>
   </div>
@@ -1293,33 +1317,46 @@ specific mapping</p></div>
       <p id="gludb.config.Database" class="name">class <span class="ident">Database</span></p>
       
   
-    <div class="desc"><p>Configuration class representing a database instance supported by one
-of our backends</p></div>
+    <div class="desc"><p>Configuration class.</p>
+<p>Represents a database instance supported by one of our backends.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.Database" class="source">
     <pre><code>class Database(object):
-    """Configuration class representing a database instance supported by one
-    of our backends"""
+    """Configuration class.
+
+    Represents a database instance supported by one of our backends.
+    """
+
     def __init__(self, db_driver, **kwrds):
+        """Construct instance for a driver (and optionally parameters)."""
         mod = import_module('.backends.'+db_driver, __package__)
         Backend = getattr(mod, "Backend")
         self.backend = Backend(**kwrds)
 
     def ensure_table(self, cls):
+        """Ensure the table exists - defer to backend."""
         return self.backend.ensure_table(cls)
 
     def find_one(self, cls, id):
+        """Find one record  - defer to backend."""
         return self.backend.find_one(cls, id)
 
     def find_all(self, cls):
+        """Find all records - defer to backend."""
         return self.backend.find_all(cls)
 
     def find_by_index(self, cls, index_name, value):
+        """Find records matching index query - defer to backend."""
         return self.backend.find_by_index(cls, index_name, value)
 
     def save(self, obj):
+        """Save the object instance - defer to backend."""
         self.backend.save(obj)
+
+    def delete(self, obj):
+        """Delete the object instance - defer to backend."""
+        self.backend.delete(obj)
 </code></pre>
   </div>
 </div>
@@ -1352,13 +1389,37 @@ of our backends</p></div>
 
     
   
+    <div class="desc"><p>Construct instance for a driver (and optionally parameters).</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database.__init__', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.Database.__init__" class="source">
     <pre><code>def __init__(self, db_driver, **kwrds):
+    """Construct instance for a driver (and optionally parameters)."""
     mod = import_module('.backends.'+db_driver, __package__)
     Backend = getattr(mod, "Backend")
     self.backend = Backend(**kwrds)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.config.Database.delete">
+    <p>def <span class="ident">delete</span>(</p><p>self, obj)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Delete the object instance - defer to backend.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database.delete', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.config.Database.delete" class="source">
+    <pre><code>def delete(self, obj):
+    """Delete the object instance - defer to backend."""
+    self.backend.delete(obj)
 </code></pre>
   </div>
 </div>
@@ -1374,10 +1435,12 @@ of our backends</p></div>
 
     
   
+    <div class="desc"><p>Ensure the table exists - defer to backend.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database.ensure_table', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.Database.ensure_table" class="source">
     <pre><code>def ensure_table(self, cls):
+    """Ensure the table exists - defer to backend."""
     return self.backend.ensure_table(cls)
 </code></pre>
   </div>
@@ -1394,10 +1457,12 @@ of our backends</p></div>
 
     
   
+    <div class="desc"><p>Find all records - defer to backend.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database.find_all', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.Database.find_all" class="source">
     <pre><code>def find_all(self, cls):
+    """Find all records - defer to backend."""
     return self.backend.find_all(cls)
 </code></pre>
   </div>
@@ -1414,10 +1479,12 @@ of our backends</p></div>
 
     
   
+    <div class="desc"><p>Find records matching index query - defer to backend.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database.find_by_index', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.Database.find_by_index" class="source">
     <pre><code>def find_by_index(self, cls, index_name, value):
+    """Find records matching index query - defer to backend."""
     return self.backend.find_by_index(cls, index_name, value)
 </code></pre>
   </div>
@@ -1434,10 +1501,12 @@ of our backends</p></div>
 
     
   
+    <div class="desc"><p>Find one record  - defer to backend.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database.find_one', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.Database.find_one" class="source">
     <pre><code>def find_one(self, cls, id):
+    """Find one record  - defer to backend."""
     return self.backend.find_one(cls, id)
 </code></pre>
   </div>
@@ -1454,10 +1523,12 @@ of our backends</p></div>
 
     
   
+    <div class="desc"><p>Save the object instance - defer to backend.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.Database.save', this);">Show source &equiv;</a></p>
   <div id="source-gludb.config.Database.save" class="source">
     <pre><code>def save(self, obj):
+    """Save the object instance - defer to backend."""
     self.backend.save(obj)
 </code></pre>
   </div>

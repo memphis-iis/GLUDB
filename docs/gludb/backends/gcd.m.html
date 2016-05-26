@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>gludb.backends.gcd API documentation</title>
-    <meta name="description" content="gludb.backends.gcd - backend Google Cloud Datastore module" />
+    <meta name="description" content="gludb.backends.gcd - backend Google Cloud Datastore module." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -991,6 +991,7 @@ table {
           
   <ul>
     <li class="mono"><a href="#gludb.backends.gcd.Backend.__init__">__init__</a></li>
+    <li class="mono"><a href="#gludb.backends.gcd.Backend.delete">delete</a></li>
     <li class="mono"><a href="#gludb.backends.gcd.Backend.ensure_table">ensure_table</a></li>
     <li class="mono"><a href="#gludb.backends.gcd.Backend.find_all">find_all</a></li>
     <li class="mono"><a href="#gludb.backends.gcd.Backend.find_by_index">find_by_index</a></li>
@@ -1025,46 +1026,53 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">gludb.backends.gcd</span> module</h1>
-  <p>gludb.backends.gcd - backend Google Cloud Datastore module</p>
+  <p>gludb.backends.gcd - backend Google Cloud Datastore module.</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd" class="source">
-    <pre><code>"""gludb.backends.gcd - backend Google Cloud Datastore module
-"""
+    <pre><code>"""gludb.backends.gcd - backend Google Cloud Datastore module."""
 
 import sys
 
 from ..utils import uuid
+from ..data import DeleteNotSupported
 
 if sys.version_info >= (3, 0):
     raise ImportError("GLUDB GCD Backend only supports Python 2.7")
 
-import googledatastore as datastore
+import googledatastore as datastore  # NOQA
 # TODO: one day use this instead (when it has Python3 support)
 # from gcloud import datastore
 
 
 class DatastoreTransaction(object):
+    """GCD transction monitor."""
+
     def __init__(self):
+        """Ctor."""
         self.tx = None
         self.commit_req = None
 
     def __enter__(self):
+        """Start transction."""
         req = datastore.BeginTransactionRequest()
         resp = datastore.begin_transaction(req)
         self.tx = resp.transaction
         return self
 
     def get_commit_req(self):
+        """Lazy commit request getter."""
         if not self.commit_req:
             self.commit_req = datastore.CommitRequest()
             self.commit_req.transaction = self.tx
         return self.commit_req
 
     def get_upsert(self):
+        """Return an upsert command."""
         return self.get_commit_req().mutation.upsert.add()
 
     def __exit__(self, type, value, traceback):
+        """End transaction."""
         if self.commit_req:
             datastore.commit(self.commit_req)
             self.commit_req = None
@@ -1075,6 +1083,7 @@ class DatastoreTransaction(object):
 
 
 def make_key(table_name, objid):
+    """Create an object key for storage."""
     key = datastore.Key()
     path = key.path_element.add()
     path.kind = table_name
@@ -1083,6 +1092,7 @@ def make_key(table_name, objid):
 
 
 def write_rec(table_name, objid, data, index_name_values):
+    """Write (upsert) a record using a tran."""
     with DatastoreTransaction() as tx:
         entity = tx.get_upsert()
 
@@ -1103,6 +1113,7 @@ def write_rec(table_name, objid, data, index_name_values):
 
 
 def extract_entity(found):
+    """Copy found entity to a dict."""
     obj = dict()
     for prop in found.entity.property:
         obj[prop.name] = prop.value.string_value
@@ -1110,6 +1121,7 @@ def extract_entity(found):
 
 
 def read_rec(table_name, objid):
+    """Generator that yields keyed recs from store."""
     req = datastore.LookupRequest()
     req.key.extend([make_key(table_name, objid)])
 
@@ -1118,6 +1130,7 @@ def read_rec(table_name, objid):
 
 
 def read_by_indexes(table_name, index_name_values=None):
+    """Index reader."""
     req = datastore.RunQueryRequest()
 
     query = req.query
@@ -1158,8 +1171,7 @@ def read_by_indexes(table_name, index_name_values=None):
 
 
 def delete_table(table_name):
-    """Mainly for testing"""
-
+    """Mainly for testing."""
     to_delete = [
         make_key(table_name, rec['id'])
         for rec in read_by_indexes(table_name, [])
@@ -1170,13 +1182,18 @@ def delete_table(table_name):
 
 
 class Backend(object):
+    """Backend implementation."""
+
     def __init__(self, **kwrds):
+        """Entry point."""
         pass  # No current keywords needed/used
 
     def ensure_table(self, cls):
+        """Required functionality."""
         pass  # Currently nothing needs to be done
 
     def find_one(self, cls, id):
+        """Required functionality."""
         db_result = None
         for rec in read_rec(cls.get_table_name(), id):
             db_result = rec
@@ -1188,6 +1205,7 @@ class Backend(object):
         return obj
 
     def find_all(self, cls):
+        """Required functionality."""
         final_results = []
         for db_result in read_by_indexes(cls.get_table_name(), []):
             obj = cls.from_data(db_result['value'])
@@ -1196,6 +1214,7 @@ class Backend(object):
         return final_results
 
     def find_by_index(self, cls, index_name, value):
+        """Required functionality."""
         table_name = cls.get_table_name()
         index_name_vals = [(index_name, value)]
 
@@ -1207,6 +1226,7 @@ class Backend(object):
         return final_results
 
     def save(self, obj):
+        """Required functionality."""
         if not obj.id:
             obj.id = uuid()
 
@@ -1223,6 +1243,10 @@ class Backend(object):
             obj.to_data(),
             index_name_values
         )
+
+    def delete(self, cls):
+        """Unsupported functionality."""
+        raise DeleteNotSupported()
 </code></pre>
   </div>
 
@@ -1240,13 +1264,12 @@ class Backend(object):
 
     
   
-    <div class="desc"><p>Mainly for testing</p></div>
+    <div class="desc"><p>Mainly for testing.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.delete_table', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.delete_table" class="source">
     <pre><code>def delete_table(table_name):
-    """Mainly for testing"""
-
+    """Mainly for testing."""
     to_delete = [
         make_key(table_name, rec['id'])
         for rec in read_by_indexes(table_name, [])
@@ -1269,10 +1292,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Copy found entity to a dict.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.extract_entity', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.extract_entity" class="source">
     <pre><code>def extract_entity(found):
+    """Copy found entity to a dict."""
     obj = dict()
     for prop in found.entity.property:
         obj[prop.name] = prop.value.string_value
@@ -1292,10 +1317,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Create an object key for storage.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.make_key', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.make_key" class="source">
     <pre><code>def make_key(table_name, objid):
+    """Create an object key for storage."""
     key = datastore.Key()
     path = key.path_element.add()
     path.kind = table_name
@@ -1316,10 +1343,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Index reader.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.read_by_indexes', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.read_by_indexes" class="source">
     <pre><code>def read_by_indexes(table_name, index_name_values=None):
+    """Index reader."""
     req = datastore.RunQueryRequest()
 
     query = req.query
@@ -1372,10 +1401,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Generator that yields keyed recs from store.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.read_rec', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.read_rec" class="source">
     <pre><code>def read_rec(table_name, objid):
+    """Generator that yields keyed recs from store."""
     req = datastore.LookupRequest()
     req.key.extend([make_key(table_name, objid)])
 
@@ -1396,10 +1427,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Write (upsert) a record using a tran.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.write_rec', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.write_rec" class="source">
     <pre><code>def write_rec(table_name, objid, data, index_name_values):
+    """Write (upsert) a record using a tran."""
     with DatastoreTransaction() as tx:
         entity = tx.get_upsert()
 
@@ -1430,17 +1463,23 @@ class Backend(object):
       <p id="gludb.backends.gcd.Backend" class="name">class <span class="ident">Backend</span></p>
       
   
+    <div class="desc"><p>Backend implementation.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.Backend" class="source">
     <pre><code>class Backend(object):
+    """Backend implementation."""
+
     def __init__(self, **kwrds):
+        """Entry point."""
         pass  # No current keywords needed/used
 
     def ensure_table(self, cls):
+        """Required functionality."""
         pass  # Currently nothing needs to be done
 
     def find_one(self, cls, id):
+        """Required functionality."""
         db_result = None
         for rec in read_rec(cls.get_table_name(), id):
             db_result = rec
@@ -1452,6 +1491,7 @@ class Backend(object):
         return obj
 
     def find_all(self, cls):
+        """Required functionality."""
         final_results = []
         for db_result in read_by_indexes(cls.get_table_name(), []):
             obj = cls.from_data(db_result['value'])
@@ -1460,6 +1500,7 @@ class Backend(object):
         return final_results
 
     def find_by_index(self, cls, index_name, value):
+        """Required functionality."""
         table_name = cls.get_table_name()
         index_name_vals = [(index_name, value)]
 
@@ -1471,6 +1512,7 @@ class Backend(object):
         return final_results
 
     def save(self, obj):
+        """Required functionality."""
         if not obj.id:
             obj.id = uuid()
 
@@ -1487,6 +1529,10 @@ class Backend(object):
             obj.to_data(),
             index_name_values
         )
+
+    def delete(self, cls):
+        """Unsupported functionality."""
+        raise DeleteNotSupported()
 </code></pre>
   </div>
 </div>
@@ -1508,11 +1554,35 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Entry point.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend.__init__', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.Backend.__init__" class="source">
     <pre><code>def __init__(self, **kwrds):
+    """Entry point."""
     pass  # No current keywords needed/used
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backends.gcd.Backend.delete">
+    <p>def <span class="ident">delete</span>(</p><p>self, cls)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Unsupported functionality.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend.delete', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backends.gcd.Backend.delete" class="source">
+    <pre><code>def delete(self, cls):
+    """Unsupported functionality."""
+    raise DeleteNotSupported()
 </code></pre>
   </div>
 </div>
@@ -1528,10 +1598,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend.ensure_table', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.Backend.ensure_table" class="source">
     <pre><code>def ensure_table(self, cls):
+    """Required functionality."""
     pass  # Currently nothing needs to be done
 </code></pre>
   </div>
@@ -1548,10 +1620,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend.find_all', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.Backend.find_all" class="source">
     <pre><code>def find_all(self, cls):
+    """Required functionality."""
     final_results = []
     for db_result in read_by_indexes(cls.get_table_name(), []):
         obj = cls.from_data(db_result['value'])
@@ -1572,10 +1646,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend.find_by_index', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.Backend.find_by_index" class="source">
     <pre><code>def find_by_index(self, cls, index_name, value):
+    """Required functionality."""
     table_name = cls.get_table_name()
     index_name_vals = [(index_name, value)]
     final_results = []
@@ -1598,10 +1674,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend.find_one', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.Backend.find_one" class="source">
     <pre><code>def find_one(self, cls, id):
+    """Required functionality."""
     db_result = None
     for rec in read_rec(cls.get_table_name(), id):
         db_result = rec
@@ -1625,10 +1703,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.Backend.save', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.Backend.save" class="source">
     <pre><code>def save(self, obj):
+    """Required functionality."""
     if not obj.id:
         obj.id = uuid()
     index_names = obj.__class__.index_names() or []
@@ -1656,30 +1736,38 @@ class Backend(object):
       <p id="gludb.backends.gcd.DatastoreTransaction" class="name">class <span class="ident">DatastoreTransaction</span></p>
       
   
+    <div class="desc"><p>GCD transction monitor.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.DatastoreTransaction', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.DatastoreTransaction" class="source">
     <pre><code>class DatastoreTransaction(object):
+    """GCD transction monitor."""
+
     def __init__(self):
+        """Ctor."""
         self.tx = None
         self.commit_req = None
 
     def __enter__(self):
+        """Start transction."""
         req = datastore.BeginTransactionRequest()
         resp = datastore.begin_transaction(req)
         self.tx = resp.transaction
         return self
 
     def get_commit_req(self):
+        """Lazy commit request getter."""
         if not self.commit_req:
             self.commit_req = datastore.CommitRequest()
             self.commit_req.transaction = self.tx
         return self.commit_req
 
     def get_upsert(self):
+        """Return an upsert command."""
         return self.get_commit_req().mutation.upsert.add()
 
     def __exit__(self, type, value, traceback):
+        """End transaction."""
         if self.commit_req:
             datastore.commit(self.commit_req)
             self.commit_req = None
@@ -1729,10 +1817,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Ctor.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.DatastoreTransaction.__init__', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.DatastoreTransaction.__init__" class="source">
     <pre><code>def __init__(self):
+    """Ctor."""
     self.tx = None
     self.commit_req = None
 </code></pre>
@@ -1750,10 +1840,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Lazy commit request getter.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.DatastoreTransaction.get_commit_req', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.DatastoreTransaction.get_commit_req" class="source">
     <pre><code>def get_commit_req(self):
+    """Lazy commit request getter."""
     if not self.commit_req:
         self.commit_req = datastore.CommitRequest()
         self.commit_req.transaction = self.tx
@@ -1773,10 +1865,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Return an upsert command.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.gcd.DatastoreTransaction.get_upsert', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.gcd.DatastoreTransaction.get_upsert" class="source">
     <pre><code>def get_upsert(self):
+    """Return an upsert command."""
     return self.get_commit_req().mutation.upsert.add()
 </code></pre>
   </div>

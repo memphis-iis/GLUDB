@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>gludb.backends.mongodb API documentation</title>
-    <meta name="description" content="MongoDB backend" />
+    <meta name="description" content="MongoDB backend." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -986,6 +986,7 @@ table {
           
   <ul>
     <li class="mono"><a href="#gludb.backends.mongodb.Backend.__init__">__init__</a></li>
+    <li class="mono"><a href="#gludb.backends.mongodb.Backend.delete">delete</a></li>
     <li class="mono"><a href="#gludb.backends.mongodb.Backend.ensure_table">ensure_table</a></li>
     <li class="mono"><a href="#gludb.backends.mongodb.Backend.find_all">find_all</a></li>
     <li class="mono"><a href="#gludb.backends.mongodb.Backend.find_by_index">find_by_index</a></li>
@@ -1010,12 +1011,11 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">gludb.backends.mongodb</span> module</h1>
-  <p>MongoDB backend</p>
+  <p>MongoDB backend.</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb" class="source">
-    <pre><code>"""MongoDB backend
-"""
+    <pre><code>"""MongoDB backend."""
 
 import json
 
@@ -1026,20 +1026,25 @@ from ..utils import uuid
 
 
 def delete_collection(db_name, collection_name, host='localhost', port=27017):
-    """Almost exclusively for testing"""
+    """Almost exclusively for testing."""
     client = MongoClient("mongodb://%s:%d" % (host, port))
     client[db_name].drop_collection(collection_name)
 
 
 class Backend(object):
+    """Backend implementation."""
+
     def __init__(self, **kwrds):
+        """Ctor - mongo_url is required."""
         self.mongo_url = kwrds.get('mongo_url', 'mongodb://localhost:27017')
         self.mongo_client = MongoClient(self.mongo_url)
 
     def get_collection(self, collection_name):
+        """Return the named collection for the current database."""
         return self.mongo_client.get_default_database()[collection_name]
 
     def ensure_table(self, cls):
+        """Required functionality."""
         coll_name = cls.get_table_name()
         try:
             db = self.mongo_client.get_default_database()
@@ -1065,18 +1070,22 @@ class Backend(object):
         return final_results
 
     def find_one(self, cls, id):
+        """Required functionality."""
         one = self._find(cls, {"_id": id})
         if not one:
             return None
         return one[0]
 
     def find_all(self, cls):
+        """Required functionality."""
         return self._find(cls, {})
 
     def find_by_index(self, cls, index_name, value):
+        """Required functionality."""
         return self._find(cls, {index_name: str(value)})
 
     def save(self, obj):
+        """Required functionality."""
         if not obj.id:
             obj.id = uuid()
 
@@ -1092,6 +1101,15 @@ class Backend(object):
 
         coll = self.get_collection(obj.__class__.get_table_name())
         coll.update({"_id": obj.id}, stored_data, upsert=True)
+
+    def delete(self, obj):
+        """Required functionality."""
+        del_id = obj.get_id()
+        if not del_id:
+            return
+
+        coll = self.get_collection(obj.__class__.get_table_name())
+        coll.delete_one({"_id": del_id})
 </code></pre>
   </div>
 
@@ -1109,12 +1127,12 @@ class Backend(object):
 
     
   
-    <div class="desc"><p>Almost exclusively for testing</p></div>
+    <div class="desc"><p>Almost exclusively for testing.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.delete_collection', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.delete_collection" class="source">
     <pre><code>def delete_collection(db_name, collection_name, host='localhost', port=27017):
-    """Almost exclusively for testing"""
+    """Almost exclusively for testing."""
     client = MongoClient("mongodb://%s:%d" % (host, port))
     client[db_name].drop_collection(collection_name)
 </code></pre>
@@ -1130,18 +1148,24 @@ class Backend(object):
       <p id="gludb.backends.mongodb.Backend" class="name">class <span class="ident">Backend</span></p>
       
   
+    <div class="desc"><p>Backend implementation.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend" class="source">
     <pre><code>class Backend(object):
+    """Backend implementation."""
+
     def __init__(self, **kwrds):
+        """Ctor - mongo_url is required."""
         self.mongo_url = kwrds.get('mongo_url', 'mongodb://localhost:27017')
         self.mongo_client = MongoClient(self.mongo_url)
 
     def get_collection(self, collection_name):
+        """Return the named collection for the current database."""
         return self.mongo_client.get_default_database()[collection_name]
 
     def ensure_table(self, cls):
+        """Required functionality."""
         coll_name = cls.get_table_name()
         try:
             db = self.mongo_client.get_default_database()
@@ -1167,18 +1191,22 @@ class Backend(object):
         return final_results
 
     def find_one(self, cls, id):
+        """Required functionality."""
         one = self._find(cls, {"_id": id})
         if not one:
             return None
         return one[0]
 
     def find_all(self, cls):
+        """Required functionality."""
         return self._find(cls, {})
 
     def find_by_index(self, cls, index_name, value):
+        """Required functionality."""
         return self._find(cls, {index_name: str(value)})
 
     def save(self, obj):
+        """Required functionality."""
         if not obj.id:
             obj.id = uuid()
 
@@ -1194,6 +1222,15 @@ class Backend(object):
 
         coll = self.get_collection(obj.__class__.get_table_name())
         coll.update({"_id": obj.id}, stored_data, upsert=True)
+
+    def delete(self, obj):
+        """Required functionality."""
+        del_id = obj.get_id()
+        if not del_id:
+            return
+
+        coll = self.get_collection(obj.__class__.get_table_name())
+        coll.delete_one({"_id": del_id})
 </code></pre>
   </div>
 </div>
@@ -1236,12 +1273,40 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Ctor - mongo_url is required.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.__init__', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend.__init__" class="source">
     <pre><code>def __init__(self, **kwrds):
+    """Ctor - mongo_url is required."""
     self.mongo_url = kwrds.get('mongo_url', 'mongodb://localhost:27017')
     self.mongo_client = MongoClient(self.mongo_url)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backends.mongodb.Backend.delete">
+    <p>def <span class="ident">delete</span>(</p><p>self, obj)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Required functionality.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.delete', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backends.mongodb.Backend.delete" class="source">
+    <pre><code>def delete(self, obj):
+    """Required functionality."""
+    del_id = obj.get_id()
+    if not del_id:
+        return
+    coll = self.get_collection(obj.__class__.get_table_name())
+    coll.delete_one({"_id": del_id})
 </code></pre>
   </div>
 </div>
@@ -1257,10 +1322,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.ensure_table', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend.ensure_table" class="source">
     <pre><code>def ensure_table(self, cls):
+    """Required functionality."""
     coll_name = cls.get_table_name()
     try:
         db = self.mongo_client.get_default_database()
@@ -1286,10 +1353,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.find_all', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend.find_all" class="source">
     <pre><code>def find_all(self, cls):
+    """Required functionality."""
     return self._find(cls, {})
 </code></pre>
   </div>
@@ -1306,10 +1375,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.find_by_index', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend.find_by_index" class="source">
     <pre><code>def find_by_index(self, cls, index_name, value):
+    """Required functionality."""
     return self._find(cls, {index_name: str(value)})
 </code></pre>
   </div>
@@ -1326,10 +1397,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.find_one', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend.find_one" class="source">
     <pre><code>def find_one(self, cls, id):
+    """Required functionality."""
     one = self._find(cls, {"_id": id})
     if not one:
         return None
@@ -1349,10 +1422,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Return the named collection for the current database.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.get_collection', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend.get_collection" class="source">
     <pre><code>def get_collection(self, collection_name):
+    """Return the named collection for the current database."""
     return self.mongo_client.get_default_database()[collection_name]
 </code></pre>
   </div>
@@ -1369,10 +1444,12 @@ class Backend(object):
 
     
   
+    <div class="desc"><p>Required functionality.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backends.mongodb.Backend.save', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backends.mongodb.Backend.save" class="source">
     <pre><code>def save(self, obj):
+    """Required functionality."""
     if not obj.id:
         obj.id = uuid()
     stored_data = {

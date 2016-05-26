@@ -1,5 +1,10 @@
 # GLUDB Release Notes
 
+## v0.1.7
+
+Support for `delete` in sqlite and mongodb. There is no support for deleting in
+the "cloud" backends (dynamo and gcd) right now.
+
 ## v0.1.6
 
 Fix for v0.1.5 - we now support the sqlite backend across multiple threads. We

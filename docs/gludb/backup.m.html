@@ -992,6 +992,7 @@ table {
     <li class="mono"><a href="#gludb.backup.Backup.__init__">__init__</a></li>
     <li class="mono"><a href="#gludb.backup.Backup.add_class">add_class</a></li>
     <li class="mono"><a href="#gludb.backup.Backup.add_package">add_package</a></li>
+    <li class="mono"><a href="#gludb.backup.Backup.delete">delete</a></li>
     <li class="mono"><a href="#gludb.backup.Backup.ensure_table">ensure_table</a></li>
     <li class="mono"><a href="#gludb.backup.Backup.find_all">find_all</a></li>
     <li class="mono"><a href="#gludb.backup.Backup.find_by_index">find_by_index</a></li>
@@ -1840,6 +1841,27 @@ backup.add_package('subpackage', parent_pkg='toppackage')</code></p></div>
                 include_bases=include_bases,
                 parent_pkg=parent_pkg
             )
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="gludb.backup.Backup.delete">
+    <p>def <span class="ident">delete</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.delete', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.backup.Backup.delete" class="source">
+    <pre><code>def _delete(self):
+    # Actual delete - and note no version changes
+    get_mapping(self.__class__).delete(self)
 </code></pre>
   </div>
 </div>
