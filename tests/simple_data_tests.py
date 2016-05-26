@@ -210,6 +210,21 @@ class DefaultStorageTesting(unittest.TestCase):
         # We should one object per thread plus our starting object
         self.assertEquals(THREAD_COUNT+1, len(SimpleStorage.find_all()))
 
+    def test_delete(self):
+        s1 = SimpleStorage(id='key1', name='Bob', descrip='abc', age=101)
+        s2 = SimpleStorage(id='key2', name='Alice', descrip='xyz', age=102)
+
+        s1.save()
+        s2.save()
+
+        self.assertEquals(2, len(SimpleStorage.find_all()))
+
+        s1.delete()
+
+        all_recs = SimpleStorage.find_all()
+        self.assertEquals(1, len(all_recs))
+        self.assertEquals(s2.get_id(), all_recs[0].get_id())
+
 
 # Same tests as DefaultStorageTesting but with differnt setUp/tearDown
 class SpecificStorageTesting(DefaultStorageTesting):

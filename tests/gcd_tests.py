@@ -1,13 +1,20 @@
-"""Testing for Google Cloud Datastore backend"""
+"""Testing for Google Cloud Datastore backend."""
+
+# pylama:ignore=D101,D102
 
 import sys
 import gludb.config
 
-if sys.version_info < (3, 0):
-    from simple_data_tests import SimpleStorage, DefaultStorageTesting
-    from index_tests import IndexReadWriteTesting, IndexedData
+from gludb.data import DeleteNotSupported
 
-    class SpecificStorageTesting(DefaultStorageTesting):
+if sys.version_info < (3, 0):
+    import simple_data_tests
+    from simple_data_tests import SimpleStorage
+
+    import index_tests
+    from index_tests import IndexedData
+
+    class SpecificStorageTesting(simple_data_tests.DefaultStorageTesting):
         def setUp(self):
             gludb.config.default_database(None)  # no default database
             gludb.config.class_database(SimpleStorage, gludb.config.Database(
@@ -22,7 +29,11 @@ if sys.version_info < (3, 0):
             )
             gludb.config.clear_database_config()
 
-    class GCDIndexReadWriteTesting(IndexReadWriteTesting):
+        def test_delete(self):
+            s = SimpleStorage()
+            self.assertRaises(DeleteNotSupported, s.delete)
+
+    class GCDIndexReadWriteTesting(index_tests.IndexReadWriteTesting):
         def setUp(self):
             gludb.config.default_database(gludb.config.Database('gcd'))
             IndexedData.ensure_table()

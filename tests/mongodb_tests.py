@@ -1,11 +1,16 @@
-"""Testing for mongodb backend"""
+"""Testing for mongodb backend."""
+
+# pylama:ignore=D101,D102,D103
 
 import unittest
 
 import gludb.config
 
-from simple_data_tests import SimpleStorage, DefaultStorageTesting
-from index_tests import IndexReadWriteTesting, IndexedData
+import simple_data_tests
+from simple_data_tests import SimpleStorage
+
+import index_tests
+from index_tests import IndexedData
 
 
 def delete_test_colls():
@@ -19,7 +24,7 @@ def delete_test_colls():
     )
 
 
-class SpecificStorageTesting(DefaultStorageTesting):
+class SpecificStorageTesting(simple_data_tests.DefaultStorageTesting):
     def setUp(self):
         gludb.config.default_database(None)  # no default database
         gludb.config.class_database(SimpleStorage, gludb.config.Database(
@@ -35,7 +40,7 @@ class SpecificStorageTesting(DefaultStorageTesting):
         gludb.config.clear_database_config()
 
 
-class MongoDBIndexReadWriteTesting(IndexReadWriteTesting):
+class MongoDBIndexReadWriteTesting(index_tests.IndexReadWriteTesting):
     def setUp(self):
         gludb.config.default_database(gludb.config.Database(
             'mongodb',

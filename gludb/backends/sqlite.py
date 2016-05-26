@@ -124,3 +124,18 @@ class Backend(object):
         self._conn().commit()
 
         cur.close()
+
+    def delete(self, obj):
+        """Required functionality."""
+        del_id = obj.get_id()
+        if not del_id:
+            return
+
+        cur = self._conn().cursor()
+
+        tabname = obj.__class__.get_table_name()
+        query = 'delete from %s where id = ?' % tabname
+        cur.execute(query, (del_id,))
+
+        self._conn().commit()
+        cur.close()

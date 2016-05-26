@@ -1,5 +1,4 @@
-"""MongoDB backend
-"""
+"""MongoDB backend."""
 
 import json
 
@@ -10,20 +9,25 @@ from ..utils import uuid
 
 
 def delete_collection(db_name, collection_name, host='localhost', port=27017):
-    """Almost exclusively for testing"""
+    """Almost exclusively for testing."""
     client = MongoClient("mongodb://%s:%d" % (host, port))
     client[db_name].drop_collection(collection_name)
 
 
 class Backend(object):
+    """Backend implementation."""
+
     def __init__(self, **kwrds):
+        """Ctor - mongo_url is required."""
         self.mongo_url = kwrds.get('mongo_url', 'mongodb://localhost:27017')
         self.mongo_client = MongoClient(self.mongo_url)
 
     def get_collection(self, collection_name):
+        """Return the named collection for the current database."""
         return self.mongo_client.get_default_database()[collection_name]
 
     def ensure_table(self, cls):
+        """Required functionality."""
         coll_name = cls.get_table_name()
         try:
             db = self.mongo_client.get_default_database()
@@ -49,18 +53,22 @@ class Backend(object):
         return final_results
 
     def find_one(self, cls, id):
+        """Required functionality."""
         one = self._find(cls, {"_id": id})
         if not one:
             return None
         return one[0]
 
     def find_all(self, cls):
+        """Required functionality."""
         return self._find(cls, {})
 
     def find_by_index(self, cls, index_name, value):
+        """Required functionality."""
         return self._find(cls, {index_name: str(value)})
 
     def save(self, obj):
+        """Required functionality."""
         if not obj.id:
             obj.id = uuid()
 
@@ -76,3 +84,12 @@ class Backend(object):
 
         coll = self.get_collection(obj.__class__.get_table_name())
         coll.update({"_id": obj.id}, stored_data, upsert=True)
+
+    def delete(self, obj):
+        """Required functionality."""
+        del_id = obj.get_id()
+        if not del_id:
+            return
+
+        coll = self.get_collection(obj.__class__.get_table_name())
+        coll.delete_one({"_id": del_id})

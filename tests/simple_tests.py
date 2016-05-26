@@ -1,6 +1,8 @@
 """Testing all the functionality in gludb.simple *except* for actual
-data storage (that's in simple_data_tests.py)
+data storage (that's in simple_data_tests.py).
 """
+
+# pylama:ignore=D400,D101,D102,D205
 
 import unittest
 

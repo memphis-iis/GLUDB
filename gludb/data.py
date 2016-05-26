@@ -12,6 +12,11 @@ from .config import get_mapping
 # pylama:ignore=E501
 
 
+class DeleteNotSupported(Exception):  # NOQA
+    """Exception thrown when delete is not supported by the backend."""
+    pass
+
+
 # A little magic for using metaclasses with both Python 2 and 3
 def _with_metaclass(meta, *bases):
     """Taken from future.utils, who took it from jinja2/_compat.py (BSD license)."""
@@ -127,6 +132,11 @@ def _save(self):
     setattr(self, Storable.ORIG_VER_FIELD_NAME, self.to_data())
 
 
+def _delete(self):
+    # Actual delete - and note no version changes
+    get_mapping(self.__class__).delete(self)
+
+
 # TODO: we need a function ensure_package_db - it should work mainly like the
 #       package_add functionality in Backup. Once the class list is create,
 #       we would loop over every class and call ensure_table
@@ -148,6 +158,7 @@ def DatabaseEnabled(cls):
     cls.find_all = classmethod(_find_all)
     cls.find_by_index = classmethod(_find_by_index)
     cls.save = _save
+    cls.delete = _delete
 
     return cls
 
