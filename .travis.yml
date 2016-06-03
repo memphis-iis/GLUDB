@@ -10,8 +10,11 @@ env:
 
 # Travis CI services we use
 services:
-  - mongodb
-  - postgresql
+    - mongodb
+    - postgresql
+
+addons:
+    postgresql: "9.4"
 
 # we have some dev dependencies to install, and we run some services needed for
 # testing. Currently that's dynalite to emulate DynamoDB and gcd to emulate
@@ -28,7 +31,7 @@ install:
 
 # Setup postgresql for testing
 before_script:
-  - psql -c 'create database gludb_test;' -U postgres
+    - psql -c 'create database gludb_test;' -U postgres
 
 # command to run tests
 script: nosetests
