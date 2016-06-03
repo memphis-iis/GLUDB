@@ -31,54 +31,56 @@ def delete_test_tables():
             cur.execute("drop table if exists " + IndexedData.get_table_name())
 
 
-class SpecificStorageTesting(simple_data_tests.DefaultStorageTesting):
-    def setUp(self):
-        gludb.config.default_database(None)  # no default database
-        gludb.config.class_database(SimpleStorage, gludb.config.Database(
-            'postgresql',
-            conn_string=PG_CONN_STR
-        ))
-        delete_test_tables()
-        SimpleStorage.ensure_table()
+# TODO: check https://github.com/travis-ci/travis-ci/issues/4264 to see we we can remove this
+# Sadly, Travis CI doesn't support PostgresSQL 9.5 - 9.4 doesn't support 2
+# features that we use: upserts and "if not exists" for index creation
+if not os.environ.get('travis', False):
+    class SpecificStorageTesting(simple_data_tests.DefaultStorageTesting):
+        def setUp(self):
+            gludb.config.default_database(None)  # no default database
+            gludb.config.class_database(SimpleStorage, gludb.config.Database(
+                'postgresql',
+                conn_string=PG_CONN_STR
+            ))
+            delete_test_tables()
+            SimpleStorage.ensure_table()
 
-    def tearDown(self):
-        # Undo any database setup
-        delete_test_tables()
-        gludb.config.clear_database_config()
+        def tearDown(self):
+            # Undo any database setup
+            delete_test_tables()
+            gludb.config.clear_database_config()
 
+    class PostgreSQLIndexReadWriteTesting(index_tests.IndexReadWriteTesting):
+        def setUp(self):
+            gludb.config.default_database(gludb.config.Database(
+                'postgresql',
+                conn_string=PG_CONN_STR
+            ))
+            delete_test_tables()
+            IndexedData.ensure_table()
 
-class PostgreSQLIndexReadWriteTesting(index_tests.IndexReadWriteTesting):
-    def setUp(self):
-        gludb.config.default_database(gludb.config.Database(
-            'postgresql',
-            conn_string=PG_CONN_STR
-        ))
-        delete_test_tables()
-        IndexedData.ensure_table()
+        def tearDown(self):
+            delete_test_tables()
+            gludb.config.clear_database_config()
 
-    def tearDown(self):
-        delete_test_tables()
-        gludb.config.clear_database_config()
+    class CollectionCreationTesting(unittest.TestCase):
+        def setUp(self):
+            gludb.config.default_database(gludb.config.Database(
+                'postgresql',
+                conn_string=PG_CONN_STR
+            ))
+            delete_test_tables()
 
+        def tearDown(self):
+            # Undo any database setup
+            delete_test_tables()
+            gludb.config.clear_database_config()
 
-class CollectionCreationTesting(unittest.TestCase):
-    def setUp(self):
-        gludb.config.default_database(gludb.config.Database(
-            'postgresql',
-            conn_string=PG_CONN_STR
-        ))
-        delete_test_tables()
+        def test_repeated_creates(self):
+            SimpleStorage.ensure_table()
+            SimpleStorage.ensure_table()
+            SimpleStorage.ensure_table()
 
-    def tearDown(self):
-        # Undo any database setup
-        delete_test_tables()
-        gludb.config.clear_database_config()
-
-    def test_repeated_creates(self):
-        SimpleStorage.ensure_table()
-        SimpleStorage.ensure_table()
-        SimpleStorage.ensure_table()
-
-        IndexedData.ensure_table()
-        IndexedData.ensure_table()
-        IndexedData.ensure_table()
+            IndexedData.ensure_table()
+            IndexedData.ensure_table()
+            IndexedData.ensure_table()
