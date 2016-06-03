@@ -62,6 +62,7 @@ setup(
         'dynamodb': ['boto'],
         'gcd': ['googledatastore'],
         'mongodb': ['pymongo'],
+        'postgresql': ['psycopg2'],
         'backups': ['boto'],
     },
 

@@ -11,6 +11,7 @@ env:
 # Travis CI services we use
 services:
   - mongodb
+  - postgresql
 
 # we have some dev dependencies to install, and we run some services needed for
 # testing. Currently that's dynalite to emulate DynamoDB and gcd to emulate
@@ -24,6 +25,10 @@ install:
     - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --upgrade -r dev-requirements-27.txt; fi
     - ./tests/start_ci_services.sh
     - sleep 5
+
+# Setup postgresql for testing
+before_script:
+  - psql -c 'create database gludb_test;' -U postgres
 
 # command to run tests
 script: nosetests

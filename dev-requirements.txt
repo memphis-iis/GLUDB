@@ -14,3 +14,6 @@ boto==2.38.0
 
 # MongoDB support
 pymongo==3.0.3
+
+# Postgresql support
+psycopg2==2.6.1
