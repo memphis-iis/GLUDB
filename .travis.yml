@@ -15,7 +15,7 @@ services:
     - postgresql
 
 addons:
-    postgresql: "9.5"
+    postgresql: "9.4" # someday... "9.5"
 
 # we have some dev dependencies to install, and we run some services needed for
 # testing. Currently that's dynalite to emulate DynamoDB and gcd to emulate
