@@ -17,6 +17,9 @@ from index_tests import IndexedData
 if os.environ.get('travis', False):
     # Testing on travis CI
     PG_CONN_STR = "host='localhost' dbname='gludb_test' user='postgres'"
+elif os.environ.get('IN_DOCKER', False):
+    # Testing with the Dockerfile
+    PG_CONN_STR = "host='localhost' dbname='docker' user='docker' password='docker'"
 else:
     # Workstation/local testing
     # TODO: let this be locally configurable
