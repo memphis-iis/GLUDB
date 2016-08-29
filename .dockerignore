@@ -1,0 +1,7 @@
+.git
+dist
+env
+env2
+env3
+build_env
+test_services_env
