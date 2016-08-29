@@ -58,6 +58,12 @@ fi
 # Note that python 2 send --version to stderr, but 3 sends to stdout
 echo "Using Python version: $(python --version 2>&1)"
 echo "Using nose version: $(nosetests --version)"
+if [ x-"$1" == x-"no-tests" ];
+then
+    echo "Requested no tests"
+    exit 0
+fi
+
 echo nosetests -w "$SCRIPT_DIR" $*
 
 # test config
