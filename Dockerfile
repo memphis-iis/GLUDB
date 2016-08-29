@@ -33,7 +33,8 @@ USER postgres
 RUN /etc/init.d/postgresql start &&\
     psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'docker';" &&\
     createdb -O docker docker &&\
-    sleep 1
+    sleep 1 &&\
+    /etc/init.d/postgresql stop
 USER root
 
 # Dynalite

@@ -4,6 +4,9 @@
 export IN_DOCKER=1
 cd /var/testing
 
+# Start up postgres manually
+su -m postgres -c "/etc/init.d/postgresql start"
+
 # This should demonize
 supervisord -c "/var/testing/supervisord.docker.conf"
 
