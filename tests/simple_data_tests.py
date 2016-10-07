@@ -149,6 +149,7 @@ class DefaultStorageTesting(unittest.TestCase):
 
         s2 = SimpleStorage(id=s.id, name='Post', descrip='AtItAgain', age=256)
         s2.save()
+        self.assertEqual(s.id, s2.id)
         self.assertReadable(s2)
 
         all_recs = SimpleStorage.find_all()
