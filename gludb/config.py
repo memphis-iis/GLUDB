@@ -44,6 +44,8 @@ would work *sort of*. Some notes:
   would be the last thing checked before the actual default.
 """
 
+# pylama:ignore=D213
+
 from inspect import getmro
 from importlib import import_module
 
@@ -149,19 +151,27 @@ def get_mapping(cls, no_mapping_ok=False):
     """Return a database config object for the given class."""
     return _database_mapping.get_mapping(cls, no_mapping_ok)
 
+
 def apply_db_application_prefix(name):
+    """Return name with app prefix if necessary."""
     if _APPLICATION_PREFIX is not None:
         return _APPLICATION_SEP.join([_APPLICATION_PREFIX, name])
     else:
         return name
-    
+
+
 def get_db_application_prefix():
+    """Global application prefix accessor."""
     return _APPLICATION_PREFIX
-    
+
+
 def get_db_application_sep():
+    """Global application separator accessor."""
     return _APPLICATION_SEP
-    
-def set_db_application_prefix(prefix, sep = None):
+
+
+def set_db_application_prefix(prefix, sep=None):
+    """Set the global app prefix and separator."""
     global _APPLICATION_PREFIX, _APPLICATION_SEP
     _APPLICATION_PREFIX = prefix
     if (sep is not None):

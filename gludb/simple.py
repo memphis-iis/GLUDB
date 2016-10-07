@@ -1,6 +1,4 @@
-"""gludb.simple
-
-Provides the simplest possible interface to our functionality.
+"""gludb.simple Provides the simplest possible interface to our functionality.
 
 We provide a simple annotation to create classes with fields (with optional
 default values), parameterized constructors, persistence, and data operations.
@@ -42,6 +40,8 @@ a function that will be called to retreive a default value. In this example
 you should use `Field(default=dict)`.
 """
 
+# pylama:ignore=D204,D213,D401
+
 import json
 
 from .config import apply_db_application_prefix
@@ -49,21 +49,22 @@ from .utils import now_field
 from .data import Storable, DatabaseEnabled, orig_version
 from .versioning import VersioningTypes, record_diff, append_diff_hist
 
+
 class _NO_VAL:
-    """Simple helper we use instead of None (in case they want to use a default
-    value of None)."""
+    """Simple helper we use instead of None."""
     pass
 
 
 class Field(object):
-    """Support for class-level field declaration.
-    """
+    """Support for class-level field declaration."""
+
     def __init__(self, default=''):
+        """Ctor - should have a default (default is empty string)."""
         self.name = None
         self.default = default
 
     def get_default_val(self):
-        """Helper to expand default value (support callables)"""
+        """Helper to expand default value (support callables)."""
         val = self.default
         while callable(val):
             val = val()
@@ -71,8 +72,7 @@ class Field(object):
 
 
 def _auto_init(self, *args, **kwrds):
-    """Our decorator will add this as __init__ to target classes
-    """
+    """Our decorator will add this as __init__ to target classes."""
     for fld in getattr(self, '__fields__', []):
         val = kwrds.get(fld.name, _NO_VAL)
         if val is _NO_VAL:
@@ -87,8 +87,10 @@ def _auto_init(self, *args, **kwrds):
 # comparison between _auto_init and a replaced __init__)
 _auto_init._clobber_ok = True
 
+
 # Actual check for an overridable __init__ given a class
 def ctor_overridable(cls):
+    """Return true if cls has on overridable __init__."""
     prev_init = getattr(cls, "__init__", None)
     if not callable(prev_init):
         return True
@@ -103,6 +105,7 @@ def ctor_overridable(cls):
 
 def _get_table_name(cls):
     return apply_db_application_prefix(cls.__table_name__)
+
 
 def _get_id(self):
     return self.id
@@ -251,11 +254,14 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
 
 
 def Index(func):
-    """Marks instance methods of a DBObject-decorated class as being used for
+    """Decorator to mark function as index.
+
+    Marks instance methods of a DBObject-decorated class as being used for
     indexing. The function name is used as the index name, and the return
     value is used as the index value.
 
     Note that callables are call recursively so in theory you can return
-    a function which will be called to get the index value"""
+    a function which will be called to get the index value.
+    """
     func.is_index = True
     return func
