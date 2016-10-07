@@ -13,7 +13,15 @@ supervisord -c "/var/testing/supervisord.docker.conf"
 # HACK: Sleep 1 second for each process + 1 for good measure
 sleep 6
 
-git clone https://github.com/memphis-iis/GLUDB.git
+if [ -d /var/testing/src-repo/.git ];
+then
+    echo "External source repo given: cloning from /var/testing/src-repo"
+    git clone /var/testing/src-repo GLUDB
+else
+    echo "DEFAULT: Using https://github.com/memphis-iis/GLUDB.git"
+    git clone https://github.com/memphis-iis/GLUDB.git
+fi
+
 cd GLUDB
 
 echo "Performing env setup first"
