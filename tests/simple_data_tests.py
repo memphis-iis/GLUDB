@@ -7,7 +7,7 @@ DefaultStorageTesting to include the same test.
 """
 
 # We skip the warnings on public class docstrings for these tests
-# pylama:ignore=D101,D102
+# pylama:ignore=D101,D102,D213
 
 import os
 import sys
@@ -86,6 +86,12 @@ class DefaultStorageTesting(unittest.TestCase):
 
     def test_missing(self):
         self.assertIsNone(SimpleStorage.find_one('not there'))
+
+    def test_table_has_prefix(self):
+        self.assertEqual(
+            SimpleStorage.get_table_name(),
+            SimpleStorage.__table_name__
+        )
 
     def test_extra_fields(self):
         s = SimpleStorage(name='TimeTracking', descrip='FirstSave')
@@ -240,6 +246,34 @@ class SpecificStorageTesting(DefaultStorageTesting):
         # Undo any database setup
         gludb.config.clear_database_config()
         os.remove(self.SQLITE_DB)
+
+
+# Same tests as DefaultStorageTesting but with differnt setUp/tearDown
+class PrefixedStorageTesting(DefaultStorageTesting):
+    PREFIX = "Prefix"
+
+    def setUp(self):
+        gludb.config.default_database(None)  # no default database
+        gludb.config.class_database(SimpleStorage, gludb.config.Database(
+            'sqlite',
+            filename=self.SQLITE_DB
+        ))
+        gludb.config.set_db_application_prefix(self.PREFIX)
+        SimpleStorage.ensure_table()
+
+    def tearDown(self):
+        # Undo any database setup
+        gludb.config.clear_database_config()
+        gludb.config.set_db_application_prefix(None)
+        os.remove(self.SQLITE_DB)
+
+    def test_table_has_prefix(self):
+        expectedName = (
+            self.PREFIX +
+            gludb.config._APPLICATION_SEP +
+            SimpleStorage.__table_name__
+        )
+        self.assertEqual(SimpleStorage.get_table_name(), expectedName)
 
 
 # Insure that use of :memory: across multiple threads fails
