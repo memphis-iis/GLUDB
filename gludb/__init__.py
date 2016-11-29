@@ -15,4 +15,5 @@ data stores currently supported are:
 * DynamoDB
 * Google Cloud Datastore
 * MongoDB
+* PostgreSQL
 """

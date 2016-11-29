@@ -12,6 +12,13 @@ set -e
 
 # Use our virtualenv (and create if necessary)
 VE_DIR="$SCRIPT_DIR/env"
+
+if [ "$1" == "api" ];
+then
+    echo "API generation requires refrshing the virtualenv"
+    rm -fr "$VE_DIR"
+fi
+
 if [ -d "$VE_DIR" ];
 then
     echo "$VE_DIR already exists"
@@ -40,5 +47,5 @@ then
     pdoc --overwrite --html --all-submodules --html-dir ./docs ./gludb
 else
     echo "  mkdocs $*"
-    mkdocs $*
+    mkdocs "$@"
 fi
