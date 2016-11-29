@@ -1,5 +1,4 @@
-GLUDB
-=============
+# GLUDB
 
 ![Travis CI Build State](https://travis-ci.org/memphis-iis/GLUDB.svg?branch=master)
 [Travis CI Details](https://travis-ci.org/memphis-iis/GLUDB)
@@ -8,8 +7,7 @@ GLUDB
 See our documentation at [http://gludb.readthedocs.io/](http://gludb.readthedocs.io/)
 
 
-Generalized Learning Utilities Database Library
---------------------------------------------------
+## Generalized Learning Utilities Database Library
 
 For more GLU, see also
 [SuperGLU](https://github.com/GeneralizedLearningUtilities/SuperGLU)
@@ -30,13 +28,15 @@ supported are:
 * DynamoDB
 * Google Cloud Datastore
 * MongoDB
+* PostgreSQL (version 9.5 and greater)
 
-Installing
-------------
+## Installing
 
 You can install from PyPI using pip:
 
-    pip install gludb
+````
+pip install gludb
+````
 
 You will also need to install any dependencies you need based on the
 functionality you want to use:
@@ -48,10 +48,12 @@ functionality you want to use:
 
 setup.py includes these dependencies so that you can install them all at the
 same time (assuming a decently recent version of pip). As an example, you
-could install gludb and the dependencies needed for dynamodb and backup
+could install gludb and the dependencies needed for DynamoDB and backup
 support into a virtualenv using Python 3 like this:
 
-    user@host:~$ virtualenv -p python3 env
-    user@host:~$ . env/bin/activate
-    user@host:~$ pip install --upgrade pip wheel
-    user@host:~$ pip install gludb[dynamodb,backups]
+````
+user@host:~$ virtualenv -p python3 env
+user@host:~$ . env/bin/activate
+user@host:~$ pip install --upgrade pip wheel
+user@host:~$ pip install gludb[dynamodb,backups]
+````

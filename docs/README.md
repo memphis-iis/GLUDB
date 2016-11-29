@@ -1,5 +1,4 @@
-GLUDB Documentation
-===================
+# GLUDB Documentation
 
 This is the main documentation for GLUDB. The current plan is to deploy to
 ReadTheDocs.io (aka RTD). Note that RTD will automatically use the mkdocs.yml
