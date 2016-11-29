@@ -4,7 +4,9 @@
 
 Since everyone has space preferences, here's ours:
 
-    Indentation is 4 spaces. No tabs. No trailing whitespace.
+````
+Indentation is 4 spaces. No tabs. No trailing whitespace.
+````
 
 We reserve the right to reformat pull requests not following this guideline.
 Don't say we didn't warn you :)
@@ -24,7 +26,10 @@ Please see our [testing document](testing.md)
 
 ## Creating a new backend
 
-TODO: walkthrough
+We load backends dynamically from the modules in the package `gludb.backends`.
+The easiest way to create a new backend is to clone an existing backend and
+update it to suit your purposes. If you are writing a backend for a relational
+database, you can refer to either `sqlite.py` or `postgresql.py`.
 
 ## Documentation
 
@@ -36,9 +41,9 @@ ReadTheDocs provides hosting (and styling and markdown conversion). The
 current markdown conversion method is mkdocs (see `mkdocs.yml` in the root of
 this project).
 
-The [API document](api.md) is just a pointer to HTML documents we generate
-with the handy pdoc. Instead of calling pdoc directly, you should use our
-helper script `docs/make_docs.sh` with the api command:
+The [API document](api.md) is a pointer to HTML documents we generate with the
+handy pdoc. Instead of calling pdoc directly, you should use our helper script
+`docs/make_docs.sh` with the api command:
 
 ```
 user@workstation:~/gludb$ docs/make_docs.sh api
@@ -75,13 +80,15 @@ Making a release is simple, but is a multi-step process:
 Assuming that the version number is 1.1.1 and you've already updated files as
 per steps 2 and 3, then steps 4 and following would like this:
 
-    user@GLUDB:~/gludb $ docs/make_docs.sh api
-    user@GLUDB:~/gludb $ ./build.sh
-    user@GLUDB:~/gludb $ git add -A
-    user@GLUDB:~/gludb $ git commit -m "release 1.1.1"
-    user@GLUDB:~/gludb $ git tag -a -m "tagging 1.1.1" v1.1.1
-    user@GLUDB:~/gludb $ git push --all
-    user@GLUDB:~/gludb $ git push --tags
+````
+user@GLUDB:~/gludb $ docs/make_docs.sh api
+user@GLUDB:~/gludb $ ./build.sh
+user@GLUDB:~/gludb $ git add -A
+user@GLUDB:~/gludb $ git commit -m "release 1.1.1"
+user@GLUDB:~/gludb $ git tag -a -m "tagging 1.1.1" v1.1.1
+user@GLUDB:~/gludb $ git push --all
+user@GLUDB:~/gludb $ git push --tags
+````
 
 ## Top-level directory contents
 

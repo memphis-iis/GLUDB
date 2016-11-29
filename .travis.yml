@@ -1,3 +1,5 @@
+sudo: false
+dist: trusty
 language: python
 python:
     - "2.7"
@@ -9,13 +11,12 @@ env:
         DATASTORE_HOST="http://localhost:8080"
         DATASTORE_DATASET="gcd-data"
 
-# Travis CI services we use
+# Travis CI services and addons we use
 services:
     - mongodb
     - postgresql
-
 addons:
-    postgresql: "9.4" # someday... "9.5"
+    postgresql: "9.5"
 
 # we have some dev dependencies to install, and we run some services needed for
 # testing. Currently that's dynalite to emulate DynamoDB and gcd to emulate
@@ -23,7 +24,6 @@ addons:
 # ./tests/start_ci_services.sh and ./tests/supervisord.ctl for details. Also
 # note that we use the `sleep 5` hack below to give supervisord time to get
 # the services started
-sudo: false
 install:
     - pip install --upgrade -r dev-requirements.txt
     - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install --upgrade -r dev-requirements-27.txt; fi
