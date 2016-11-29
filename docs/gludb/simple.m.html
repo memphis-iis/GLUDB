@@ -4,11 +4,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>gludb.simple API documentation</title>
-    <meta name="description" content="gludb.simple
+    <meta name="description" content="gludb.simple Provides the simplest possible interface to our functionality.
 
-Provides the simplest possible interface to our functionality.
-
-We provide a simple an..." />
+We provide a simple ann..." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -1011,8 +1009,7 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">gludb.simple</span> module</h1>
-  <p>gludb.simple</p>
-<p>Provides the simplest possible interface to our functionality.</p>
+  <p>gludb.simple Provides the simplest possible interface to our functionality.</p>
 <p>We provide a simple annotation to create classes with fields (with optional
 default values), parameterized constructors, persistence, and data operations.
 You are free to derive from any object you wish. See gludb.data if you need
@@ -1052,9 +1049,7 @@ you should use <code>Field(default=dict)</code>.</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.simple', this);">Show source &equiv;</a></p>
   <div id="source-gludb.simple" class="source">
-    <pre><code>"""gludb.simple
-
-Provides the simplest possible interface to our functionality.
+    <pre><code>"""gludb.simple Provides the simplest possible interface to our functionality.
 
 We provide a simple annotation to create classes with fields (with optional
 default values), parameterized constructors, persistence, and data operations.
@@ -1096,28 +1091,31 @@ a function that will be called to retreive a default value. In this example
 you should use `Field(default=dict)`.
 """
 
+# pylama:ignore=D204,D213,D401
+
 import json
 
+from .config import apply_db_application_prefix
 from .utils import now_field
 from .data import Storable, DatabaseEnabled, orig_version
 from .versioning import VersioningTypes, record_diff, append_diff_hist
 
 
 class _NO_VAL:
-    """Simple helper we use instead of None (in case they want to use a default
-    value of None)."""
+    """Simple helper we use instead of None."""
     pass
 
 
 class Field(object):
-    """Support for class-level field declaration.
-    """
+    """Support for class-level field declaration."""
+
     def __init__(self, default=''):
+        """Ctor - should have a default (default is empty string)."""
         self.name = None
         self.default = default
 
     def get_default_val(self):
-        """Helper to expand default value (support callables)"""
+        """Helper to expand default value (support callables)."""
         val = self.default
         while callable(val):
             val = val()
@@ -1125,8 +1123,7 @@ class Field(object):
 
 
 def _auto_init(self, *args, **kwrds):
-    """Our decorator will add this as __init__ to target classes
-    """
+    """Our decorator will add this as __init__ to target classes."""
     for fld in getattr(self, '__fields__', []):
         val = kwrds.get(fld.name, _NO_VAL)
         if val is _NO_VAL:
@@ -1141,8 +1138,10 @@ def _auto_init(self, *args, **kwrds):
 # comparison between _auto_init and a replaced __init__)
 _auto_init._clobber_ok = True
 
+
 # Actual check for an overridable __init__ given a class
 def ctor_overridable(cls):
+    """Return true if cls has on overridable __init__."""
     prev_init = getattr(cls, "__init__", None)
     if not callable(prev_init):
         return True
@@ -1156,7 +1155,7 @@ def ctor_overridable(cls):
 
 
 def _get_table_name(cls):
-    return cls.__table_name__
+    return apply_db_application_prefix(cls.__table_name__)
 
 
 def _get_id(self):
@@ -1306,12 +1305,15 @@ def DBObject(table_name, versioning=VersioningTypes.NONE):
 
 
 def Index(func):
-    """Marks instance methods of a DBObject-decorated class as being used for
+    """Decorator to mark function as index.
+
+    Marks instance methods of a DBObject-decorated class as being used for
     indexing. The function name is used as the index name, and the return
     value is used as the index value.
 
     Note that callables are call recursively so in theory you can return
-    a function which will be called to get the index value"""
+    a function which will be called to get the index value.
+    """
     func.is_index = True
     return func
 </code></pre>
@@ -1416,21 +1418,25 @@ def Index(func):
 
     
   
-    <div class="desc"><p>Marks instance methods of a DBObject-decorated class as being used for
+    <div class="desc"><p>Decorator to mark function as index.</p>
+<p>Marks instance methods of a DBObject-decorated class as being used for
 indexing. The function name is used as the index name, and the return
 value is used as the index value.</p>
 <p>Note that callables are call recursively so in theory you can return
-a function which will be called to get the index value</p></div>
+a function which will be called to get the index value.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.simple.Index', this);">Show source &equiv;</a></p>
   <div id="source-gludb.simple.Index" class="source">
     <pre><code>def Index(func):
-    """Marks instance methods of a DBObject-decorated class as being used for
+    """Decorator to mark function as index.
+
+    Marks instance methods of a DBObject-decorated class as being used for
     indexing. The function name is used as the index name, and the return
     value is used as the index value.
 
     Note that callables are call recursively so in theory you can return
-    a function which will be called to get the index value"""
+    a function which will be called to get the index value.
+    """
     func.is_index = True
     return func
 </code></pre>
@@ -1448,10 +1454,12 @@ a function which will be called to get the index value</p></div>
 
     
   
+    <div class="desc"><p>Return true if cls has on overridable <strong>init</strong>.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.simple.ctor_overridable', this);">Show source &equiv;</a></p>
   <div id="source-gludb.simple.ctor_overridable" class="source">
     <pre><code>def ctor_overridable(cls):
+    """Return true if cls has on overridable __init__."""
     prev_init = getattr(cls, "__init__", None)
     if not callable(prev_init):
         return True
@@ -1480,14 +1488,15 @@ a function which will be called to get the index value</p></div>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.simple.Field', this);">Show source &equiv;</a></p>
   <div id="source-gludb.simple.Field" class="source">
     <pre><code>class Field(object):
-    """Support for class-level field declaration.
-    """
+    """Support for class-level field declaration."""
+
     def __init__(self, default=''):
+        """Ctor - should have a default (default is empty string)."""
         self.name = None
         self.default = default
 
     def get_default_val(self):
-        """Helper to expand default value (support callables)"""
+        """Helper to expand default value (support callables)."""
         val = self.default
         while callable(val):
             val = val()
@@ -1534,10 +1543,12 @@ a function which will be called to get the index value</p></div>
 
     
   
+    <div class="desc"><p>Ctor - should have a default (default is empty string).</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.simple.Field.__init__', this);">Show source &equiv;</a></p>
   <div id="source-gludb.simple.Field.__init__" class="source">
     <pre><code>def __init__(self, default=''):
+    """Ctor - should have a default (default is empty string)."""
     self.name = None
     self.default = default
 </code></pre>
@@ -1555,12 +1566,12 @@ a function which will be called to get the index value</p></div>
 
     
   
-    <div class="desc"><p>Helper to expand default value (support callables)</p></div>
+    <div class="desc"><p>Helper to expand default value (support callables).</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.simple.Field.get_default_val', this);">Show source &equiv;</a></p>
   <div id="source-gludb.simple.Field.get_default_val" class="source">
     <pre><code>def get_default_val(self):
-    """Helper to expand default value (support callables)"""
+    """Helper to expand default value (support callables)."""
     val = self.default
     while callable(val):
         val = val()

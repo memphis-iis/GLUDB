@@ -1,5 +1,12 @@
 # GLUDB Release Notes
 
+## 0.2.0
+
+PostgreSQL backend is working and getting test coverage in Travis-CI. GLUDB is
+now in production at least 3 different organizations and working fine. That
+means we're bumping to 0.2.0 and moving our Development Status (see
+`setup.py`) from Alpha to Beta.
+
 ## v0.1.7
 
 Support for `delete` in sqlite and mongodb. There is no support for deleting in

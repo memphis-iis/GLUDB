@@ -32,6 +32,7 @@ stores supported are:
 -  DynamoDB
 -  Google Cloud Datastore
 -  MongoDB
+-  PostgreSQL (version 9.5 and greater)
 
 Installing
 ----------
@@ -53,7 +54,7 @@ functionality you want to use:
 setup.py includes these dependencies so that you can install them all at
 the same time (assuming a decently recent version of pip). As an
 example, you could install gludb and the dependencies needed for
-dynamodb and backup support into a virtualenv using Python 3 like this:
+DynamoDB and backup support into a virtualenv using Python 3 like this:
 
 ::
 

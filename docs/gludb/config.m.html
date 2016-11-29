@@ -976,10 +976,14 @@ table {
     <li class="set"><h3><a href="#header-functions">Functions</a></h3>
       
   <ul>
+    <li class="mono"><a href="#gludb.config.apply_db_application_prefix">apply_db_application_prefix</a></li>
     <li class="mono"><a href="#gludb.config.class_database">class_database</a></li>
     <li class="mono"><a href="#gludb.config.clear_database_config">clear_database_config</a></li>
     <li class="mono"><a href="#gludb.config.default_database">default_database</a></li>
+    <li class="mono"><a href="#gludb.config.get_db_application_prefix">get_db_application_prefix</a></li>
+    <li class="mono"><a href="#gludb.config.get_db_application_sep">get_db_application_sep</a></li>
     <li class="mono"><a href="#gludb.config.get_mapping">get_mapping</a></li>
+    <li class="mono"><a href="#gludb.config.set_db_application_prefix">set_db_application_prefix</a></li>
   </ul>
 
     </li>
@@ -1105,8 +1109,13 @@ would work *sort of*. Some notes:
   would be the last thing checked before the actual default.
 """
 
+# pylama:ignore=D213
+
 from inspect import getmro
 from importlib import import_module
+
+_APPLICATION_PREFIX = None
+_APPLICATION_SEP = '_'
 
 
 class Database(object):
@@ -1206,6 +1215,32 @@ def clear_database_config():
 def get_mapping(cls, no_mapping_ok=False):
     """Return a database config object for the given class."""
     return _database_mapping.get_mapping(cls, no_mapping_ok)
+
+
+def apply_db_application_prefix(name):
+    """Return name with app prefix if necessary."""
+    if _APPLICATION_PREFIX is not None:
+        return _APPLICATION_SEP.join([_APPLICATION_PREFIX, name])
+    else:
+        return name
+
+
+def get_db_application_prefix():
+    """Global application prefix accessor."""
+    return _APPLICATION_PREFIX
+
+
+def get_db_application_sep():
+    """Global application separator accessor."""
+    return _APPLICATION_SEP
+
+
+def set_db_application_prefix(prefix, sep=None):
+    """Set the global app prefix and separator."""
+    global _APPLICATION_PREFIX, _APPLICATION_SEP
+    _APPLICATION_PREFIX = prefix
+    if (sep is not None):
+        _APPLICATION_SEP = sep
 </code></pre>
   </div>
 
@@ -1214,6 +1249,31 @@ def get_mapping(cls, no_mapping_ok=False):
   <section id="section-items">
 
     <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="gludb.config.apply_db_application_prefix">
+    <p>def <span class="ident">apply_db_application_prefix</span>(</p><p>name)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Return name with app prefix if necessary.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.apply_db_application_prefix', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.config.apply_db_application_prefix" class="source">
+    <pre><code>def apply_db_application_prefix(name):
+    """Return name with app prefix if necessary."""
+    if _APPLICATION_PREFIX is not None:
+        return _APPLICATION_SEP.join([_APPLICATION_PREFIX, name])
+    else:
+        return name
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
       
   <div class="item">
     <div class="name def" id="gludb.config.class_database">
@@ -1290,6 +1350,50 @@ def get_mapping(cls, no_mapping_ok=False):
   
       
   <div class="item">
+    <div class="name def" id="gludb.config.get_db_application_prefix">
+    <p>def <span class="ident">get_db_application_prefix</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Global application prefix accessor.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.get_db_application_prefix', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.config.get_db_application_prefix" class="source">
+    <pre><code>def get_db_application_prefix():
+    """Global application prefix accessor."""
+    return _APPLICATION_PREFIX
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="gludb.config.get_db_application_sep">
+    <p>def <span class="ident">get_db_application_sep</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Global application separator accessor.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.get_db_application_sep', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.config.get_db_application_sep" class="source">
+    <pre><code>def get_db_application_sep():
+    """Global application separator accessor."""
+    return _APPLICATION_SEP
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="gludb.config.get_mapping">
     <p>def <span class="ident">get_mapping</span>(</p><p>cls, no_mapping_ok=False)</p>
     </div>
@@ -1304,6 +1408,31 @@ def get_mapping(cls, no_mapping_ok=False):
     <pre><code>def get_mapping(cls, no_mapping_ok=False):
     """Return a database config object for the given class."""
     return _database_mapping.get_mapping(cls, no_mapping_ok)
+</code></pre>
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="gludb.config.set_db_application_prefix">
+    <p>def <span class="ident">set_db_application_prefix</span>(</p><p>prefix, sep=None)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Set the global app prefix and separator.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.config.set_db_application_prefix', this);">Show source &equiv;</a></p>
+  <div id="source-gludb.config.set_db_application_prefix" class="source">
+    <pre><code>def set_db_application_prefix(prefix, sep=None):
+    """Set the global app prefix and separator."""
+    global _APPLICATION_PREFIX, _APPLICATION_SEP
+    _APPLICATION_PREFIX = prefix
+    if (sep is not None):
+        _APPLICATION_SEP = sep
 </code></pre>
   </div>
 </div>

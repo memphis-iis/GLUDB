@@ -16,7 +16,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='gludb',
-    version='0.1.7',
+    version='0.2.0',
     description='A simple database wrapper',
     long_description=long_description,
     url='https://github.com/memphis-iis/GLUDB',
@@ -25,7 +25,7 @@ setup(
     license='Apache Version 2.0',
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         'Intended Audience :: Developers',
 
@@ -41,6 +41,7 @@ setup(
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
     ],
 
     keywords='database versioning backup'

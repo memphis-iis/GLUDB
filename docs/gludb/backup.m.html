@@ -1697,13 +1697,12 @@ strings will be used</p></div>
 
     
   
-    <div class="desc"><p>Our decorator will add this as <strong>init</strong> to target classes</p></div>
+    <div class="desc"><p>Our decorator will add this as <strong>init</strong> to target classes.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.__init__', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backup.Backup.__init__" class="source">
     <pre><code>def _auto_init(self, *args, **kwrds):
-    """Our decorator will add this as __init__ to target classes
-    """
+    """Our decorator will add this as __init__ to target classes."""
     for fld in getattr(self, '__fields__', []):
         val = kwrds.get(fld.name, _NO_VAL)
         if val is _NO_VAL:
@@ -2008,7 +2007,7 @@ backup.add_package('subpackage', parent_pkg='toppackage')</code></p></div>
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-gludb.backup.Backup.get_table_name', this);">Show source &equiv;</a></p>
   <div id="source-gludb.backup.Backup.get_table_name" class="source">
     <pre><code>def _get_table_name(cls):
-    return cls.__table_name__
+    return apply_db_application_prefix(cls.__table_name__)
 </code></pre>
   </div>
 </div>
